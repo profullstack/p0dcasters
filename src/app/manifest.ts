@@ -9,9 +9,19 @@ import type { MetadataRoute } from "next";
  * to the 80% safe zone. Regenerate them from src/app/favicon.png if the mark
  * changes — the size-named icons come out of the favicon generator, these
  * two do not.
+ *
+ * Nothing below 128px belongs in here. The manifest icon list is what a
+ * launcher picks the home screen icon from, and the 16/32/48 entries that used
+ * to lead it are favicon sizes: a picker that walks the list in order rather
+ * than by area lands on a 16px image and draws a blurred smudge. Favicons are
+ * declared in layout.tsx, where they belong, and only there.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    // Pinned so the install identity survives a future change to start_url.
+    // Without it a launcher keys the installed app on start_url and a change
+    // there orphans the existing install instead of updating it.
+    id: "/",
     name: "p0dcasters — the independent podcast directory",
     short_name: "p0dcasters",
     description:
@@ -23,9 +33,6 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#fbfaf7",
     categories: ["entertainment", "news", "music"],
     icons: [
-      { src: "/icons/icon-16x16.png", sizes: "16x16", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-48x48.png", sizes: "48x48", type: "image/png", purpose: "any" },
       { src: "/icons/icon-128x128.png", sizes: "128x128", type: "image/png", purpose: "any" },
       { src: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-256x256.png", sizes: "256x256", type: "image/png", purpose: "any" },

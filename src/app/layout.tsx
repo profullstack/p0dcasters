@@ -5,6 +5,7 @@ import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
 import AdRescan from "@/components/AdRescan";
+import ServiceWorker from "@/components/ServiceWorker";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
@@ -26,7 +27,10 @@ export const metadata: Metadata = {
   // the src/app/manifest.ts route, which Next links on its own.
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "48x48" },
+      // The .ico really does hold 16 and 32 and nothing else. It was declared
+      // as 48x48 — Next's own default for the file — which is a size no
+      // browser then finds inside it.
+      { url: "/favicon.ico", sizes: "16x16 32x32" },
       { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
       { url: "/icons/favicon-16.png", type: "image/png", sizes: "16x16" },
       { url: "/icons/icon-192x192.png", type: "image/png", sizes: "192x192" },
@@ -44,7 +48,13 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   other: {
-    // no mobile-web-app-capable here — appleWebApp.capable above already emits it
+    // appleWebApp.capable does NOT emit apple-mobile-web-app-capable. Next
+    // 15.5 emits the unprefixed mobile-web-app-capable for it and nothing
+    // else (lib/metadata/generate/basic.tsx), and Safari reads only the
+    // prefixed name — so iOS was told nothing and added the site as a plain
+    // Safari bookmark, which is drawn from a page snapshot rather than the
+    // touch icon. Set by hand until Next emits both.
+    "apple-mobile-web-app-capable": "yes",
     "msapplication-TileColor": "#fbfaf7",
     "msapplication-config": "/browserconfig.xml",
     "msapplication-TileImage": "/icons/icon-256x256.png",
@@ -135,6 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <Script src="https://crawlproof.com/ad.js" strategy="afterInteractive" />
         <AdRescan />
+        <ServiceWorker />
       </body>
     </html>
   );
