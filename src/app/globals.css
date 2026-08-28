@@ -166,7 +166,15 @@ footer.site a { color: var(--muted); text-decoration: underline; }
 @media (max-width: 640px) {
   .show { grid-template-columns: 1fr; gap: 20px; }
   .show img.art { width: 150px; height: 150px; }
-  header.site nav { gap: 13px; font-size: 13px; }
+  /* At 390px the brand plus five links do not fit on one line. The nav used to
+     shrink until "Sign in" broke across two lines and hung under the edge; give
+     it its own row instead. */
+  header.site .inner { flex-wrap: wrap; gap: 6px 13px; padding: 11px 20px; }
+  header.site nav {
+    gap: 13px; font-size: 13px;
+    width: 100%; margin-left: 0; justify-content: space-between;
+  }
+  header.site nav a { white-space: nowrap; }
 }
 
 .art-fallback {
