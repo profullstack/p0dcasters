@@ -19,6 +19,28 @@ rows=cur.execute(f"""SELECT id,url,title,link,itunesAuthor,itunesOwnerName,expli
  newestEnclosureDuration FROM live WHERE {F}""").fetchall()
 print(f"candidates: {len(rows):,}")
 
+
+# The Podcast Index `host` column sometimes holds a bare public suffix ("co.nz",
+# "com.br") instead of the registrable domain. Those rows are mis-attributed and
+# they duplicate the correctly-hosted copy of the same show under a second
+# "host", which the dedupe below cannot see. Re-derive from the feed URL.
+PUBLIC_SUFFIX = {
+ "co.uk","com.br","org.au","com.au","org.uk","co.il","com.tr","co.jp","co.za","or.jp",
+ "com.ar","com.mx","net.au","co.kr","co.nz","com.co","com.ua","ne.jp","com.tw","com.pl",
+ "co.in","com.es","com.pe","com.ve","co.id","com.sg","com.hk","com.my","com.ph","com.vn",
+ "go.jp","ac.uk","net.br","org.br","gov.uk","com.cn","net.nz","org.nz","com.ng","co.ke",
+ "com.pk","org.za",
+}
+
+def real_host(host, url):
+    h = (host or "").lower().strip()
+    if h and h not in PUBLIC_SUFFIX:
+        return h
+    from urllib.parse import urlsplit
+    net = urlsplit(url).netloc.lower().split(":")[0]
+    net = re.sub(r"^www\.", "", net)
+    return net or h
+
 def slugify(s, maxlen=60):
     s=unicodedata.normalize("NFKD",s)
     s=s.encode("ascii","ignore").decode("ascii").lower()
@@ -57,6 +79,7 @@ for r in rows:
     depth=math.log1p(min(ec,500))
     longevity=math.log1p((span or 0)/30.0)      # rewards feeds running for months/years
     score=round(depth*fresh + longevity*0.5,4)
+    host=real_host(host,url)
     cats=[c for c in (c1,c2,c3,c4,c5) if c]
     base=slugify(title) or f"podcast"
     s=base
@@ -67,6 +90,17 @@ for r in rows:
                  lang,lb,(c1 or None),",".join(cats),ec,npd,opd,co,enc,dur,gen,per_week,score))
 
 out.executemany("INSERT INTO podcasts VALUES(" + ",".join("?"*25) + ")", kept)
+# Collapse entries a reader cannot tell apart: same domain, same title, same
+# episode count, same latest episode. Sites that publish per-category feeds emit
+# a dozen of these with identical metadata. Keeping the shortest feed_url picks
+# the canonical top-level feed. Deliberately NOT keyed on (host,title) alone --
+# some stations run many distinct programmes under one generic title.
+out.execute("""DELETE FROM podcasts WHERE id NOT IN (
+  SELECT id FROM (SELECT id, ROW_NUMBER() OVER (
+      PARTITION BY host, LOWER(TRIM(title)), episode_count, newest_pubdate
+      ORDER BY LENGTH(feed_url), id) rn FROM podcasts) WHERE rn = 1)""")
+print("after dedupe:", out.execute("SELECT COUNT(*) FROM podcasts").fetchone()[0])
+
 out.execute("CREATE UNIQUE INDEX i_slug ON podcasts(slug)")
 out.execute("CREATE INDEX i_cat ON podcasts(category)")
 out.execute("CREATE INDEX i_lang ON podcasts(lang_base)")

@@ -4,7 +4,7 @@ A directory of podcasts that live on their own domain.
 
 Of the 4.7M feeds in the [Podcast Index](https://podcastindex.org), ~40% sit on Anchor
 alone and the ten largest hosts carry about three quarters of everything. This lists the
-remainder: **22,386 shows on 13,397 distinct domains**, each publishing from a domain its
+remainder: **21,628 shows on 13,408 distinct domains**, each publishing from a domain its
 creator controls.
 
 ## Inclusion rules
@@ -36,3 +36,13 @@ syntax and would otherwise 500.
 python3 ../p0dcasters-data/export_indie.py    # writes p0dcasters.db
 turso db shell p0dcasters < dump.sql
 ```
+
+## Data-quality fixes applied
+
+- **Duplicate listings.** Collapsed entries sharing domain + title + episode count +
+  latest episode — sites that publish per-category feeds emit a dozen with identical
+  metadata. Deliberately *not* keyed on (host, title) alone: some stations run many
+  distinct programmes under one generic title.
+- **Bare public-suffix hosts.** The Podcast Index `host` column sometimes holds `co.nz` or
+  `com.br` rather than the registrable domain, which both mis-attributes the show and
+  duplicates it under a second "host". Re-derived from the feed URL.
