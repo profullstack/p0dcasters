@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </footer>
           </PlayerProvider>
         </SessionProvider>
+              <Script data-site="e06bdaf4-e0f0-4e13-873a-21277fd6abd3" src="https://crawlproof.com/stats.js" strategy="afterInteractive" />
       </body>
     </html>
   );
