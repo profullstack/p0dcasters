@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { all, count } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { languageName } from "@/lib/format";
 import Link from "next/link";
 
@@ -43,6 +46,10 @@ export default async function Language({
   );
   const pages = Math.ceil(total / PER);
 
+  // Same shape as a category listing — see there for why the break goes
+  // between two grids rather than inside one.
+  const split = rows.length > AD_GRID_SPLIT + 3 ? AD_GRID_SPLIT : 0;
+
   return (
     <div className="wrap">
       <section>
@@ -52,11 +59,22 @@ export default async function Language({
         <p style={{ color: "var(--muted)", margin: "0 0 22px" }}>
           {total.toLocaleString()} independent shows
         </p>
+        <Ad format={AD_TEXT} />
         <div className="grid">
-          {rows.map((p) => (
+          {(split ? rows.slice(0, split) : rows).map((p) => (
             <Card key={p.id} p={p} />
           ))}
         </div>
+        {split > 0 && (
+          <>
+            <Ad format={AD_TEXT} />
+            <div className="grid">
+              {rows.slice(split).map((p) => (
+                <Card key={p.id} p={p} />
+              ))}
+            </div>
+          </>
+        )}
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
@@ -74,6 +92,7 @@ export default async function Language({
             )}
           </div>
         )}
+        <AdBanner />
       </section>
     </div>
   );

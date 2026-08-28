@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { all } from "@/lib/db";
 import { titleCase, languageName } from "@/lib/format";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
 export const revalidate = 300;
@@ -30,6 +33,9 @@ export default async function Browse() {
           ))}
         </div>
       </section>
+      {/* Between the two chip walls — the natural break on this page, and the
+          one place a unit is not competing with a heading. */}
+      <Ad format={AD_TEXT} />
       <section>
         <h2 className="sec">Languages</h2>
         <div className="chips">
@@ -40,6 +46,7 @@ export default async function Browse() {
           ))}
         </div>
       </section>
+      <AdBanner />
     </div>
   );
 }

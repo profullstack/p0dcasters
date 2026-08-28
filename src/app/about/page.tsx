@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { all, count } from "@/lib/db";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_MREC } from "@/lib/ads";
 
 export const revalidate = 86400;
 export const metadata: Metadata = {
@@ -48,6 +51,10 @@ export default async function About() {
           </li>
         </ul>
 
+        {/* One rectangle, at a section break well into the piece — someone
+            still reading here has settled in. */}
+        <Ad format={AD_MREC} />
+
         <h2>Why not just rank by popularity</h2>
         <p>
           The obvious move is to rank feeds by how popular their domain is. It doesn't work:
@@ -72,6 +79,7 @@ export default async function About() {
           import. Nothing here is hosted by us: every link points at the publisher.
         </p>
       </section>
+      <AdBanner />
     </div>
   );
 }

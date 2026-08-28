@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { all } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { tokenise, ftsQuery } from "@/lib/search";
 
 export const metadata: Metadata = {
@@ -31,6 +34,10 @@ export default async function Search({
   const query = (q || "").trim();
   const results = query ? await search(query) : [];
 
+  // Only once a search has actually returned a run of shows. An empty search
+  // page is a form, and a form is not a place to sell anything.
+  const split = results.length > AD_GRID_SPLIT + 3 ? AD_GRID_SPLIT : 0;
+
   return (
     <div className="wrap">
       <section>
@@ -56,11 +63,24 @@ export default async function Search({
               : `Nothing found for “${query}”`}
           </h2>
           {results.length ? (
-            <div className="grid">
-              {results.map((p) => (
-                <Card key={p.id} p={p} />
-              ))}
-            </div>
+            <>
+              <Ad format={AD_TEXT} />
+              <div className="grid">
+                {(split ? results.slice(0, split) : results).map((p) => (
+                  <Card key={p.id} p={p} />
+                ))}
+              </div>
+              {split > 0 && (
+                <>
+                  <Ad format={AD_TEXT} />
+                  <div className="grid">
+                    {results.slice(split).map((p) => (
+                      <Card key={p.id} p={p} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           ) : (
             <p className="empty">
               No independent show matches that. The directory only covers self-hosted
@@ -69,6 +89,7 @@ export default async function Search({
           )}
         </section>
       )}
+      <AdBanner />
     </div>
   );
 }

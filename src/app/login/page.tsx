@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
+import AdBanner from "@/components/AdBanner";
 import { currentUser } from "@/lib/auth/session";
 import { safeNext } from "@/lib/auth/next";
 
@@ -23,6 +24,9 @@ export default async function Login({
   return (
     <div className="wrap narrow">
       <AuthForm mode="login" next={next} expired={params.expired === "1"} />
+      {/* Under the form, never beside it. Nothing on a sign-in page should
+          compete with the one thing the reader is here to do. */}
+      <AdBanner />
     </div>
   );
 }

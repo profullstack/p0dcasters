@@ -6,6 +6,9 @@ import type { Podcast } from "@/lib/db";
 import { currentUser } from "@/lib/auth/session";
 import Card from "@/components/Card";
 import FollowingFeed from "@/components/FollowingFeed";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_TEXT } from "@/lib/ads";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +40,7 @@ export default async function Following() {
             Browse the directory
           </Link>
         </p>
+        <AdBanner />
       </div>
     );
   }
@@ -57,6 +61,11 @@ export default async function Following() {
         }))}
       />
 
+      {/* Below the new-episode feed, above the library. This page is a
+          reader's own collection, so it gets the quietest unit there is and
+          nothing else. */}
+      <Ad format={AD_TEXT} />
+
       <section>
         <h2 className="sec">Your shows</h2>
         <div className="grid">
@@ -65,6 +74,8 @@ export default async function Following() {
           ))}
         </div>
       </section>
+
+      <AdBanner />
     </div>
   );
 }

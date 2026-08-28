@@ -5,6 +5,7 @@ import { count } from "@/lib/db";
 import { currentUser } from "@/lib/auth/session";
 import { credentialsFor } from "@/lib/auth/passkey";
 import PasskeyManager from "@/components/PasskeyManager";
+import AdBanner from "@/components/AdBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +77,10 @@ export default async function Account() {
           </button>
         </form>
       </section>
+
+      {/* Settings pages get the foot banner and nothing else — every control on
+          this page is one the reader came here to press. */}
+      <AdBanner />
     </div>
   );
 }

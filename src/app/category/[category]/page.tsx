@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { all, count } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { titleCase } from "@/lib/format";
 import Link from "next/link";
 
@@ -44,6 +47,10 @@ export default async function Category({
   );
   const pages = Math.ceil(total / PER);
 
+  // The break falls between two runs of cards rather than inside one, so the
+  // unit sits in its own full-width band and cannot distort a grid row.
+  const split = rows.length > AD_GRID_SPLIT + 3 ? AD_GRID_SPLIT : 0;
+
   return (
     <div className="wrap">
       <section>
@@ -53,11 +60,22 @@ export default async function Category({
         <p style={{ color: "var(--muted)", margin: "0 0 22px" }}>
           {total.toLocaleString()} independent shows
         </p>
+        <Ad format={AD_TEXT} />
         <div className="grid">
-          {rows.map((p) => (
+          {(split ? rows.slice(0, split) : rows).map((p) => (
             <Card key={p.id} p={p} />
           ))}
         </div>
+        {split > 0 && (
+          <>
+            <Ad format={AD_TEXT} />
+            <div className="grid">
+              {rows.slice(split).map((p) => (
+                <Card key={p.id} p={p} />
+              ))}
+            </div>
+          </>
+        )}
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
@@ -75,6 +93,7 @@ export default async function Category({
             )}
           </div>
         )}
+        <AdBanner />
       </section>
     </div>
   );

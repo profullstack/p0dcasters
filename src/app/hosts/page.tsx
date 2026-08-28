@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { all } from "@/lib/db";
+import Ad from "@/components/Ad";
+import AdBanner from "@/components/AdBanner";
+import { adPlan, AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
 export const revalidate = 300;
@@ -15,6 +18,11 @@ export default async function Hosts() {
     `SELECT host, COUNT(*) AS n, SUM(episode_count) AS eps
      FROM podcasts GROUP BY host ORDER BY n DESC, eps DESC LIMIT 300`,
   );
+
+  // A stack of 300 compact rows. text_link is the only format that belongs in
+  // it — a rectangle here would break the column in half.
+  const ads = adPlan(rows.length, { first: 13, every: 40, max: 3, formats: [AD_TEXT] });
+
   return (
     <div className="wrap">
       <section>
@@ -25,7 +33,9 @@ export default async function Hosts() {
           are excluded by construction.
         </p>
         <div className="rows">
-          {rows.map((h) => (
+          {rows.flatMap((h, i) => {
+            const format = ads.get(i);
+            const row = (
             <Link className="row" key={h.host} href={`/search?q=${encodeURIComponent(h.host)}`}>
               <div style={{ minWidth: 0 }}>
                 <p className="t" style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 14.5 }}>
@@ -37,8 +47,11 @@ export default async function Hosts() {
                 </p>
               </div>
             </Link>
-          ))}
+            );
+            return format ? [row, <Ad key={`ad-${i}`} format={format} />] : [row];
+          })}
         </div>
+        <AdBanner />
       </section>
     </div>
   );

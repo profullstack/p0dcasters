@@ -354,3 +354,43 @@ body:has(.player) footer.site { padding-bottom: 122px; }
 }
 
 .btn.ghosted { opacity: .45; pointer-events: none; }
+
+/* ------------------------------------------------------------------- ads */
+
+/* Every unit collapses to nothing until ad.js reports a fill, so an unsold or
+   ad-blocked position leaves no hole — and reserving the box only under
+   [data-cp-filled] means it costs no layout shift either. ad.js sets that
+   attribute the moment it starts the request and removes it again if the
+   response comes back empty, so all three states come out right.
+
+   Heights are the creative plus ~16px for the "Advertisement" caption ad.js
+   prepends. No label of our own: the banners get that caption and the text
+   link carries its own "Sponsored" inside the frame. */
+.ad { display: block; width: 100%; margin: 0 auto; }
+.ad[data-cp-filled] { margin: 34px auto; }
+
+/* ad.js gives the frame display:block inline but no margin, so this is what
+   centres a 300px creative in a wider column. */
+.ad > iframe { margin-left: auto; margin-right: auto; }
+
+.ad-text_link[data-cp-filled] { min-height: 40px; margin: 26px auto; }
+
+.ad-banner_300x250[data-cp-filled] { min-height: 266px; max-width: 300px; }
+
+/* The responsive unit. Two heights because <AdBanner> picks between a 320x50
+   and a 728x90 at that same breakpoint — see the component for why it is one
+   element and not two. */
+.ad-banner[data-cp-filled] { min-height: 66px; }
+
+@media (min-width: 48rem) {
+  .ad-banner[data-cp-filled] { min-height: 106px; max-width: 728px; }
+}
+
+/* Nothing goes inside .grid. A listing breaks between two grids instead, so
+   the unit gets its own full-width band — a 266px cell in a row of ~100px
+   cards forces the whole row to match it and leaves card-shaped holes beside
+   it. See src/lib/ads.ts. */
+
+/* A unit sitting in a stack of .row links belongs to the stack, not to the
+   page around it. */
+.rows > .ad[data-cp-filled] { margin: 14px auto; }

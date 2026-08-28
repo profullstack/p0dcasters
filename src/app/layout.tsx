@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
-import Script from "next/script";
+import AdRescan from "@/components/AdRescan";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
@@ -68,12 +69,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </footer>
           </PlayerProvider>
         </SessionProvider>
-              <Script data-site="e06bdaf4-e0f0-4e13-873a-21277fd6abd3" src="https://crawlproof.com/stats.js" strategy="afterInteractive" />
-              <div data-cp-ad="" data-slot="250db6de-f91a-4c9e-802c-0ce68901067e" data-format="banner_300x250" />
-        <div data-cp-ad="" data-slot="250db6de-f91a-4c9e-802c-0ce68901067e" data-format="banner_728x90" />
-        <div data-cp-ad="" data-slot="250db6de-f91a-4c9e-802c-0ce68901067e" data-format="banner_320x50" />
-        <div data-cp-ad="" data-slot="250db6de-f91a-4c9e-802c-0ce68901067e" data-format="text_link" />
+
+        <Script
+          data-site="e06bdaf4-e0f0-4e13-873a-21277fd6abd3"
+          src="https://crawlproof.com/stats.js"
+          strategy="afterInteractive"
+        />
+
+        {/*
+          The ad loader, once for the site. It only ever acts on the
+          [data-cp-ad] positions the pages themselves place (<Ad> and
+          <AdBanner>) — there are deliberately none in here. The generated
+          install dropped all four sizes at the bottom of <body>, which is a
+          unit on the sign-in form and four stacked boxes under every footer;
+          they are placed per page instead.
+
+          <AdRescan> is what makes those positions work at all on a site whose
+          navigation is client side; see the component.
+        */}
         <Script src="https://crawlproof.com/ad.js" strategy="afterInteractive" />
+        <AdRescan />
       </body>
     </html>
   );
