@@ -48,3 +48,33 @@ Drop **only** those two. The same database holds the account tables — `users`,
 `migrate_auth.mjs`, and they must survive every rebuild. This is also why `follows`
 stores a slug rather than a `podcasts.id`: the reload above reassigns ids, so a
 numeric key would come back pointing at somebody else's show.
+## Automatic refresh
+
+`refresh-if-new-dump.sh` does the whole thing above, but only when Podcast Index has
+actually published a new dump. It runs from cron every 6 hours:
+
+```
+0 */6 * * * /bin/sh /home/anthony/p0dcasters/scripts/refresh-if-new-dump.sh
+```
+
+A check is one HEAD request. It compares `last-modified` + `content-length` against
+`~/p0dcasters-data/.last-dump-stamp` and exits immediately when they match, so the
+expensive path runs roughly weekly rather than four times a day.
+
+**Why it is conditional rather than just scheduled.** Inclusion is "published within
+90 days", recomputed at build time. Rebuilding against a dump you have already
+processed only slides the cutoff forward: it drops shows that have gone quiet and adds
+nothing. A plain nightly rebuild would erode the directory a few shows at a time. Run
+on 2026-08-28 against an unchanged dump, it cut 21 of 21,628.
+
+It is ordered so prod is the last thing touched: download (to a `.part` file, moved into
+place only after the length matches), extract, build both databases, then check the new
+build has at least `MIN_ROWS` (default 10,000) rows. Only then are the Turso tables
+dropped and reloaded, and the remote count is compared against the local one before the
+stamp is written. A failure anywhere before that leaves the live directory alone.
+
+Logs go to `~/p0dcasters-data/refresh.log`. `FORCE=1` rebuilds even when the dump has
+not moved; `DRY_RUN=1` reports what it would do and stops before downloading.
+
+If `load_turso.mjs` fails after the drop, the tables are gone and the fix is
+`FORCE=1 sh scripts/refresh-if-new-dump.sh` — the script says so in the failure line.
