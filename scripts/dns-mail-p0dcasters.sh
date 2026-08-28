@@ -29,6 +29,19 @@ SEND_SPF='v=spf1 include:amazonses.com ~all'
 # A bare "forward-email=<address>" is a catch-all for the whole domain.
 FORWARD_TO=${FORWARD_TO:-anthony@profullstack.com}
 
+# Sending *through* Forward Email (SMTP/IMAP) rather than only receiving needs
+# three more records. The root SPF is safe to add unconditionally; the other two
+# carry per-domain values from the Forward Email dashboard and are skipped when
+# unset, so this script stays runnable without them.
+#
+# The root SPF does not affect Resend. SPF is checked against the envelope
+# sender, and Resend's is @send.p0dcasters.com (that is what the "send" MX to
+# feedback-smtp is -- a custom SES MAIL FROM domain), which has its own SPF
+# record. Resend's DKIM signs as d=p0dcasters.com, so DMARC still aligns.
+FE_SPF=${FE_SPF:-v=spf1 include:spf.forwardemail.net -all}
+FE_DKIM=${FE_DKIM:-}                  # value for forwardemail._domainkey
+FE_VERIFICATION=${FE_VERIFICATION:-}  # forward-email-site-verification=<code>
+
 : "${PORKBUN_API_KEY:?set PORKBUN_API_KEY}"
 : "${PORKBUN_SECRET_API_KEY:?set PORKBUN_SECRET_API_KEY}"
 
@@ -103,6 +116,20 @@ echo "Forward Email (receiving, on the root):"
 ensure "" MX mx1.forwardemail.net 10
 ensure "" MX mx2.forwardemail.net 10
 ensure "" TXT "forward-email=$FORWARD_TO"
+
+echo
+echo "Forward Email (sending, on the root):"
+ensure "" TXT "$FE_SPF"
+if [ -n "$FE_DKIM" ]; then
+  ensure forwardemail._domainkey TXT "$FE_DKIM"
+else
+  echo "  SKIP   TXT forwardemail._domainkey.$DOMAIN (FE_DKIM unset)"
+fi
+if [ -n "$FE_VERIFICATION" ]; then
+  ensure "" TXT "forward-email-site-verification=$FE_VERIFICATION"
+else
+  echo "  SKIP   TXT $DOMAIN forward-email-site-verification (FE_VERIFICATION unset)"
+fi
 
 echo
 echo "DMARC (monitor only -- p=none reports without affecting delivery):"
