@@ -74,8 +74,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PlayerProvider>
             <header className="site">
               <div className="inner">
-                <Link className="brand" href="/">
-                  p<span>0</span>dcasters
+                <Link className="brand" href="/" aria-label="p0dcasters home">
+                  {/*
+                    Two files, not one recoloured: the wordmark is dark ink on the
+                    light theme and white on the dark one. <picture> picks before
+                    first paint, so there is no flash and no JS. Both were keyed to
+                    transparency from the masters in src/app — those ship with a
+                    flat background baked in, which drew a rectangle on the header.
+                  */}
+                  <picture>
+                    <source srcSet="/logo-dark.png" media="(prefers-color-scheme: dark)" />
+                    <img src="/logo.png" alt="p0dcasters" width={600} height={100} />
+                  </picture>
                 </Link>
                 <nav>
                   <Link href="/browse">Browse</Link>
