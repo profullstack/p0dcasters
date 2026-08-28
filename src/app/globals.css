@@ -127,6 +127,10 @@ h2.sec {
   padding: 10px 17px; border-radius: var(--radius); font-size: 14.5px;
   border: 1px solid var(--border); background: var(--surface);
   font-family: ui-sans-serif, system-ui, sans-serif;
+  /* A <button> does not inherit colour the way <a> does — without this it
+     falls back to the UA's near-black ButtonText and vanishes on the dark
+     surface. Every non-primary button here is a .btn, so it belongs on .btn. */
+  color: var(--text);
 }
 .btn:hover { border-color: var(--accent); text-decoration: none; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
