@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { suggestEmail } from "@/lib/auth/typo";
 
 /**
  * One implementation behind both /login and /signup. There is no separate
@@ -20,27 +21,48 @@ export default function AuthForm({
 }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [sentTo, setSentTo] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(
     expired ? "That link had already been used, or it expired. Here is another." : null,
   );
   const [error, setError] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
 
-  async function sendLink(e: React.FormEvent) {
+  /**
+   * A near-miss like `.con` is checked here because it cannot be checked
+   * anywhere else: the endpoint deliberately answers the same way for every
+   * address, so a bounced link is indistinguishable from a delivered one. The
+   * guard is a prompt, never a wall — submitting again with the suggestion on
+   * screen sends to the address as typed, so an unfamiliar domain still works.
+   */
+  function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!suggestion) {
+      const near = suggestEmail(email);
+      if (near) {
+        setSuggestion(near);
+        return;
+      }
+    }
+    void send(email);
+  }
+
+  async function send(address: string) {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch("/api/auth/magic", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, next }),
+        body: JSON.stringify({ email: address, next }),
       });
       const body = await res.json();
       if (!res.ok) {
         setError(body.message || "That did not work. Try again.");
       } else {
         setSent(true);
+        setSentTo(address);
         setNote(body.message);
       }
     } catch {
@@ -92,6 +114,23 @@ export default function AuthForm({
           The link works once and expires in 15 minutes. Opening it on this device
           signs you in here.
         </p>
+        {/* Naming the address is the only way a reader can catch a slip they
+            have already made. The endpoint cannot tell them it bounced, so the
+            address they typed is shown back to them instead. */}
+        <p className="muted">
+          Sent to <strong>{sentTo}</strong>.{" "}
+          <button
+            type="button"
+            className="linklike"
+            onClick={() => {
+              setSent(false);
+              setNote(null);
+              setSuggestion(null);
+            }}
+          >
+            Not your address?
+          </button>
+        </p>
       </div>
     );
   }
@@ -107,7 +146,7 @@ export default function AuthForm({
 
       {note && !sent && <p className="auth-note">{note}</p>}
 
-      <form onSubmit={sendLink}>
+      <form onSubmit={submit}>
         <label htmlFor="email">Email address</label>
         <input
           id="email"
@@ -116,10 +155,34 @@ export default function AuthForm({
           autoComplete="email webauthn"
           placeholder="you@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            // Editing the address retracts the question we asked about it.
+            setSuggestion(null);
+          }}
+          aria-describedby={suggestion ? "email-suggestion" : undefined}
         />
+
+        {suggestion && (
+          <p className="auth-note" id="email-suggestion">
+            Did you mean <strong>{suggestion}</strong>?{" "}
+            <button
+              type="button"
+              className="linklike"
+              onClick={() => {
+                setEmail(suggestion);
+                setSuggestion(null);
+                void send(suggestion);
+              }}
+            >
+              Use that instead
+            </button>{" "}
+            — or send it again to use the address as you typed it.
+          </p>
+        )}
+
         <button className="btn primary wide" type="submit" disabled={busy || !email}>
-          {busy ? "Sending…" : mode === "signup" ? "Email me a link" : "Email me a link"}
+          {busy ? "Sending…" : "Email me a link"}
         </button>
       </form>
 

@@ -240,6 +240,11 @@ button.btn:disabled { opacity: .55; cursor: default; }
   padding: 10px 13px; border-radius: 8px; font-size: 14px; margin: 0 0 18px;
 }
 .auth-error { color: var(--accent); font-size: 14.5px; margin-top: 14px; }
+/* A button that has to read as prose, because it sits mid-sentence. */
+.linklike {
+  background: none; border: 0; padding: 0; font: inherit; cursor: pointer;
+  color: var(--accent); text-decoration: underline;
+}
 .auth-swap { margin-top: 28px; font-size: 14.5px; color: var(--muted); }
 .auth-swap a { color: var(--accent); text-decoration: underline; }
 .auth-done { padding: 60px 0; }
