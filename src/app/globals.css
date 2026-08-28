@@ -175,6 +175,21 @@ footer.site a { color: var(--muted); text-decoration: underline; }
     width: 100%; margin-left: 0; justify-content: space-between;
   }
   header.site nav a { white-space: nowrap; }
+
+  /* Touch targets. Measured at 390px: the nav links were 21px tall (bare text),
+     chips 36, the episode play buttons 40, search 41 — all under the 44px floor.
+     Padding rather than min-height, so the box grows around the text instead of
+     leaving it stranded at the top. Confined to this breakpoint: the desktop
+     layout is fine as it is and these paddings would coarsen it.
+     The brand link is deliberately left at 34px — it is 150px wide, so it is not
+     actually hard to hit, and stretching it vertically would either overlap the
+     nav row's hit area or push a sticky header past 100px. */
+  header.site .inner { gap: 0 13px; padding: 8px 20px 4px; }
+  header.site nav a { padding: 12px 0; }
+  .searchbar input, .searchbar button { padding-top: 13px; padding-bottom: 13px; }
+  .chip { padding: 11px 15px; }
+  .btn { padding: 13px 17px; }
+  .btn.small { padding: 10px 12px; }
 }
 
 .art-fallback {
@@ -263,6 +278,12 @@ ol.episodes { list-style: none; padding: 0; margin: 0 0 18px; }
   justify-content: center; margin-top: 2px;
 }
 .episode-play:hover { border-color: var(--accent); background: var(--accent); color: #fff; }
+/* 40px is under the 44px touch floor, and this is the control the site exists
+   for. Has to live below .episode-play rather than in the 640px block further
+   up: same specificity, so the later rule would win and silently undo it. */
+@media (max-width: 640px) {
+  .episode-play { flex: 0 0 44px; width: 44px; height: 44px; }
+}
 .episode-body { min-width: 0; }
 .episode h3 { margin: 0 0 3px; font-size: 16.5px; line-height: 1.35; letter-spacing: -0.01em; }
 .episode-meta {

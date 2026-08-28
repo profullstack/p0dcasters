@@ -38,6 +38,11 @@ export async function generateMetadata({
       description: desc,
       images: [{ url: p.image_url }],
     },
+    // Overrides the layout's summary_large_image. Podcast artwork is square, and
+    // a large card is 1.91:1 — X crops the top and bottom off it. A summary card
+    // shows the square uncropped beside the title. twitter.images stays unset so
+    // it keeps falling back to the openGraph image above.
+    twitter: { card: "summary" },
   };
 }
 
