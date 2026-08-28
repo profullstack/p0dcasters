@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import "./globals.css";
@@ -22,6 +22,42 @@ export const metadata: Metadata = {
       "Podcasts that live on their own domains. Every show here is self-hosted, off the big platforms.",
   },
   twitter: { card: "summary_large_image" },
+  // /favicon.ico and /icons/* are real files under public/; the manifest is
+  // the src/app/manifest.ts route, which Next links on its own.
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icons/favicon-16.png", type: "image/png", sizes: "16x16" },
+      { url: "/icons/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icons/icon-512x512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [180, 152, 144, 120, 114, 76, 72, 60, 57].map((n) => ({
+      url: `/icons/apple-touch-icon-${n}x${n}.png`,
+      sizes: `${n}x${n}`,
+      type: "image/png",
+    })),
+  },
+  appleWebApp: {
+    capable: true,
+    title: "p0dcasters",
+    statusBarStyle: "default",
+  },
+  other: {
+    // no mobile-web-app-capable here — appleWebApp.capable above already emits it
+    "msapplication-TileColor": "#fbfaf7",
+    "msapplication-config": "/browserconfig.xml",
+    "msapplication-TileImage": "/icons/icon-256x256.png",
+  },
+};
+
+// Browser chrome follows the page, which is light/dark by prefers-color-scheme
+// (see globals.css) — a single colour would leave a white bar over a dark page.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#14140f" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
