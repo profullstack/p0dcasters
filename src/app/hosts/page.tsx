@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { all } from "@/lib/db";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Domains",
   description:

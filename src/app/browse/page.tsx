@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { all } from "@/lib/db";
 import { titleCase, languageName } from "@/lib/format";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Browse",
   description: "Browse independent, self-hosted podcasts by subject and language.",

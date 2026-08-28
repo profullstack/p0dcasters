@@ -4,7 +4,7 @@ import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 type CatRow = { category: string; n: number };
 type LangRow = { lang_base: string; n: number };
