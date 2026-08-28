@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { all } from "@/lib/db";
 import { titleCase, languageName } from "@/lib/format";
+import Link from "next/link";
 
 export const revalidate = 300;
 export const metadata: Metadata = {
@@ -23,9 +24,9 @@ export default async function Browse() {
         <h2 className="sec">Subjects</h2>
         <div className="chips">
           {cats.map((c) => (
-            <a className="chip" key={c.category} href={`/category/${c.category}`}>
+            <Link className="chip" key={c.category} href={`/category/${c.category}`}>
               {titleCase(c.category)} <b>{Number(c.n).toLocaleString()}</b>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -33,9 +34,9 @@ export default async function Browse() {
         <h2 className="sec">Languages</h2>
         <div className="chips">
           {langs.map((l) => (
-            <a className="chip" key={l.lang_base} href={`/language/${l.lang_base}`}>
+            <Link className="chip" key={l.lang_base} href={`/language/${l.lang_base}`}>
               {languageName(l.lang_base)} <b>{Number(l.n).toLocaleString()}</b>
-            </a>
+            </Link>
           ))}
         </div>
       </section>

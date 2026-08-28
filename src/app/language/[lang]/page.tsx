@@ -4,6 +4,7 @@ import { all, count } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import { languageName } from "@/lib/format";
+import Link from "next/link";
 
 export const revalidate = 3600;
 const PER = 60;
@@ -59,17 +60,17 @@ export default async function Language({
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
-              <a className="btn" href={`/language/${lang}?page=${pg - 1}`}>
+              <Link className="btn" href={`/language/${lang}?page=${pg - 1}`}>
                 ← Previous
-              </a>
+              </Link>
             )}
             <span className="btn" style={{ borderColor: "transparent" }}>
               {pg} of {pages}
             </span>
             {pg < pages && (
-              <a className="btn" href={`/language/${lang}?page=${pg + 1}`}>
+              <Link className="btn" href={`/language/${lang}?page=${pg + 1}`}>
                 Next →
-              </a>
+              </Link>
             )}
           </div>
         )}

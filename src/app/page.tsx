@@ -3,6 +3,7 @@ import { timeAgo, titleCase, languageName, clamp } from "@/lib/format";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
+import Link from "next/link";
 
 export const revalidate = 300;
 
@@ -70,14 +71,14 @@ export default async function Home() {
         <h2 className="sec">Published this week</h2>
         <div className="rows">
           {fresh.map((p) => (
-            <a className="row" key={p.id} href={`/podcast/${p.slug}`}>
+            <Link className="row" key={p.id} href={`/podcast/${p.slug}`}>
               <Art src={p.image_url} title={p.title} />
               <div style={{ minWidth: 0 }}>
                 <p className="t">{clamp(p.title, 64)}</p>
                 <p className="s">{p.host}</p>
               </div>
               <span className="n">{timeAgo(p.newest_pubdate)}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -86,9 +87,9 @@ export default async function Home() {
         <h2 className="sec">By subject</h2>
         <div className="chips">
           {cats.map((c) => (
-            <a className="chip" key={c.category} href={`/category/${c.category}`}>
+            <Link className="chip" key={c.category} href={`/category/${c.category}`}>
               {titleCase(c.category)} <b>{Number(c.n).toLocaleString()}</b>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -97,9 +98,9 @@ export default async function Home() {
         <h2 className="sec">By language</h2>
         <div className="chips">
           {langs.map((l) => (
-            <a className="chip" key={l.lang_base} href={`/language/${l.lang_base}`}>
+            <Link className="chip" key={l.lang_base} href={`/language/${l.lang_base}`}>
               {languageName(l.lang_base)} <b>{Number(l.n).toLocaleString()}</b>
-            </a>
+            </Link>
           ))}
         </div>
       </section>

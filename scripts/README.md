@@ -42,3 +42,9 @@ when you want the numbers behind the About page.
 echo "DROP TABLE IF EXISTS podcasts_fts; DROP TABLE IF EXISTS podcasts;" | turso db shell p0dcasters
 node scripts/load_turso.mjs
 ```
+
+Drop **only** those two. The same database holds the account tables — `users`,
+`sessions`, `login_tokens`, `credentials`, `follows` — created by
+`migrate_auth.mjs`, and they must survive every rebuild. This is also why `follows`
+stores a slug rather than a `podcasts.id`: the reload above reassigns ids, so a
+numeric key would come back pointing at somebody else's show.

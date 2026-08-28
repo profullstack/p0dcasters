@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { all } from "@/lib/db";
+import Link from "next/link";
 
 export const revalidate = 300;
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default async function Hosts() {
         </p>
         <div className="rows">
           {rows.map((h) => (
-            <a className="row" key={h.host} href={`/search?q=${encodeURIComponent(h.host)}`}>
+            <Link className="row" key={h.host} href={`/search?q=${encodeURIComponent(h.host)}`}>
               <div style={{ minWidth: 0 }}>
                 <p className="t" style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 14.5 }}>
                   {h.host}
@@ -35,7 +36,7 @@ export default async function Hosts() {
                   {Number(h.eps).toLocaleString()} episodes
                 </p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>

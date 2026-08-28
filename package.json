@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.0",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.3",
+    "fast-xml-parser": "^4.5.7",
     "next": "^15.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

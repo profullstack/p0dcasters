@@ -1,9 +1,13 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { all, one } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
+import FollowButton from "@/components/FollowButton";
+import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
 import { timeAgo, cadence, languageName, titleCase, clamp } from "@/lib/format";
 
 export const revalidate = 3600;
@@ -51,6 +55,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
   const cats = (p.categories || "").split(",").filter(Boolean);
   const site = p.link || `https://${p.host}`;
   const rate = cadence(p.per_week);
+  const show = { slug: p.slug, title: p.title, image: p.image_url };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -107,27 +112,39 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
           </div>
 
           <div className="actions">
-            <a className="btn primary" href={p.feed_url} rel="noopener nofollow">
+            <Suspense fallback={<span className="btn primary ghosted">▶ Play latest</span>}>
+              <LatestButton feedUrl={p.feed_url} show={show} />
+            </Suspense>
+            <FollowButton slug={p.slug} />
+            <a className="btn" href={p.feed_url} rel="noopener nofollow">
               RSS feed
             </a>
             <a className="btn" href={site} rel="noopener nofollow">
               Website
             </a>
-            {p.latest_audio && (
-              <a className="btn" href={p.latest_audio} rel="noopener nofollow">
-                Latest episode
-              </a>
-            )}
             {cats.map((c) => (
-              <a className="btn" key={c} href={`/category/${c}`}>
+              <Link className="btn" key={c} href={`/category/${c}`}>
                 {titleCase(c)}
-              </a>
+              </Link>
             ))}
           </div>
 
           <div className="feedurl">{p.feed_url}</div>
         </div>
       </div>
+
+      <section>
+        <Suspense
+          fallback={
+            <>
+              <h2 className="sec">Episodes</h2>
+              <p className="muted">Reading the feed…</p>
+            </>
+          }
+        >
+          <ShowEpisodes feedUrl={p.feed_url} show={show} />
+        </Suspense>
+      </section>
 
       {sameHost.length > 0 && (
         <section>

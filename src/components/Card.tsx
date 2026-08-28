@@ -1,10 +1,11 @@
 import type { Podcast } from "@/lib/db";
 import { timeAgo } from "@/lib/format";
 import Art from "@/components/Art";
+import Link from "next/link";
 
 export default function Card({ p }: { p: Podcast }) {
   return (
-    <a className="card" href={`/podcast/${p.slug}`}>
+    <Link className="card" href={`/podcast/${p.slug}`}>
       <Art src={p.image_url} title={p.title} />
       <div className="meta">
         <h3>{p.title}</h3>
@@ -13,6 +14,6 @@ export default function Card({ p }: { p: Podcast }) {
           {Number(p.episode_count).toLocaleString()} episodes · {timeAgo(p.newest_pubdate)}
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

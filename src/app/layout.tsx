@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
+import { PlayerProvider } from "@/components/Player";
+import { AccountNav, SessionProvider } from "@/components/Session";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
@@ -8,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s · p0dcasters",
   },
   description:
-    "A directory of podcasts that live on their own domains. No Spotify, no Anchor, no Buzzsprout — every show here is self-hosted.",
+    "A directory of podcasts that live on their own domains. No Spotify, no Anchor, no Buzzsprout — every show here is self-hosted. Listen in the browser and follow your favourites.",
   openGraph: {
     type: "website",
     siteName: "p0dcasters",
@@ -22,35 +25,48 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      {/*
+        Every internal link is a next/link on purpose. The player lives in the
+        layout and keeps playing across route changes — but only while the
+        navigation is client side. A plain <a href> tears the document down and
+        takes the audio with it.
+      */}
       <body>
-        <header className="site">
-          <div className="inner">
-            <a className="brand" href="/">
-              p<span>0</span>dcasters
-            </a>
-            <nav>
-              <a href="/browse">Browse</a>
-              <a href="/search">Search</a>
-              <a href="/hosts">Hosts</a>
-              <a href="/about">About</a>
-            </nav>
-          </div>
-        </header>
-        <main>{children}</main>
-        <footer className="site">
-          <div className="wrap">
-            <p>
-              <strong>p0dcasters</strong> — independent, self-hosted podcasts only.
-              Feed metadata from the{" "}
-              <a href="https://podcastindex.org">Podcast Index</a>, filtered to shows
-              that publish from their own domain.
-            </p>
-            <p>
-              <a href="/opml">Full directory as OPML</a> ·{" "}
-              <a href="/sitemap.xml">Sitemap</a> · <a href="/about">How this is built</a>
-            </p>
-          </div>
-        </footer>
+        <SessionProvider>
+          <PlayerProvider>
+            <header className="site">
+              <div className="inner">
+                <Link className="brand" href="/">
+                  p<span>0</span>dcasters
+                </Link>
+                <nav>
+                  <Link href="/browse">Browse</Link>
+                  <Link href="/search">Search</Link>
+                  <Link href="/hosts">Hosts</Link>
+                  <Link href="/about">About</Link>
+                  <AccountNav />
+                </nav>
+              </div>
+            </header>
+            <main>{children}</main>
+            <footer className="site">
+              <div className="wrap">
+                <p>
+                  <strong>p0dcasters</strong> — independent, self-hosted podcasts only.
+                  Feed metadata from the{" "}
+                  <a href="https://podcastindex.org">Podcast Index</a>, filtered to shows
+                  that publish from their own domain.
+                </p>
+                <p>
+                  <Link href="/opml">Full directory as OPML</Link> ·{" "}
+                  <Link href="/sitemap.xml">Sitemap</Link> ·{" "}
+                  <Link href="/about">How this is built</Link> ·{" "}
+                  <Link href="/signup">Create an account</Link>
+                </p>
+              </div>
+            </footer>
+          </PlayerProvider>
+        </SessionProvider>
       </body>
     </html>
   );
