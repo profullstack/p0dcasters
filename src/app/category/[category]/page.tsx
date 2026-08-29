@@ -7,6 +7,7 @@ import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { titleCase } from "@/lib/format";
+import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 import Link from "next/link";
 
 export const revalidate = 3600;
@@ -53,6 +54,19 @@ export default async function Category({
 
   return (
     <div className="wrap">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={jsonLdScript(
+          listingJsonLd({
+            path: `/category/${category}`,
+            name: `${titleCase(cat)} podcasts`,
+            description: `${total.toLocaleString()} independent, self-hosted ${cat} podcasts — every show publishes from a domain its creator controls.`,
+            crumb: titleCase(cat),
+            rows,
+            page: pg,
+          }),
+        )}
+      />
       <section>
         <h1 style={{ fontSize: 30, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
           {titleCase(cat)}

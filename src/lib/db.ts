@@ -1,4 +1,5 @@
 import { createClient, type Client } from "@libsql/client";
+import { normalizeLang } from "@/lib/format";
 
 // Next inlines `process.env.FOO` at build time. Reading through a variable key
 // keeps the lookup dynamic so the value is read from the real runtime env on
@@ -74,4 +75,46 @@ export async function one<T = Podcast>(
 export async function count(sql: string, values: unknown[] = []): Promise<number> {
   const row = await one<{ n: number }>(sql, values);
   return Number(row?.n ?? 0);
+}
+
+// --- languages ------------------------------------------------------------
+//
+// lang_base holds whatever the publisher declared, so one language turns up
+// under several spellings (" en ", "en_US", "engli", "eng"). Everything below
+// groups on the normalised ISO 639-1 code instead, so a language is a single
+// bucket with a single URL — and a URL that would 404 is never linked or
+// sitemapped. See normalizeLang, and the ingest fix in scripts/export_indie.py.
+
+export type LanguageBucket = { code: string; n: number; raw: string[] };
+
+async function rawLanguageRows() {
+  return all<{ lang_base: string; n: number }>(
+    "SELECT lang_base, COUNT(*) AS n FROM podcasts WHERE lang_base IS NOT NULL GROUP BY lang_base",
+  );
+}
+
+/** Every language with a page behind it, most shows first. */
+export async function languageBuckets(): Promise<LanguageBucket[]> {
+  const rows = await rawLanguageRows();
+  const by = new Map<string, LanguageBucket>();
+  for (const r of rows) {
+    const code = normalizeLang(r.lang_base);
+    if (!code) continue; // "und", or a language with no two-letter code
+    const b = by.get(code) ?? { code, n: 0, raw: [] };
+    b.n += Number(r.n);
+    b.raw.push(r.lang_base);
+    by.set(code, b);
+  }
+  return [...by.values()].sort((a, b) => b.n - a.n);
+}
+
+/**
+ * The raw lang_base spellings belonging to one canonical code, for a
+ * `lang_base IN (…)` filter. Empty when the code names no shows.
+ */
+export async function languageVariants(code: string): Promise<string[]> {
+  const want = normalizeLang(code);
+  if (!want) return [];
+  const rows = await rawLanguageRows();
+  return rows.filter((r) => normalizeLang(r.lang_base) === want).map((r) => r.lang_base);
 }
