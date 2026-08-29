@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { all } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import { currentUser } from "@/lib/auth/session";
+import { safeImage } from "@/lib/format";
 import Card from "@/components/Card";
 import FollowingFeed from "@/components/FollowingFeed";
 import Ad from "@/components/Ad";
@@ -56,7 +57,7 @@ export default async function Following() {
         shows={shows.map((s) => ({
           slug: s.slug,
           title: s.title,
-          image: s.image_url,
+          image: safeImage(s.image_url),
           host: s.host,
         }))}
       />

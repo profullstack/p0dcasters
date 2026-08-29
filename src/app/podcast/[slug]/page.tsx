@@ -65,7 +65,9 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
   const cats = (p.categories || "").split(",").filter(Boolean);
   const site = p.link || `https://${p.host}`;
   const rate = cadence(p.per_week);
-  const show = { slug: p.slug, title: p.title, image: p.image_url };
+  // The player's track travels to a client component too, so upgrade it here
+  // rather than leaving an http:// URL in the serialised payload.
+  const show = { slug: p.slug, title: p.title, image: safeImage(p.image_url) };
 
   const url = `https://p0dcasters.com/podcast/${p.slug}`;
   const art = safeImage(p.image_url);
@@ -117,7 +119,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
       />
       <div className="show">
         <div>
-          <Art className="art" src={p.image_url} title={p.title} size={200} />
+          <Art className="art" src={art} title={p.title} size={200} />
         </div>
         <div>
           <h1>{p.title}</h1>

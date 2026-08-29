@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { all, count, languageBuckets } from "@/lib/db";
-import { timeAgo, titleCase, languageName, clamp } from "@/lib/format";
+import { timeAgo, titleCase, languageName, clamp, safeImage } from "@/lib/format";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
@@ -86,7 +86,7 @@ export default async function Home() {
         <div className="rows">
           {fresh.map((p) => (
             <Link className="row" key={p.id} href={`/podcast/${p.slug}`}>
-              <Art src={p.image_url} title={p.title} size={52} />
+              <Art src={safeImage(p.image_url)} title={p.title} size={52} />
               <div style={{ minWidth: 0 }}>
                 <p className="t">{clamp(p.title, 64)}</p>
                 <p className="s">{p.host}</p>
