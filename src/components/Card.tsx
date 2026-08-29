@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Card({ p }: { p: Podcast }) {
   return (
     <Link className="card" href={`/podcast/${p.slug}`}>
-      <Art src={p.image_url} title={p.title} />
+      <Art src={p.image_url} title={p.title} size={68} />
       <div className="meta">
         <h3>{p.title}</h3>
         <div className="host">{p.host}</div>
