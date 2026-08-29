@@ -89,3 +89,31 @@ turso db shell p0dcasters < dump.sql
 - **Bare public-suffix hosts.** The Podcast Index `host` column sometimes holds `co.nz` or
   `com.br` rather than the registrable domain, which both mis-attributes the show and
   duplicates it under a second "host". Re-derived from the feed URL.
+
+## Crawl status
+
+`/crawlstats` is the status board for the pipeline above, with `/api/crawlstats` as the
+same figures in JSON. It exists because that pipeline can die without anything looking
+wrong: the site keeps serving, the shows are all still there, and they quietly describe a
+directory that stopped being true weeks ago. Nothing about that is visible from outside.
+
+The page answers four questions — is the cron check still running, when did a rebuild last
+land, what did it change, and how much of the directory is drifting towards the 90-day
+cutoff — plus a freshness histogram, per-category sizes with a sparkline per row, the most
+recently published shows, and the ones closest to being dropped.
+
+Two things shape how it is built:
+
+- **The health badge reads the check, not the rebuild.** A fortnight without a rebuild is
+  normal, because Podcast Index had not republished. A day without a *check* is not, and
+  it is the only outage this page can detect on its own.
+- **It is uncached, and every relative figure is derived at render.** Caching an object
+  holding "last checked 20 minutes ago" freezes that sentence, and a page that reports a
+  dead pipeline as cheerfully current is worse than no page. The reads are one libSQL
+  batch each and the directory is 21k rows, so this costs a round trip, not a scan.
+
+Its history comes from `refresh_runs`, written by the pipeline itself — see
+`scripts/README.md`. Create the table with `node scripts/migrate_runs.mjs`, and do **not**
+add it to the rebuild's drop list: like the account tables it has to survive a reload,
+because it is the only record of anything that happened before the current directory
+existed.
