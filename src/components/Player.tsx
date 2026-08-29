@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { attachSource, type AttachedSource } from "@profullstack/player";
 import { safeImage } from "@/lib/format";
 
 export type Track = {
@@ -114,6 +115,56 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (saved.rate) setRateState(saved.rate);
     if (typeof saved.volume === "number") setVolumeState(saved.volume);
   }, []);
+
+  /**
+   * Get the episode's bytes into the element.
+   *
+   * Was `src={track.audio}`, which is right until a show publishes something
+   * the browser cannot open on its own. `attachSource` names the source and
+   * picks how to deliver it -- native for the ordinary MP3, hls.js for a
+   * playlist -- and this component keeps everything else it already does: the
+   * queue, the dock, the persisted position.
+   *
+   * Attaching is asynchronous because a delivery engine is only downloaded if
+   * a source needs one, so a race is possible: two track changes in quick
+   * succession would otherwise leave the first attachment running under the
+   * second. `cancelled` is what makes the last press win.
+   */
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el || !track?.audio) return;
+
+    let cancelled = false;
+    let attached: AttachedSource | null = null;
+
+    void attachSource(el, {
+      src: track.audio,
+      onError: (message) => {
+        if (cancelled) return;
+        setLoading(false);
+        setPlaying(false);
+        setError(message);
+      },
+    })
+      .then((result) => {
+        if (cancelled) {
+          result.destroy();
+          return;
+        }
+        attached = result;
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoading(false);
+          setError("This episode would not play. The show may have moved the file.");
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      attached?.destroy();
+    };
+  }, [track?.audio]);
 
   const persist = useCallback(
     (partial: Partial<Saved>) => {
@@ -325,7 +376,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       {children}
       <audio
         ref={audioRef}
-        src={track?.audio}
+        // No `src` here on purpose. An enclosure is whatever the show publishes:
+        // usually an MP3, sometimes an HLS playlist, and a browser handed the
+        // latter directly plays nothing and reports a bare media error. The
+        // effect above routes it through the shared engine picker instead.
         preload="metadata"
         onLoadedMetadata={(e) => {
           const el = e.currentTarget;

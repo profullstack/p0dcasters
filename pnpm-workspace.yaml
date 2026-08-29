@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@profullstack/player@0.2.0'
