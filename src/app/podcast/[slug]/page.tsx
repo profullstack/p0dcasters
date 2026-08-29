@@ -11,7 +11,7 @@ import AdBanner from "@/components/AdBanner";
 import { AD_MREC } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
-import { timeAgo, cadence, languageName, titleCase, clamp } from "@/lib/format";
+import { timeAgo, cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
 
 export const revalidate = 3600;
 
@@ -36,7 +36,9 @@ export async function generateMetadata({
       type: "website",
       title: p.title,
       description: desc,
-      images: [{ url: p.image_url }],
+      // https only — an http card image is dropped by every scraper that
+      // fetches it from an https page.
+      images: safeImage(p.image_url) ? [{ url: safeImage(p.image_url) }] : undefined,
     },
     // Overrides the layout's summary_large_image. Podcast artwork is square, and
     // a large card is 1.91:1 — X crops the top and bottom off it. A summary card
@@ -65,16 +67,46 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
   const rate = cadence(p.per_week);
   const show = { slug: p.slug, title: p.title, image: p.image_url };
 
+  const url = `https://p0dcasters.com/podcast/${p.slug}`;
+  const art = safeImage(p.image_url);
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "PodcastSeries",
-    name: p.title,
-    description: clamp(p.description, 500),
-    image: p.image_url,
-    url: `https://p0dcasters.com/podcast/${p.slug}`,
-    webFeed: p.feed_url,
-    inLanguage: p.language || undefined,
-    ...(p.author ? { author: { "@type": "Person", name: p.author } } : {}),
+    "@graph": [
+      {
+        "@type": "PodcastSeries",
+        "@id": `${url}#series`,
+        name: p.title,
+        description: clamp(p.description, 500),
+        ...(art ? { image: art } : {}),
+        url,
+        webFeed: p.feed_url,
+        numberOfEpisodes: Number(p.episode_count) || undefined,
+        inLanguage: normalizeLang(p.lang_base ?? p.language) ?? undefined,
+        ...(p.category ? { genre: titleCase(p.category) } : {}),
+        ...(p.author ? { author: { "@type": "Person", name: p.author } } : {}),
+        // The show is published on the creator's own domain — that is the whole
+        // premise of the directory, so say so rather than implying we host it.
+        publisher: { "@type": "Organization", name: p.author || p.host, url: site },
+        isPartOf: { "@id": "https://p0dcasters.com/#website" },
+      },
+      // Where this page sits, so a result can be shown in context rather than
+      // as a bare URL.
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "p0dcasters", item: "https://p0dcasters.com/" },
+          ...(p.category
+            ? [{
+                "@type": "ListItem",
+                position: 2,
+                name: titleCase(p.category),
+                item: `https://p0dcasters.com/category/${encodeURIComponent(p.category)}`,
+              }]
+            : []),
+          { "@type": "ListItem", position: p.category ? 3 : 2, name: p.title, item: url },
+        ],
+      },
+    ],
   };
 
   return (
@@ -85,7 +117,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
       />
       <div className="show">
         <div>
-          <Art className="art" src={p.image_url} title={p.title} />
+          <Art className="art" src={p.image_url} title={p.title} size={200} />
         </div>
         <div>
           <h1>{p.title}</h1>
@@ -131,7 +163,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
               Website
             </a>
             {cats.map((c) => (
-              <Link className="btn" key={c} href={`/category/${c}`}>
+              <Link className="btn" key={c} href={`/category/${encodeURIComponent(c)}`}>
                 {titleCase(c)}
               </Link>
             ))}

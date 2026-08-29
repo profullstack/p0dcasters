@@ -41,6 +41,84 @@ def real_host(host, url):
     net = re.sub(r"^www\.", "", net)
     return net or h
 
+# Publishers declare <language> in whatever shape they like: "en_US", " en ",
+# "English", "français", "ger_deu", or the ISO 639-2 "eng". This used to be
+# `(lang or "").lower().split("-")[0][:5]`, which trimmed nothing, never split
+# on "_", and cut at five characters — minting lang_base values like "franç",
+# "engli", "ger_d" and " en " that /language/<code> has no page for, so the
+# homepage and the sitemap both linked straight at 404s. Fold onto ISO 639-1,
+# and return None when there is no honest two-letter code ("und", Scots, Luo):
+# a show with no code is simply not offered under /language/*.
+# Kept in step with normalizeLang() in src/lib/format.ts.
+LANG_ALIAS = {
+ "english":"en","eng":"en",
+ "french":"fr","français":"fr","francais":"fr","fre":"fr","fra":"fr",
+ "german":"de","deutsch":"de","ger":"de","deu":"de",
+ "spanish":"es","español":"es","espanol":"es","spa":"es","esp":"es",
+ "portuguese":"pt","português":"pt","portugues":"pt","por":"pt",
+ "italian":"it","italiano":"it","ita":"it",
+ "dutch":"nl","nederlands":"nl","nld":"nl","dut":"nl",
+ "russian":"ru","rus":"ru",
+ "japanese":"ja","jpn":"ja","jp":"ja",
+ "chinese":"zh","zho":"zh","chi":"zh",
+ "korean":"ko","kor":"ko",
+ "swedish":"sv","svenska":"sv","swe":"sv",
+ "danish":"da","dansk":"da","dan":"da",
+ "norwegian":"no","norsk":"no","nor":"no",
+ "finnish":"fi","suomi":"fi","fin":"fi",
+ "polish":"pl","polski":"pl","pol":"pl",
+ "czech":"cs","ces":"cs","cze":"cs",
+ "turkish":"tr","tur":"tr",
+ "arabic":"ar","ara":"ar",
+ "hebrew":"he","heb":"he",
+ "hindi":"hi","hin":"hi",
+ "greek":"el","ell":"el","gre":"el",
+ "romanian":"ro","ron":"ro","rum":"ro",
+ "ukrainian":"uk","ukr":"uk",
+ "hungarian":"hu","magyar":"hu","hun":"hu",
+ "croatian":"hr","hrv":"hr",
+ "serbian":"sr","srp":"sr",
+ "slovak":"sk","slk":"sk","slo":"sk",
+ "slovenian":"sl","slv":"sl",
+ "bulgarian":"bg","bul":"bg",
+ "catalan":"ca","català":"ca","catala":"ca","cat":"ca",
+ "basque":"eu","euskara":"eu","eus":"eu","baq":"eu",
+ "galician":"gl","glg":"gl",
+ "icelandic":"is","isl":"is","ice":"is",
+ "estonian":"et","est":"et",
+ "latvian":"lv","lav":"lv",
+ "lithuanian":"lt","lit":"lt",
+ "persian":"fa","farsi":"fa","fas":"fa","per":"fa",
+ "thai":"th","tha":"th",
+ "vietnamese":"vi","vie":"vi",
+ "indonesian":"id","bahasa":"id","ind":"id",
+ "tagalog":"tl","filipino":"tl","tgl":"tl","fil":"tl",
+ "malay":"ms","msa":"ms","may":"ms",
+ "swahili":"sw","swa":"sw",
+ "afrikaans":"af","afr":"af",
+ "albanian":"sq","sqi":"sq","alb":"sq",
+ "welsh":"cy","cym":"cy","wel":"cy",
+ "irish":"ga","gle":"ga",
+ "tamil":"ta","tam":"ta",
+ "bengali":"bn","ben":"bn",
+ "urdu":"ur","urd":"ur",
+ "pashto":"ps","pus":"ps",
+ "faroese":"fo","fao":"fo",
+ "luxembourgish":"lb","ltz":"lb",
+ "yiddish":"yi","yid":"yi",
+ "armenian":"hy","hye":"hy","arm":"hy",
+ "georgian":"ka","kat":"ka","geo":"ka",
+}
+
+def norm_lang(lang):
+    s=(lang or "").strip().lower().replace("_","-")
+    if not s: return None
+    if s in LANG_ALIAS: return LANG_ALIAS[s]
+    head=s.split("-")[0]
+    if head in LANG_ALIAS: return LANG_ALIAS[head]
+    if re.fullmatch(r"[a-z]{2}", head): return head
+    return None
+
 def slugify(s, maxlen=60):
     s=unicodedata.normalize("NFKD",s)
     s=s.encode("ascii","ignore").decode("ascii").lower()
@@ -85,7 +163,7 @@ for r in rows:
     s=base
     if s in seen_slug: s=f"{base}-{fid}"
     seen_slug[s]=1
-    lb=(lang or "").lower().split("-")[0][:5] or None
+    lb=norm_lang(lang)
     kept.append((fid,s,guid,url,title,desc[:4000],img,link,host,author,owner,1 if exp else 0,
                  lang,lb,(c1 or None),",".join(cats),ec,npd,opd,co,enc,dur,gen,per_week,score))
 

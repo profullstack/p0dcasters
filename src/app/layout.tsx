@@ -13,8 +13,10 @@ export const metadata: Metadata = {
     default: "p0dcasters — the independent podcast directory",
     template: "%s · p0dcasters",
   },
+  // 149 characters. The previous wording ran to 176 and lost its last clause to
+  // truncation in exactly the snippet it was written for.
   description:
-    "A directory of podcasts that live on their own domains. No Spotify, no Anchor, no Buzzsprout — every show here is self-hosted. Listen in the browser and follow your favourites.",
+    "A free directory of podcasts that live on their own domains — no Spotify, no Anchor, no Buzzsprout. Every show is self-hosted. Listen in the browser.",
   openGraph: {
     type: "website",
     siteName: "p0dcasters",
@@ -70,6 +72,48 @@ export const viewport: Viewport = {
   ],
 };
 
+// Sitewide identity, emitted once in the layout. Show pages reference the
+// WebSite node by @id rather than repeating it. The SearchAction is the real
+// /search form on the homepage — same endpoint, same `q` parameter.
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://p0dcasters.com/#organization",
+      name: "p0dcasters",
+      url: "https://p0dcasters.com/",
+      logo: "https://p0dcasters.com/icons/icon-512x512.png",
+      description:
+        "An independent podcast directory: every show listed publishes from a domain its creator controls.",
+      email: "hello@p0dcasters.com",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "hello@p0dcasters.com",
+        url: "https://p0dcasters.com/contact",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://p0dcasters.com/#website",
+      name: "p0dcasters",
+      alternateName: "the independent podcast directory",
+      url: "https://p0dcasters.com/",
+      inLanguage: "en",
+      publisher: { "@id": "https://p0dcasters.com/#organization" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: "https://p0dcasters.com/search?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -80,8 +124,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         takes the audio with it.
       */}
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
         <SessionProvider>
           <PlayerProvider>
+            {/* First focusable thing on every page, so a keyboard or screen
+                reader user can jump the header and the nav instead of tabbing
+                through them on all 22k pages. Visible only while focused. */}
+            <a className="skip-link" href="#main">
+              Skip to main content
+            </a>
             <header className="site">
               <div className="inner">
                 <Link className="brand" href="/" aria-label="p0dcasters home">
@@ -106,7 +160,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </nav>
               </div>
             </header>
-            <main>{children}</main>
+            <main id="main">{children}</main>
             <footer className="site">
               <div className="wrap">
                 <p>
@@ -120,7 +174,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/sitemap.xml">Sitemap</Link> ·{" "}
                   <Link href="/about">How this is built</Link> ·{" "}
                   <Link href="/crawlstats">Crawl status</Link> ·{" "}
-                  <Link href="/signup">Create an account</Link>
+                  <Link href="/signup">Create a free account</Link> to follow shows
+                </p>
+                <p>
+                  <Link href="/contact">Contact</Link> ·{" "}
+                  <Link href="/privacy">Privacy</Link> ·{" "}
+                  <Link href="/terms">Terms</Link>
                 </p>
               </div>
             </footer>

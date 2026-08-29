@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { all } from "@/lib/db";
+import { all, languageBuckets } from "@/lib/db";
 import { titleCase, languageName } from "@/lib/format";
 import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
@@ -17,9 +17,7 @@ export default async function Browse() {
   const cats = await all<{ category: string; n: number }>(
     "SELECT category, COUNT(*) AS n FROM podcasts WHERE category IS NOT NULL GROUP BY category ORDER BY n DESC",
   );
-  const langs = await all<{ lang_base: string; n: number }>(
-    "SELECT lang_base, COUNT(*) AS n FROM podcasts WHERE lang_base IS NOT NULL GROUP BY lang_base ORDER BY n DESC",
-  );
+  const langs = await languageBuckets();
   return (
     <div className="wrap">
       <section>
@@ -27,7 +25,12 @@ export default async function Browse() {
         <h2 className="sec">Subjects</h2>
         <div className="chips">
           {cats.map((c) => (
-            <Link className="chip" key={c.category} href={`/category/${c.category}`}>
+            <Link
+              className="chip"
+              key={c.category}
+              // Encoded: "self improvement" and "true crime" carry a space.
+              href={`/category/${encodeURIComponent(c.category)}`}
+            >
               {titleCase(c.category)} <b>{Number(c.n).toLocaleString()}</b>
             </Link>
           ))}
@@ -40,8 +43,8 @@ export default async function Browse() {
         <h2 className="sec">Languages</h2>
         <div className="chips">
           {langs.map((l) => (
-            <Link className="chip" key={l.lang_base} href={`/language/${l.lang_base}`}>
-              {languageName(l.lang_base)} <b>{Number(l.n).toLocaleString()}</b>
+            <Link className="chip" key={l.code} href={`/language/${l.code}`}>
+              {languageName(l.code)} <b>{Number(l.n).toLocaleString()}</b>
             </Link>
           ))}
         </div>

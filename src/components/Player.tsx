@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import Link from "next/link";
+import { safeImage } from "@/lib/format";
 
 export type Track = {
   id: string;
@@ -392,9 +393,11 @@ function PlayerBar() {
 
       <div className="player-inner">
         <Link className="player-show" href={`/podcast/${p.track.showSlug}`}>
-          {p.track.image ? (
+          {safeImage(p.track.image) ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={p.track.image} alt="" />
+            // Decorative on purpose here: the show title sits beside it in the
+            // same link, so naming the art would just say it twice.
+            <img src={safeImage(p.track.image)} alt="" />
           ) : (
             <span className="player-art-fallback" aria-hidden="true">
               {p.track.showTitle.charAt(0).toUpperCase()}

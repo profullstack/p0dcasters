@@ -1,4 +1,4 @@
-import { all } from "@/lib/db";
+import { all, languageBuckets } from "@/lib/db";
 
 export const revalidate = 86400;
 const SITE = "https://p0dcasters.com";
@@ -25,18 +25,23 @@ export async function GET(
     const cats = await all<{ category: string }>(
       "SELECT DISTINCT category FROM podcasts WHERE category IS NOT NULL",
     );
-    const langs = await all<{ lang_base: string }>(
-      "SELECT DISTINCT lang_base FROM podcasts WHERE lang_base IS NOT NULL",
-    );
-    const statics = ["", "/browse", "/search", "/hosts", "/about"];
+    // Normalised codes, not raw lang_base: the directory holds spellings like
+    // " en " and "franç", and sitemapping those was submitting URLs that 404.
+    const langs = await languageBuckets();
+    // /search is deliberately absent — robots.txt disallows it, and a sitemap
+    // that submits a disallowed URL is asking for a coverage error.
+    const statics = ["", "/browse", "/hosts", "/about", "/privacy", "/terms", "/contact"];
     return wrap([
       ...statics.map((p) => `  <url><loc>${SITE}${p}</loc><priority>0.9</priority></url>`),
       // Listed, but low: /crawlstats is a real page and worth being findable,
       // and it is also the one URL here whose content is different on every
       // request. It should never compete with a show page for crawl budget.
       `  <url><loc>${SITE}/crawlstats</loc><priority>0.3</priority></url>`,
-      ...cats.map((c) => `  <url><loc>${SITE}/category/${esc(c.category)}</loc><priority>0.7</priority></url>`),
-      ...langs.map((l) => `  <url><loc>${SITE}/language/${esc(l.lang_base)}</loc><priority>0.6</priority></url>`),
+      // Percent-encoded, not just XML-escaped: two categories are two words
+      // ("self improvement", "true crime") and a raw space in a <loc> is not a
+      // URL the sitemap spec accepts.
+      ...cats.map((c) => `  <url><loc>${SITE}/category/${esc(encodeURIComponent(c.category))}</loc><priority>0.7</priority></url>`),
+      ...langs.map((l) => `  <url><loc>${SITE}/language/${esc(l.code)}</loc><priority>0.6</priority></url>`),
     ]);
   }
 
