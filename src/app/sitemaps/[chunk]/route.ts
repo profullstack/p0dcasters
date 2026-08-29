@@ -31,6 +31,10 @@ export async function GET(
     const statics = ["", "/browse", "/search", "/hosts", "/about"];
     return wrap([
       ...statics.map((p) => `  <url><loc>${SITE}${p}</loc><priority>0.9</priority></url>`),
+      // Listed, but low: /crawlstats is a real page and worth being findable,
+      // and it is also the one URL here whose content is different on every
+      // request. It should never compete with a show page for crawl budget.
+      `  <url><loc>${SITE}/crawlstats</loc><priority>0.3</priority></url>`,
       ...cats.map((c) => `  <url><loc>${SITE}/category/${esc(c.category)}</loc><priority>0.7</priority></url>`),
       ...langs.map((l) => `  <url><loc>${SITE}/language/${esc(l.lang_base)}</loc><priority>0.6</priority></url>`),
     ]);

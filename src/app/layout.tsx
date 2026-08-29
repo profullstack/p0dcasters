@@ -119,6 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/opml">Full directory as OPML</Link> ·{" "}
                   <Link href="/sitemap.xml">Sitemap</Link> ·{" "}
                   <Link href="/about">How this is built</Link> ·{" "}
+                  <Link href="/crawlstats">Crawl status</Link> ·{" "}
                   <Link href="/signup">Create an account</Link>
                 </p>
               </div>
