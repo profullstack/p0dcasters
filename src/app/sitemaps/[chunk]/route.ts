@@ -33,6 +33,10 @@ export async function GET(
     const statics = ["", "/browse", "/hosts", "/about", "/privacy", "/terms", "/contact"];
     return wrap([
       ...statics.map((p) => `  <url><loc>${SITE}${p}</loc><priority>0.9</priority></url>`),
+      // Listed, but low: /crawlstats is a real page and worth being findable,
+      // and it is also the one URL here whose content is different on every
+      // request. It should never compete with a show page for crawl budget.
+      `  <url><loc>${SITE}/crawlstats</loc><priority>0.3</priority></url>`,
       // Percent-encoded, not just XML-escaped: two categories are two words
       // ("self improvement", "true crime") and a raw space in a <loc> is not a
       // URL the sitemap spec accepts.

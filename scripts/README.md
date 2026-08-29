@@ -78,3 +78,29 @@ not moved; `DRY_RUN=1` reports what it would do and stops before downloading.
 
 If `load_turso.mjs` fails after the drop, the tables are gone and the fix is
 `FORCE=1 sh scripts/refresh-if-new-dump.sh` — the script says so in the failure line.
+
+## Reporting itself to /crawlstats
+
+Every run writes a row into `refresh_runs`, which is the only thing the
+[/crawlstats](https://p0dcasters.com/crawlstats) page reads about the pipeline. Create
+the table once with `node scripts/migrate_runs.mjs` (safe to re-run), and do **not** add
+it to the drop list above — like the account tables it has to survive a rebuild, and it
+is the history the page is made of.
+
+`record_run.mjs` does the writing, called by `refresh-if-new-dump.sh` at each state
+change. Three things about it are deliberate:
+
+- **The skipped runs are recorded too.** Four "no new dump" rows a day are the only
+  evidence, visible from production, that the cron entry still exists. Their absence is
+  the failure the page is for, and it is invisible if only rebuilds are logged.
+- **Recording never fails a rebuild.** A lost status line is bookkeeping; a refused write
+  is retried once with a freshly minted token and then given up on.
+- **The Turso token is cached** in `~/p0dcasters-data/.turso-token`. `turso db tokens
+  create` mints a non-expiring credential every time it is called, and a script running
+  four times a day would otherwise leave a thousand live tokens on the database in a
+  year. Deleting the file is safe: the next run mints another.
+
+A successful run also stores a `category -> count` snapshot. `podcasts` is dropped and
+reloaded whole, so a count taken today does not exist tomorrow; those snapshots are what
+the per-category sparklines on the page are drawn from, and they only start once this is
+deployed.
