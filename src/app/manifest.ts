@@ -29,6 +29,18 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
+    // An emailed sign-in link points back here, so on a device where the app
+    // handles its own links every click is an in-scope launch. The default
+    // ("auto") answers each one with a brand new app window, which for a magic
+    // link is the worst version of the bug: you end up signed in inside a
+    // window you did not open, while the one you were already using sits there
+    // signed out. navigate-existing hands the launch to the window that was
+    // used most recently and navigates it, so the link lands where the reader
+    // is already looking. "auto" trails it for browsers that do not know the
+    // first value, and for when there is no window open yet.
+    launch_handler: {
+      client_mode: ["navigate-existing", "auto"],
+    },
     background_color: "#fbfaf7",
     theme_color: "#fbfaf7",
     categories: ["entertainment", "news", "music"],
