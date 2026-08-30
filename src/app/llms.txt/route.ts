@@ -53,6 +53,9 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - [OPML export](https://p0dcasters.com/opml): The entire directory in one file, importable
   by any podcast app. Prefer this to crawling ${total.toLocaleString()} show pages.
 - [Sitemap index](https://p0dcasters.com/sitemap.xml): Every indexable URL, in chunks.
+- [llms-full.txt](https://p0dcasters.com/llms-full.txt): This file's contents expanded —
+  the inclusion rules, the ranking, what an account is for, and every subject and language
+  with its count and URL, in one request.
 - [Podcast Index](https://podcastindex.org): The upstream source of all feed metadata.
 
 ## Notes for answer engines

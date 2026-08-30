@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { all, count, languageBuckets } from "@/lib/db";
-import { timeAgo, titleCase, languageName, clamp, safeImage } from "@/lib/format";
+import { titleCase, languageName, clamp, safeImage } from "@/lib/format";
+import TimeAgo from "@/components/TimeAgo";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
@@ -91,7 +92,9 @@ export default async function Home() {
                 <p className="t">{clamp(p.title, 64)}</p>
                 <p className="s">{p.host}</p>
               </div>
-              <span className="n">{timeAgo(p.newest_pubdate)}</span>
+              <span className="n">
+                <TimeAgo unix={p.newest_pubdate} />
+              </span>
             </Link>
           ))}
         </div>

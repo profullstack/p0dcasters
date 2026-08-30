@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
-import { all, count, languageVariants } from "@/lib/db";
+import { all, count, one, languageVariants } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Ad from "@/components/Ad";
@@ -9,6 +9,7 @@ import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { languageName, normalizeLang, safeDecode } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 import Link from "next/link";
+import TimeAgo from "@/components/TimeAgo";
 
 export const revalidate = 3600;
 const PER = 60;
@@ -62,6 +63,14 @@ export default async function Language({
   );
   if (!total) notFound();
 
+  // Same thin-page problem as the category listings, same fix: numbers taken
+  // from this language's own rows rather than a sentence with the name swapped.
+  const facts = await one<{ domains: number; eps: number; newest: number }>(
+    `SELECT COUNT(DISTINCT host) AS domains, SUM(episode_count) AS eps, MAX(newest_pubdate) AS newest
+     FROM podcasts WHERE lang_base IN (${holes})`,
+    variants,
+  );
+
   const rows = await all<Podcast>(
     `SELECT * FROM podcasts WHERE lang_base IN (${holes}) ORDER BY score DESC LIMIT ? OFFSET ?`,
     [...variants, PER, (pg - 1) * PER],
@@ -91,9 +100,40 @@ export default async function Language({
         <h1 style={{ fontSize: 30, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
           {languageName(code)}
         </h1>
-        <p style={{ color: "var(--muted)", margin: "0 0 22px" }}>
+        <p style={{ color: "var(--muted)", margin: "0 0 14px" }}>
           {total.toLocaleString()} independent shows
         </p>
+        {pg === 1 && (
+        <div className="blurb">
+          <p>
+            Independent podcasts published in {languageName(code)}, each from a domain its
+            own creator controls. Feeds on Spotify&rsquo;s Anchor, Buzzsprout, Libsyn and the
+            other large hosts are excluded from the directory, so this is the self-hosted
+            part of {languageName(code)} podcasting rather than a chart of it.
+          </p>
+          <ul>
+            <li>
+              <strong>{total.toLocaleString()}</strong> show{total === 1 ? "" : "s"}, across{" "}
+              <strong>{Number(facts?.domains || 0).toLocaleString()}</strong> distinct
+              domain{Number(facts?.domains) === 1 ? "" : "s"}.
+            </li>
+            <li>
+              <strong>{Number(facts?.eps || 0).toLocaleString()}</strong> episodes between
+              them, newest{" "}
+              {facts?.newest ? <TimeAgo unix={facts.newest} /> : <>unknown</>}.
+            </li>
+            <li>
+              The language is the one the publisher declares in their own feed, folded onto
+              its ISO 639-1 code — so <code>eng</code>, <code>en_US</code> and{" "}
+              <code>English</code> all land here.
+            </li>
+            <li>
+              Nothing is hosted here: each card links to the show, and the show links to its
+              publisher. <Link href="/browse">Every language, with counts</Link>.
+            </li>
+          </ul>
+        </div>
+        )}
         <Ad format={AD_TEXT} />
         <div className="grid">
           {(split ? rows.slice(0, split) : rows).map((p) => (
