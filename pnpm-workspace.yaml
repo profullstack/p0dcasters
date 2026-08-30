@@ -1,2 +1,13 @@
+# Not a monorepo. This file exists only to carry the setting below, which pnpm
+# 10+ reads from here rather than from .npmrc — but pnpm 9 refuses any
+# workspace file without a `packages` field, and Railway's builder installs
+# pnpm 9. Declaring the root as the only package satisfies both: '.' is already
+# the lockfile's sole importer, so nothing about the install changes.
+packages:
+  - '.'
+
+# @profullstack/player 0.2.0 is newer than the default minimum release age, and
+# without this exclusion pnpm 10+ resolves straight past the version this app
+# actually depends on.
 minimumReleaseAgeExclude:
   - '@profullstack/player@0.2.0'
