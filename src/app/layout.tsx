@@ -87,6 +87,16 @@ const siteJsonLd = {
       description:
         "An independent podcast directory: every show listed publishes from a domain its creator controls.",
       email: "hello@p0dcasters.com",
+      // Only profiles that actually belong to this directory. A sameAs list
+      // padded with a Wikipedia or Crunchbase URL that resolves to nothing is
+      // worse than none: it is the one field an answer engine will follow to
+      // decide whether the entity is real.
+      sameAs: ["https://github.com/profullstack/p0dcasters"],
+      parentOrganization: {
+        "@type": "Organization",
+        name: "Profullstack",
+        url: "https://profullstack.com/",
+      },
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer support",

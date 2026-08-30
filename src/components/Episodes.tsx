@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Episode } from "@/lib/feed";
 import { clock, usePlayer, type Track } from "@/components/Player";
-import { timeAgo } from "@/lib/format";
+import TimeAgo from "@/components/TimeAgo";
 
 export type Show = { slug: string; title: string; image: string };
 
@@ -62,7 +62,7 @@ export function EpisodeList({
               <div className="episode-body">
                 <h3>{t.title}</h3>
                 <p className="episode-meta">
-                  {e.pubdate ? timeAgo(e.pubdate) : "undated"}
+                  <TimeAgo unix={e.pubdate} />
                   {e.duration ? ` · ${clock(e.duration)}` : ""}
                   {current ? " · playing" : ""}
                 </p>
