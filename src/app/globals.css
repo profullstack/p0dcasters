@@ -647,3 +647,20 @@ body:has(.player) footer.site { padding-bottom: 122px; }
 .crawl-table td.show-name {
   max-width: 34ch; overflow: hidden; text-overflow: ellipsis;
 }
+
+/* The standing intro on a category or language listing. Those pages were a
+   heading, a count and a wall of artwork — around 70 words, most of them show
+   titles, which is a thin page repeated forty times over. The prose says what
+   the listing is and the bullets carry the page's own numbers, which is also
+   the shape an answer engine lifts. Page two onwards omits it rather than
+   repeating it under a canonical that points back here. */
+.blurb { max-width: 68ch; margin: 0 0 24px; font-size: 14.5px; color: var(--muted); }
+.blurb p { margin: 0 0 12px; line-height: 1.65; }
+.blurb ul { margin: 0; padding-left: 20px; }
+.blurb li { margin: 0 0 6px; line-height: 1.6; }
+.blurb strong { color: var(--text); font-weight: 600; }
+.blurb a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; }
+.blurb code {
+  font-family: ui-monospace, Menlo, monospace; font-size: 0.92em;
+  background: var(--surface-2); border-radius: 4px; padding: 1px 5px;
+}
