@@ -136,5 +136,10 @@ settled by CoinPay) or the sales page at `/crawl` if it asked for HTML; a paid p
 `Disallow: /` plus `Allow: /crawl`, retrieval crawlers are named and allowed. `/llms.txt`
 and `/skill.md` stay readable to a refused crawler so the refusal is legible.
 
-Matching is on the self-declared user agent, so this charges crawlers that identify
-themselves and does nothing about one wearing a browser's UA.
+The lists catch crawlers that say who they are. Two controls in `src/lib/crawl-gateway.ts`
+cover the ones that do not: OVH's VPS ranges (a fleet seen wearing "Chrome/148" on
+rssamplifier, 2026-08-28) get a tiny `403` before anything else runs, and a request that
+claims `Chrome/…` but sends no `Sec-Fetch-Mode` (a header every Chromium sends and nothing
+can strip) is charged like GPTBot. A crawler that declares itself, Googlebot's evergreen
+string included, is judged by the lists alone. A request carrying the `p0d_session` cookie
+is never charged.

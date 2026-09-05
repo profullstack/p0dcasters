@@ -15,8 +15,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(react@19.2.8)
       '@profullstack/x402-gateway':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.2
+        version: 0.2.2
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
@@ -401,8 +401,8 @@ packages:
       react:
         optional: true
 
-  '@profullstack/x402-gateway@0.1.0':
-    resolution: {integrity: sha512-B7tWvWk/bIEoqyec6UoyRF1pO7X/+b+wFRv2ZFIClqskmEpyxoA559ZgdTvnxqAIvuDeE9v56nVpYRQ+lmOZQQ==}
+  '@profullstack/x402-gateway@0.2.2':
+    resolution: {integrity: sha512-oAbe4AuJzNEoLcb+8fhR5u9ce7i9h3XuyoaFjuXlgTxTSXkfdAWOfYFZq1aFplVWvZNRW3da7fYCv7nkQdujXA==}
     engines: {node: '>=20.11'}
 
   '@simplewebauthn/browser@13.3.0':
@@ -938,7 +938,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.8
 
-  '@profullstack/x402-gateway@0.1.0': {}
+  '@profullstack/x402-gateway@0.2.2': {}
 
   '@simplewebauthn/browser@13.3.0': {}
 
