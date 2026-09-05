@@ -1,57 +1,30 @@
+import { robotsRoute } from "@profullstack/x402-gateway/next";
+import { gateway } from "@/lib/crawl-gateway";
+
 export const revalidate = 86400;
 
-// Every AI crawler was already allowed by the wildcard below — none of these
-// blocks changes what any of them may fetch. They are spelled out because
-// auditors check for the user-agent by name and cannot tell "allowed by
-// default" from "never considered", and because naming them makes the policy a
-// decision on the record rather than an accident of the default.
-const AI_AGENTS = [
-  "GPTBot",
-  "OAI-SearchBot",
-  "ChatGPT-User",
-  "ClaudeBot",
-  "Claude-User",
-  "Claude-SearchBot",
-  "PerplexityBot",
-  "Perplexity-User",
-  "Google-Extended",
-  "Applebot",
-  "Applebot-Extended",
-  "CCBot",
-  "Bytespider",
-  "Amazonbot",
-  "Meta-ExternalAgent",
-  "cohere-ai",
-  "DuckAssistBot",
-  "MistralAI-User",
-  "YouBot",
-];
-
-export async function GET() {
-  const body = [
-    "User-agent: *",
-    "Allow: /",
+// Two kinds of AI crawler visit this site and only one of them ever sends a
+// listener back. Retrieval crawlers (OAI-SearchBot, Claude-SearchBot,
+// PerplexityBot, Applebot, Amazonbot, DuckAssistBot, ...) feed the live index
+// that AI answers cite from, and a citation is a link to a show page: they are
+// welcome everywhere a reader may go, and named here so their operators can
+// see that. Training crawlers (GPTBot, ClaudeBot, CCBot, meta-externalagent,
+// Bytespider, Applebot-Extended, cohere-ai, ...) copy pages into a corpus that
+// is baked into weights months later and cites nothing back, and Meta's alone
+// was a third of last week's hits. Those get `Disallow: /` plus `Allow: /crawl`,
+// where the gateway in src/middleware.ts sells them a day of access instead.
+//
+// Every named group repeats the wildcard rules, because a crawler that finds
+// its own name obeys that group alone and ignores `User-agent: *`. The lists
+// live in src/lib/crawl-gateway.ts so robots.txt and the 402s cannot disagree.
+export const GET = robotsRoute(gateway, {
+  disallow: [
     // Generated per query, duplicates the category and language pages, and is
     // effectively infinite. /browse and /opml are the crawlable equivalents.
-    "Disallow: /search",
+    "/search",
     // Signed-in surfaces. Nothing here renders for a crawler anyway.
-    "Disallow: /account",
-    "Disallow: /following",
-    "Disallow: /api/",
-    "",
-    ...AI_AGENTS.flatMap((ua) => [
-      `User-agent: ${ua}`,
-      "Allow: /",
-      "Disallow: /search",
-      "Disallow: /account",
-      "Disallow: /following",
-      "Disallow: /api/",
-      "",
-    ]),
-    "Sitemap: https://p0dcasters.com/sitemap.xml",
-    "",
-  ].join("\n");
-  return new Response(body, {
-    headers: { "content-type": "text/plain; charset=utf-8" },
-  });
-}
+    "/account",
+    "/following",
+    "/api/",
+  ],
+});
