@@ -12,6 +12,7 @@
   "dependencies": {
     "@libsql/client": "^0.15.0",
     "@profullstack/player": "^0.2.0",
+    "@profullstack/x402-gateway": "^0.1.0",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.3",
     "fast-xml-parser": "^4.5.7",
