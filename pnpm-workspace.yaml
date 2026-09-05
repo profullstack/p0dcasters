@@ -11,4 +11,4 @@ packages:
 # actually depends on.
 minimumReleaseAgeExclude:
   - '@profullstack/player@0.2.0'
-  - '@profullstack/x402-gateway@0.1.0 || 0.2.2'
+  - '@profullstack/x402-gateway@0.1.0 || 0.2.2 || 0.3.0'
