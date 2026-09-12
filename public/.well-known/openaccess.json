@@ -1,0 +1,29 @@
+{
+  "openaccess": "0.1",
+  "name": "p0dcasters",
+  "url": "https://p0dcasters.com",
+  "operator": "https://logicsrc.com/.well-known/openprofile.md",
+  "redirect_uris": [
+    "https://p0dcasters.com/api/v1/openaccess/callback"
+  ],
+  "jwks": {
+    "keys": [
+      {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "kid": "lcfclDbjvIbN",
+        "x": "eNPOx5yH0cJ4US-3SOWbcq8xBhdy3ob6B8D4lgGjsBc",
+        "alg": "EdDSA",
+        "use": "sig"
+      }
+    ]
+  },
+  "scopes": {},
+  "honours": [
+    "profullstack.com/all-access"
+  ],
+  "webhooks": "https://p0dcasters.com/api/v1/openaccess/events",
+  "hubs": [
+    "https://openaccess.logicsrc.com"
+  ]
+}
