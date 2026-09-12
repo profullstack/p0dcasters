@@ -72,6 +72,7 @@ would silently repoint everyone's follows at other shows.
 | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | the database; falls back to `./data/p0dcasters.db` |
 | `AUTH_SECRET` | session and audio-proxy signing. **Required in production** |
 | `RESEND_API_KEY` | sending the magic link. Without it, outside production, the link is printed to the console instead |
+| `COINPAY_X402_KEY`, `CRAWL_PAY_TO` | selling crawl access to AI training crawlers (see below). Until both are set, training crawlers get `402` with an empty offer: nothing is sold, nothing is given away |
 
 ## Rebuilding the data
 
@@ -117,3 +118,28 @@ Its history comes from `refresh_runs`, written by the pipeline itself — see
 add it to the rebuild's drop list: like the account tables it has to survive a reload,
 because it is the only record of anything that happened before the current directory
 existed.
+
+## AI crawlers
+
+Two kinds of AI crawler visit and only one sends a listener back. Retrieval crawlers
+(OAI-SearchBot, Claude-SearchBot, PerplexityBot, Applebot, Amazonbot, DuckAssistBot, ...)
+feed the live index that AI answers cite from, and a citation is a link to a show page:
+they read free, like people and Googlebot. Training crawlers (GPTBot, ClaudeBot, CCBot,
+meta-externalagent, Bytespider, Applebot-Extended, ...) copy pages into a corpus and cite
+nothing back; Meta's alone was a third of one week's hits. Those pay.
+
+`src/middleware.ts` runs [`@profullstack/x402-gateway`](https://github.com/profullstack/x402-gateway):
+a training crawler gets `402 Payment Required` with an x402 offer ($1 buys a day, USDC,
+settled by CoinPay) or the sales page at `/crawl` if it asked for HTML; a paid pass in the
+`x-crawl-pass` header lets it through. `robots.txt` is generated from the same lists in
+`src/lib/crawl-gateway.ts`, so the two cannot disagree: training crawlers get
+`Disallow: /` plus `Allow: /crawl`, retrieval crawlers are named and allowed. `/llms.txt`
+and `/skill.md` stay readable to a refused crawler so the refusal is legible.
+
+The lists catch crawlers that say who they are. Two controls in `src/lib/crawl-gateway.ts`
+cover the ones that do not: OVH's VPS ranges (a fleet seen wearing "Chrome/148" on
+rssamplifier, 2026-08-28) get a tiny `403` before anything else runs, and a request that
+claims `Chrome/…` but sends no `Sec-Fetch-Mode` (a header every Chromium sends and nothing
+can strip) is charged like GPTBot. A crawler that declares itself, Googlebot's evergreen
+string included, is judged by the lists alone. A request carrying the `p0d_session` cookie
+is never charged.

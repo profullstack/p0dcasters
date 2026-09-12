@@ -102,6 +102,11 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   // A restored session starts paused; the browser would refuse to autoplay
   // anyway, and resuming into someone's ears unasked is worse than a click.
   const restored = useRef<number | null>(null);
+  // Which source is actually on the element right now. Not the same thing as
+  // `track.audio`: attaching is asynchronous, so between choosing an episode
+  // and the engine landing there is a window in which the element still has
+  // nothing to play. Nothing may call play() during that window.
+  const [attachedSrc, setAttachedSrc] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = load();
@@ -129,6 +134,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
    * a source needs one, so a race is possible: two track changes in quick
    * succession would otherwise leave the first attachment running under the
    * second. `cancelled` is what makes the last press win.
+   *
+   * The same asynchrony is why `attachedSrc` exists. Pressing play in the
+   * content area sets the track and `playing` in one commit, and the effect
+   * below would then call play() on an element whose src is still a dynamic
+   * import away -- which rejects, and the rejection stopped playback for good.
+   * Publishing the source only once it is really on the element is what lets
+   * that effect wait instead.
    */
   useEffect(() => {
     const el = audioRef.current;
@@ -136,6 +148,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     let cancelled = false;
     let attached: AttachedSource | null = null;
+    const src = track.audio;
+    setAttachedSrc(null);
 
     void attachSource(el, {
       src: track.audio,
@@ -152,16 +166,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         attached = result;
+        // `unplayable` means no engine was attached and the element has no
+        // source; onError above has already said so to the reader.
+        if (!result.unplayable) setAttachedSrc(src);
       })
       .catch(() => {
         if (!cancelled) {
           setLoading(false);
+          setPlaying(false);
           setError("This episode would not play. The show may have moved the file.");
         }
       });
 
     return () => {
       cancelled = true;
+      setAttachedSrc(null);
       attached?.destroy();
     };
   }, [track?.audio]);
@@ -283,10 +302,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   // Drive the element from state rather than the other way round, so a play
   // that starts on one page keeps running when the route under it changes.
+  //
+  // Playing waits on the attachment. A press in the content area arrives in the
+  // same commit that names the track, so without the guard this runs against an
+  // element the engine has not reached yet; the effect runs again the moment
+  // `attachedSrc` catches up, which is what actually starts the episode.
   useEffect(() => {
     const el = audioRef.current;
     if (!el || !track) return;
     if (playing) {
+      if (attachedSrc !== track.audio) return;
       el.play().catch(() => {
         setPlaying(false);
         setError("This episode would not play. The show may have moved the file.");
@@ -294,7 +319,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     } else {
       el.pause();
     }
-  }, [playing, track]);
+  }, [playing, track, attachedSrc]);
 
   useEffect(() => {
     const el = audioRef.current;

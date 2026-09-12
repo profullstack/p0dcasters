@@ -1,8 +1,9 @@
 import { cookies, headers } from "next/headers";
 import { all, one, db, args } from "@/lib/db";
 import { now, sha256, token } from "./crypto";
+import { SESSION_COOKIE } from "./cookie";
 
-export const SESSION_COOKIE = "p0d_session";
+export { SESSION_COOKIE };
 const SESSION_DAYS = 180;
 
 export type User = { id: number; email: string; created_at: number };

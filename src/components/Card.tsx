@@ -1,5 +1,6 @@
 import type { Podcast } from "@/lib/db";
-import { timeAgo, safeImage } from "@/lib/format";
+import { safeImage } from "@/lib/format";
+import TimeAgo from "@/components/TimeAgo";
 import Art from "@/components/Art";
 import Link from "next/link";
 
@@ -15,7 +16,7 @@ export default function Card({ p }: { p: Podcast }) {
         <h3>{p.title}</h3>
         <div className="host">{p.host}</div>
         <div className="sub">
-          {Number(p.episode_count).toLocaleString()} episodes · {timeAgo(p.newest_pubdate)}
+          {Number(p.episode_count).toLocaleString()} episodes · <TimeAgo unix={p.newest_pubdate} />
         </div>
       </div>
     </Link>

@@ -11,7 +11,8 @@ import AdBanner from "@/components/AdBanner";
 import { AD_MREC } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
-import { timeAgo, cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
+import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
+import TimeAgo from "@/components/TimeAgo";
 
 export const revalidate = 3600;
 
@@ -83,6 +84,11 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
         url,
         webFeed: p.feed_url,
         numberOfEpisodes: Number(p.episode_count) || undefined,
+        // The publisher's newest episode, which is the only defensible
+        // "last updated" for a page that is a view of their feed.
+        ...(p.newest_pubdate
+          ? { dateModified: new Date(p.newest_pubdate * 1000).toISOString() }
+          : {}),
         inLanguage: normalizeLang(p.lang_base ?? p.language) ?? undefined,
         ...(p.category ? { genre: titleCase(p.category) } : {}),
         ...(p.author ? { author: { "@type": "Person", name: p.author } } : {}),
@@ -136,7 +142,10 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
               <b>{Number(p.episode_count).toLocaleString()}</b> episodes
             </div>
             <div>
-              <b>{timeAgo(p.newest_pubdate)}</b> latest
+              <b>
+                <TimeAgo unix={p.newest_pubdate} />
+              </b>{" "}
+              latest
             </div>
             {rate && (
               <div>

@@ -6,6 +6,7 @@ import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { tokenise, ftsQuery } from "@/lib/search";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -53,6 +54,35 @@ export default async function Search({
           />
           <button type="submit">Search</button>
         </form>
+        {/* With no query this page was a heading and an input — 62 words, the
+            thinnest page on the site. It is disallowed in robots.txt and so
+            never indexed, but a person who lands on it with nothing typed
+            deserves to be told what they are searching and where else to go. */}
+        {!query && (
+          <div className="blurb" style={{ marginTop: 22 }}>
+            <p>
+              Searching titles, descriptions and domains across the directory — every one of
+              them a podcast that publishes from a domain its creator controls. Shows that
+              exist only on Spotify, Anchor or another large host are not in here to find.
+            </p>
+            <ul>
+              <li>
+                Search by subject (<code>bookbinding</code>), by domain (
+                <code>stevefarrar.com</code>), or by a phrase from a show&rsquo;s own
+                description.
+              </li>
+              <li>
+                Prefer browsing? <Link href="/browse">Every subject and language</Link>, or{" "}
+                <Link href="/hosts">the domains publishing the most</Link>.
+              </li>
+              <li>
+                Taking the data rather than reading it?{" "}
+                <Link href="/opml">The whole directory as OPML</Link> is one file and one
+                request.
+              </li>
+            </ul>
+          </div>
+        )}
       </section>
 
       {query && (

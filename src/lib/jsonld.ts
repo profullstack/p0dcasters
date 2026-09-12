@@ -27,6 +27,9 @@ export function listingJsonLd({
   page: number;
 }) {
   const url = `${SITE}${path}`;
+  // A listing is as fresh as the newest episode on it. Nothing else on these
+  // pages carries a date, so without this the whole directory looks undated.
+  const newest = rows.reduce((n, p) => Math.max(n, Number(p.newest_pubdate) || 0), 0);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -37,6 +40,7 @@ export function listingJsonLd({
         name,
         description,
         isPartOf: { "@id": `${SITE}/#website` },
+        ...(newest ? { dateModified: new Date(newest * 1000).toISOString() } : {}),
         // Only the unpaginated page claims to be the list itself; ?page=2
         // onwards is a continuation, not a second copy of it.
         ...(page === 1
