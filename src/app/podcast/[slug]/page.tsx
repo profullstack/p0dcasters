@@ -12,6 +12,7 @@ import { AD_MREC } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
 import PlaylistButtons from "@/components/PlaylistButtons";
+import ShareButton from "@/components/ShareButton";
 import { nixampUrl, playlistUrl } from "@/lib/playlist";
 import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
 import TimeAgo from "@/components/TimeAgo";
@@ -173,6 +174,11 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
               RSS feed
             </a>
             <PlaylistButtons url={playlistUrl(p.slug)} nixamp={nixampUrl(playlistUrl(p.slug))} />
+            <ShareButton
+              url={`https://p0dcasters.com/podcast/${encodeURIComponent(p.slug)}`}
+              title={p.title}
+              text={clamp(p.description, 140)}
+            />
             <a className="btn" href={site} rel="noopener nofollow">
               Website
             </a>
