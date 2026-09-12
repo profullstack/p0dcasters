@@ -4,7 +4,14 @@ import { playableUrl } from "./audio";
 export type Episode = {
   id: string;
   title: string;
+  /** What the browser plays: https as published, plain http through /api/audio. */
   audio: string;
+  /**
+   * The enclosure exactly as the publisher wrote it, for handing to another
+   * player. The proxied form above is signed for this site only and is no use
+   * pasted anywhere else.
+   */
+  source: string;
   pubdate: number;
   duration: number | null;
   description: string;
@@ -145,6 +152,7 @@ export function parseFeed(xml: string): Episode[] {
       id: guid,
       title: stripTags(text(item.title)) || "Untitled episode",
       audio: url,
+      source: audio.trim(),
       pubdate: Number.isFinite(parsedDate) ? Math.floor(parsedDate / 1000) : 0,
       duration: seconds(text(item["itunes:duration"])),
       description: stripTags(body).slice(0, 600),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Episode } from "@/lib/feed";
 import { clock, usePlayer, type Track } from "@/components/Player";
 import TimeAgo from "@/components/TimeAgo";
@@ -20,6 +20,61 @@ function toTracks(episodes: Episode[], show: Show): Track[] {
 }
 
 const PAGE = 25;
+
+/**
+ * Puts the publisher's audio URL on the clipboard so it can be pasted into
+ * another player (nixamp's URL box, a terminal, a chat). It is the enclosure
+ * as published rather than what our own player uses: the plain-http shows
+ * stream here through a signed proxy that only this site can read.
+ */
+function CopyUrl({ url, title }: { url: string; title: string }) {
+  const [state, setState] = useState<"idle" | "done" | "failed">("idle");
+  const timer = useRef<number | null>(null);
+  useEffect(() => () => { if (timer.current) window.clearTimeout(timer.current); }, []);
+
+  const settle = (next: "done" | "failed") => {
+    setState(next);
+    if (timer.current) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setState("idle"), 1800);
+  };
+
+  const copy = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("no clipboard");
+      await navigator.clipboard.writeText(url);
+      settle("done");
+    } catch {
+      // Plain http pages and some in-app browsers have no clipboard API. The
+      // selectable link right next to the button is the fallback there.
+      settle("failed");
+    }
+  };
+
+  const label =
+    state === "done" ? "Copied" : state === "failed" ? "Copy failed" : "Copy URL";
+  return (
+    <span className="episode-copy">
+      <button
+        type="button"
+        className={state === "done" ? "episode-copy-btn done" : "episode-copy-btn"}
+        onClick={copy}
+        aria-label={`Copy audio URL for ${title}`}
+        title="Copy the audio URL to paste into another player, such as nixamp"
+      >
+        {label}
+      </button>
+      <a
+        className="episode-copy-link"
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+        title={url}
+      >
+        {url}
+      </a>
+    </span>
+  );
+}
 
 export function EpisodeList({
   episodes,
@@ -66,6 +121,7 @@ export function EpisodeList({
                   {e.duration ? ` · ${clock(e.duration)}` : ""}
                   {current ? " · playing" : ""}
                 </p>
+                <CopyUrl url={e.source} title={t.title} />
                 {e.description && <p className="episode-desc">{e.description}</p>}
               </div>
             </li>
