@@ -34,7 +34,7 @@ export default function PlaylistButtons({ url, nixamp }: { url: string; nixamp: 
     state === "done" ? "Copied" : state === "failed" ? "Copy failed" : "Copy playlist URL";
   return (
     <>
-      <a className="btn" href={url} rel="noopener" title="Every episode as an M3U playlist, oldest first">
+      <a className="btn" href={url} rel="noopener" title="Every episode as an M3U playlist, newest first">
         Playlist .m3u
       </a>
       <button

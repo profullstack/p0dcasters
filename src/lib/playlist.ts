@@ -24,19 +24,18 @@ function line(s: string): string {
 }
 
 /**
- * Every episode of a show as an extended M3U, oldest first.
+ * Every episode of a show as an extended M3U, newest first.
  *
- * Oldest first because the point of the file is to play a whole show through
- * in a player that takes a playlist URL, nixamp among them: a stream that
- * starts at episode one and runs forward is the show; one that starts at the
- * newest and runs backwards is not. The feed's own order is newest first and
- * the page keeps that.
+ * Newest first, the way the feed and the page put them: a listener who
+ * opens a show wants the latest episode, and a station that goes round the
+ * list comes back to the beginning soon enough. Sorted here rather than
+ * trusted, since a feed out of the wild is not always in order.
  *
  * Each entry is the publisher's enclosure as written, never this site's
  * signed proxy, since the file is for players that are not this site.
  */
 export function toM3U(title: string, slug: string, episodes: Episode[]): string {
-  const ordered = [...episodes].sort((a, b) => a.pubdate - b.pubdate);
+  const ordered = [...episodes].sort((a, b) => b.pubdate - a.pubdate);
   const out = ["#EXTM3U", `#PLAYLIST:${line(title)}`, `#EXTURL:${playlistUrl(slug)}`];
   for (const e of ordered) {
     const seconds = e.duration && e.duration > 0 ? Math.round(e.duration) : -1;
