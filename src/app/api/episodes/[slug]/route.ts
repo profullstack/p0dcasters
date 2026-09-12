@@ -2,6 +2,7 @@ import { one } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import { fetchEpisodes } from "@/lib/feed";
 import { safeImage } from "@/lib/format";
+import { playlistUrl } from "@/lib/playlist";
 
 export const revalidate = 1800;
 
@@ -23,6 +24,8 @@ export async function GET(
       title: show.title,
       // https, so the player never hands the browser a blockable image URL.
       image: safeImage(show.image_url),
+      // Every episode as one M3U, for a player that takes a playlist URL.
+      playlist: playlistUrl(show.slug),
       episodes,
     },
     { headers: { "cache-control": "public, s-maxage=1800, stale-while-revalidate=86400" } },

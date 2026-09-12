@@ -11,6 +11,8 @@ import AdBanner from "@/components/AdBanner";
 import { AD_MREC } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
+import PlaylistButtons from "@/components/PlaylistButtons";
+import { nixampUrl, playlistUrl } from "@/lib/playlist";
 import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
 import TimeAgo from "@/components/TimeAgo";
 
@@ -170,6 +172,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
             <a className="btn" href={p.feed_url} rel="noopener nofollow">
               RSS feed
             </a>
+            <PlaylistButtons url={playlistUrl(p.slug)} nixamp={nixampUrl(playlistUrl(p.slug))} />
             <a className="btn" href={site} rel="noopener nofollow">
               Website
             </a>

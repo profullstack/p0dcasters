@@ -408,6 +408,8 @@ body:has(.player) footer.site { padding-bottom: 122px; }
 }
 
 .btn.ghosted { opacity: .45; pointer-events: none; }
+.btn.playlist-copy { cursor: pointer; font: inherit; }
+.btn.playlist-copy.done { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
 
 /* ------------------------------------------------------------------- ads */
 
