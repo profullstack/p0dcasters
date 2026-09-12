@@ -65,6 +65,25 @@ if (opts.status === "ok") {
   }
 }
 
+// Runs that never reported an end. The refresh script holds a lock for its
+// whole life, so by the time this process is writing for a *different* key,
+// any row still marked running belongs to a run that was killed -- a timeout,
+// a reboot, an OOM -- before it could say so. Close it out as failed, so the
+// page stops showing a phantom run and health() judges the runs that actually
+// happened. Best effort, like everything else here.
+try {
+  await c.execute({
+    sql: `UPDATE refresh_runs
+             SET status = 'failed', finished_at = ?,
+                 message = COALESCE(message || ' -- ', '')
+                           || 'abandoned: the process died without reporting'
+           WHERE status = 'running' AND run_key <> ?`,
+    args: [now, opts.key],
+  });
+} catch (err) {
+  console.error("record_run: abandoned-run sweep failed:", err.message);
+}
+
 try {
   await c.execute({
     sql: `INSERT INTO refresh_runs

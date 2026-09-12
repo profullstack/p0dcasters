@@ -21,9 +21,11 @@ python3 scripts/build_live.py               # -> p0dcasters_live.db
 # 3. Indie cut + scoring + FTS.
 python3 scripts/export_indie.py             # -> p0dcasters.db
 
-# 4. Load into Turso.
-export TURSO_DATABASE_URL=$(turso db show p0dcasters --url)
-export TURSO_AUTH_TOKEN=$(turso db tokens create p0dcasters | tail -1)
+# 4. Load into Turso. The site's own credentials, from the vault -- not the
+#    Turso CLI, whose browser login expires weekly and then reports "not
+#    logged in" on stdout with exit 0.
+logicsrc teams pull profullstack p0dcasters prod --env /tmp/p0d.env
+export $(grep -E '^TURSO_(DATABASE_URL|AUTH_TOKEN)=' /tmp/p0d.env | xargs)
 node scripts/load_turso.mjs
 ```
 
@@ -34,20 +36,24 @@ node scripts/load_turso.mjs
 `analyze.py` profiles the raw dump — liveness, host concentration, the Tranco join. Run it
 when you want the numbers behind the About page.
 
-## Reloading into a fresh table
+## How the reload keeps prod serving
 
-`load_turso.mjs` inserts; it does not truncate. For a clean rebuild:
+`load_turso.mjs` never drops the live table first. It stages every row into
+`podcasts_new` while `podcasts` keeps serving, then swaps in one write transaction:
+drop the old table and its FTS index, rename the staged table into place, recreate
+the indexes and the FTS index. A failure before the swap leaves prod untouched; a
+failure inside it rolls back. A `podcasts_new` left by a crash is dropped on the
+next attempt. There is no longer a "tables are dropped, rerun with FORCE=1" state.
 
-```sh
-echo "DROP TABLE IF EXISTS podcasts_fts; DROP TABLE IF EXISTS podcasts;" | turso db shell p0dcasters
-node scripts/load_turso.mjs
-```
+The same database holds the account tables — `users`, `sessions`, `login_tokens`,
+`credentials`, `follows` — created by `migrate_auth.mjs`, plus `refresh_runs`. The
+loader touches none of them. This is also why `follows` stores a slug rather than a
+`podcasts.id`: the reload reassigns ids, so a numeric key would come back pointing
+at somebody else's show.
 
-Drop **only** those two. The same database holds the account tables — `users`,
-`sessions`, `login_tokens`, `credentials`, `follows` — created by
-`migrate_auth.mjs`, and they must survive every rebuild. This is also why `follows`
-stores a slug rather than a `podcasts.id`: the reload above reassigns ids, so a
-numeric key would come back pointing at somebody else's show.
+`turso_sql.mjs` runs one statement with the same credentials (`node
+scripts/turso_sql.mjs "SELECT COUNT(*) FROM podcasts"`); it is what the refresh
+script uses instead of `turso db shell`.
 ## Automatic refresh
 
 `refresh-if-new-dump.sh` does the whole thing above, but only when Podcast Index has
@@ -69,15 +75,47 @@ on 2026-08-28 against an unchanged dump, it cut 21 of 21,628.
 
 It is ordered so prod is the last thing touched: download (to a `.part` file, moved into
 place only after the length matches), extract, build both databases, then check the new
-build has at least `MIN_ROWS` (default 10,000) rows. Only then are the Turso tables
-dropped and reloaded, and the remote count is compared against the local one before the
-stamp is written. A failure anywhere before that leaves the live directory alone.
+build has at least `MIN_ROWS` (default 10,000) rows. Only then does the loader stage and
+swap, and the remote count is compared against the local one before the stamp is
+written. A failure anywhere leaves the live directory alone.
 
 Logs go to `~/p0dcasters-data/refresh.log`. `FORCE=1` rebuilds even when the dump has
 not moved; `DRY_RUN=1` reports what it would do and stops before downloading.
 
-If `load_turso.mjs` fails after the drop, the tables are gone and the fix is
-`FORCE=1 sh scripts/refresh-if-new-dump.sh` — the script says so in the failure line.
+### Recovering on its own
+
+The pipeline stalled for nine days in September 2026 without a single failing command:
+the Turso CLI's browser login had expired, and it answers "You are not logged in" on
+stdout with exit status 0, so `turso db show --url` handed the loader a sentence as a
+URL and `turso db shell` "succeeded" at dropping nothing. What changed:
+
+- **No CLI in the pipeline.** Credentials are a database token, which does not expire.
+  The script takes the first pair the database actually accepts: the cached
+  `~/p0dcasters-data/.turso-token`, then the `p0dcasters--prod` vault via `logicsrc`,
+  then the CLI if it happens to be logged in. A rejected token is discarded and the
+  chain re-walked, so a revoked credential heals on the next run.
+- **One run at a time.** `flock` on `~/p0dcasters-data/.refresh.lock`; an overlapping
+  tick exits at once. Cron wraps the run in `timeout 3h`.
+- **Retries are cheap.** The dump stamp only advances on success, so a failed run is
+  retried at the next tick, and a dump already downloaded and extracted for the same
+  upstream signature is not fetched again.
+- **Nothing is left half-reported.** Every exit path records a status, and the next
+  run's first write closes out any row still marked `running` as failed, so the page
+  never shows a phantom run for days.
+- **A watchdog reads the page.** `crawlstats-watchdog.sh` runs hourly from cron, polls
+  `/api/crawlstats`, and if `health.state` is anything but `healthy` it re-runs the
+  refresh once and checks again. If the page still is not healthy it emails
+  `anthony@profullstack.com` through Resend (key from the same vault, cached in
+  `.resend-key`), at most once every 12 hours, with the tail of `refresh.log`.
+
+```
+0 */6 * * * /usr/bin/timeout -k 60 3h /bin/sh /home/anthony/p0dcasters/scripts/refresh-if-new-dump.sh
+30 * * * *  /bin/sh /home/anthony/p0dcasters/scripts/crawlstats-watchdog.sh
+```
+
+The scripts run from the checkout they live in, so `~/p0dcasters` must be pulled for a
+merged fix to reach the directory; the copies that used to sit in `~/p0dcasters-data`
+are no longer used.
 
 ## Reporting itself to /crawlstats
 
