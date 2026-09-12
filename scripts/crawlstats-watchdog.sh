@@ -21,7 +21,8 @@ SCRIPTS=$(cd "$(dirname "$0")" && pwd)
 LOG=$DATA/watchdog.log
 ALERTED=$DATA/.watchdog-alerted
 KEYF=$DATA/.resend-key
-API=https://p0dcasters.com/api/crawlstats
+# API is overridable so the alert path can be exercised against a dead address.
+API=${API:-https://p0dcasters.com/api/crawlstats}
 ALERT_TO=${ALERT_TO:-anthony@profullstack.com}
 ALERT_EVERY=${ALERT_EVERY:-43200}
 
