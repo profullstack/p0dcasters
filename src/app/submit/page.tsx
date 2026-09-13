@@ -7,7 +7,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "Add a show",
   description:
-    "Add a self-hosted podcast to p0dcasters: paste the site or feed URL and it is checked and listed on the spot.",
+    "Add an independent podcast to p0dcasters: paste the site or feed URL, it is read and checked at once, and a person lists it after a look.",
   alternates: { canonical: "/submit" },
 };
 

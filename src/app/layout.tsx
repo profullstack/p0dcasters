@@ -175,11 +175,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <footer className="site">
               <div className="wrap">
                 <p>
-                  <strong>p0dcasters</strong> — independent, self-hosted podcasts only.
-                  Feed metadata from the{" "}
-                  <a href="https://podcastindex.org">Podcast Index</a> and from publishers who{" "}
-                  <Link href="/submit">add their own show</Link>, filtered to shows that
-                  publish from their own domain.
+                  <strong>p0dcasters</strong> — independent podcasts only. Feed metadata
+                  from the <a href="https://podcastindex.org">Podcast Index</a> and from
+                  publishers who <Link href="/submit">add their own show</Link>, filtered to
+                  shows that publish from their own domain or from Anchor.
                 </p>
                 <p>
                   <Link href="/opml">Full directory as OPML</Link> ·{" "}

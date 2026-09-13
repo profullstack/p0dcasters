@@ -14,6 +14,8 @@ type Reply = {
   statusUrl?: string;
   error?: string;
   retryAfterSeconds?: number;
+  /** Read and checked, waiting for a reviewer. */
+  review?: { url: string; feedUrl: string; title?: string }[];
 };
 
 /**
@@ -47,7 +49,7 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
             ? "Twenty submissions an hour from one address is the limit. Try again later."
             : describe(json.error ?? "bad-request"),
         );
-      } else if (json.queued > 0 && json.accepted.length === 0 && json.statusUrl) {
+      } else if (json.queued > 0 && json.accepted.length === 0 && json.statusUrl && !json.review?.length) {
         window.location.href = json.statusUrl;
       } else {
         setReply(json);
@@ -63,8 +65,9 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
     <div className="auth">
       <h1>Add a show</h1>
       <p className="muted">
-        Paste the podcast&rsquo;s site or its feed. The feed is found from the page, checked
-        against the <Link href="/about">rules</Link>, and listed on the spot if it passes. No
+        Paste the podcast&rsquo;s site or its feed. The feed is found from the page and checked
+        against the <Link href="/about">rules</Link> right now, so you see at once whether it can
+        be listed; a person then looks at it before it goes live, usually the same day. No
         account needed.
       </p>
 
@@ -113,17 +116,24 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
               <a href={reply.statusUrl}>Watch the rest land</a>.
             </p>
           )}
+          {reply.review?.map((r) => (
+            <p key={r.feedUrl}>
+              In the queue: <strong>{r.title || r.feedUrl}</strong> — read and checked; a person lists it after a
+              look.
+            </p>
+          ))}
         </div>
       )}
 
       <p className="muted small">
-        A show is listed when its feed has episodes with audio, publishes from its own domain
-        rather than a hosting platform, and has an episode inside the last 90 days. Anything
-        on a platform is welcome at{" "}
-        <a href="https://rssamplifier.com/submit">rssamplifier.com</a> instead. Submissions
-        are also passed along there. Agents and scripts: the same endpoint takes JSON, see{" "}
-        <Link href="/skill.md">skill.md</Link>, the <Link href="/mcp">MCP server</Link> or the{" "}
-        <Link href="/cli">CLI</Link>.
+        A show can be listed when its feed has episodes with audio, publishes from its own
+        domain or from Anchor rather than a paid hosting platform, and has an episode inside
+        the last 90 days. Anything on a platform is welcome at{" "}
+        <a href="https://rssamplifier.com/submit">rssamplifier.com</a> instead. Listed
+        submissions are also passed along there. Agents and scripts: the same endpoint takes
+        JSON, see <Link href="/skill.md">skill.md</Link>, the <Link href="/mcp">MCP server</Link>{" "}
+        or the <Link href="/cli">CLI</Link>; an <a href="https://openaccess.logicsrc.com">OpenAccess</a>{" "}
+        grant for <code>podcasts:submit</code> puts your name on the submission.
       </p>
     </div>
   );

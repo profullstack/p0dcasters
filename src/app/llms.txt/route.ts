@@ -15,10 +15,11 @@ export async function GET() {
   const body = `# p0dcasters
 
 > An index of ${total.toLocaleString()} podcasts that publish from a domain their creator
-> controls, across ${hosts.toLocaleString()} distinct domains. Feeds hosted on Spotify's
-> Anchor, Buzzsprout, Libsyn and the other large platforms are deliberately excluded, so
-> this is a view of the independent, self-hosted part of podcasting and nothing else.
-> Free to use, hosts no audio itself, and every listing links to the publisher.
+> controls, across ${hosts.toLocaleString()} distinct domains, plus shows on Anchor,
+> Spotify's free host. Feeds on Buzzsprout, Libsyn and the other paid platforms are
+> deliberately excluded, so this is a view of the independent part of podcasting and
+> nothing else. Free to use, hosts no audio itself, and every listing links to the
+> publisher.
 
 p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 
@@ -27,7 +28,7 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - [About](https://p0dcasters.com/about): The inclusion rules in full — a feed is listed
   when it returned HTTP 200 on the last fetch, published within 90 days, has at least
   three episodes with a title, description and artwork, sits on a domain carrying fewer
-  than 25 live feeds, and does not average ten or more episodes a day. Also explains the
+  than 25 live feeds (Anchor excepted), and does not average ten or more episodes a day. Also explains the
   ranking (catalogue depth and longevity, weighted by recency) and why ranking by domain
   popularity does not work here.
 - [Terms](https://p0dcasters.com/terms): Free, no paid tier, nothing hosted here.
@@ -51,10 +52,15 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 ## Adding a show
 
 - [Submit](https://p0dcasters.com/submit): Paste a podcast's site or feed URL; the feed is
-  found, checked against the inclusion rules and listed on the spot. No account.
+  found and checked against the inclusion rules at once, and a person lists it after a
+  look, usually the same day. No account.
 - [POST /api/submit](https://p0dcasters.com/api/submit): The same as JSON —
   {"url": "..."} or {"urls": [...]} or {"opml": "..."} — answering
-  {ok, accepted, rejected, queued, statusUrl}. Twenty requests an hour per address.
+  {ok, accepted, rejected, queued, statusUrl, review}. A feed that passes comes back in
+  review (and counted in queued), not accepted, until a person lists it. Twenty requests
+  an hour per address. An OpenAccess bearer token (hub https://openaccess.logicsrc.com,
+  scope podcasts:submit) records its principal as the submitter; scope
+  submissions:review opens GET /api/review and POST /api/review/{id}.
 - [MCP](https://p0dcasters.com/mcp): search, get_podcast, list_episodes, list_shows,
   browse, directory_stats and submit_feed at https://p0dcasters.com/api/mcp, no key.
 - [CLI](https://p0dcasters.com/cli): \`curl -fsSL https://p0dcasters.com/install.sh | sh\`
@@ -76,8 +82,8 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - Search results at /search are excluded in robots.txt: they are generated per query and
   duplicate the category and language pages. Use /browse or the OPML export instead.
 - Show metadata belongs to the publisher, is read from their feed, and can be stale.
-- No show here is hosted on a large podcast platform. That is the defining property of
-  the directory, not a claim about quality.
+- No show here is hosted on a paid podcast platform; Anchor, the free one, is the single
+  exception. That is the defining property of the directory, not a claim about quality.
 `;
 
   return new Response(body, {

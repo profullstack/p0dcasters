@@ -76,7 +76,7 @@ export default async function About() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Add it at https://p0dcasters.com/submit: paste the show's site or feed URL and it is checked against the inclusion rules and listed on the spot, no account needed. Shows in the Podcast Index that meet the rules also appear on their own at the next rebuild. To be removed, or to report wrong metadata, email hello@p0dcasters.com — though titles, descriptions and artwork are read from your feed, so correcting the feed corrects the listing everywhere.",
+            "Add it at https://p0dcasters.com/submit: paste the show's site or feed URL, it is read and checked against the inclusion rules at once, and a person lists it after a look, usually the same day; no account needed. Shows in the Podcast Index that meet the rules also appear on their own at the next rebuild. To be removed, or to report wrong metadata, email hello@p0dcasters.com — though titles, descriptions and artwork are read from your feed, so correcting the feed corrects the listing everywhere.",
         },
       },
     ],
@@ -102,7 +102,7 @@ export default async function About() {
           This directory is the remainder: <strong>{total.toLocaleString()} shows</strong> on{" "}
           <strong>{hosts.toLocaleString()} distinct domains</strong>, together{" "}
           {Number(eps).toLocaleString()} episodes. Every one publishes from a domain its
-          creator controls.
+          creator controls, or from Anchor, the free host most independent shows start on.
         </p>
 
         <h2 id="what-gets-in">What gets in?</h2>
@@ -111,8 +111,10 @@ export default async function About() {
           <li>returned HTTP 200 on the last fetch, and published within the last 90 days;</li>
           <li>
             is <em>not</em> on a hosting platform or broadcaster — defined as any domain
-            carrying 25 or more live feeds, which removes 308 domains including every major
-            host;
+            carrying 25 or more live feeds, which removes about 300 domains including every
+            paid host. One exception: Anchor, Spotify&rsquo;s free host, is let through,
+            because it is where most one-person shows start and excluding it threw out
+            exactly the long tail this directory exists for;
           </li>
           <li>has at least three episodes, plus a title, description and artwork;</li>
           <li>
@@ -161,10 +163,10 @@ export default async function About() {
         <h2 id="get-listed">How do I get my show listed, or removed?</h2>
         <p>
           <Link href="/submit">Add it</Link>: paste the show&rsquo;s site or its feed and it is
-          checked against the rules above and listed on the spot. Nobody approves entries by
-          hand, so there is nothing to wait for; a feed that misses a rule is told which one.
-          Shows in the Podcast Index that meet the rules also appear on their own at the next
-          rebuild. To be taken out, or to report metadata that is wrong, write to{" "}
+          read and checked against the rules above at once — a feed that misses a rule is told
+          which one. A feed that passes waits for a person to look at it before it is listed,
+          usually the same day. Shows in the Podcast Index that meet the rules also appear on
+          their own at the next rebuild, with nobody in the loop. To be taken out, or to report metadata that is wrong, write to{" "}
           <Link href="/contact">us</Link> — though titles, descriptions and artwork are read
           from your feed, so fixing the feed fixes it everywhere.
         </p>

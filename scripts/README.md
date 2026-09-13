@@ -55,7 +55,12 @@ the dump does not already carry into `podcasts_new` — unless the show has aged
 the same 90-day rule as everything else. Where the dump now carries the feed, the
 dump's row wins and the submission's slug is kept on it so follows and links survive.
 `platform_hosts` (written by `export_indie.py`, the 25-feeds-per-host cut) is staged
-and swapped like `podcasts`; it is what `/api/submit` refuses platform feeds with. This is also why `follows` stores a slug rather than a
+and swapped like `podcasts`; it is what `/api/submit` refuses platform feeds with.
+`anchor.fm` is deleted from that cut on purpose (`ALLOWED_PLATFORMS` in
+`export_indie.py`, mirrored in `src/lib/platforms.ts`, since 2026-09-13), which is why
+the directory is ~5x the size it was before that date. A submission is not listed by
+the loader until a person has approved it: only rows in status `listed` are merged, and
+`review` rows wait in the queue at `/admin/submissions`. This is also why `follows` stores a slug rather than a
 `podcasts.id`: the reload reassigns ids, so a numeric key would come back pointing
 at somebody else's show.
 

@@ -10,9 +10,18 @@ import { count } from "@/lib/db";
  * below is the fallback for a database that has not been rebuilt since the
  * table was added, and it is the well-known names only: a platform the table
  * would catch and this list would not is exactly what the table is for.
+ *
+ * One platform is let through on purpose. Anchor (Spotify for Creators) is
+ * the free host where most genuinely independent shows start and the largest
+ * host in the index by far, and treating it as "commercial" threw out exactly
+ * the long tail of one-person shows the directory exists for. Since
+ * 2026-09-13 it is allowed here and in scripts/export_indie.py
+ * (ALLOWED_PLATFORMS there, kept the same), so a submitted Anchor show and a
+ * dump-listed one are judged alike. The paid hosts and the networks stay out.
  */
+export const ALLOWED_PLATFORMS = ["anchor.fm"];
+
 export const KNOWN_PLATFORMS = [
-  "anchor.fm",
   "spotify.com",
   "spotifycdn.com",
   "buzzsprout.com",
@@ -59,6 +68,7 @@ export const KNOWN_PLATFORMS = [
 export async function isPlatformHost(host: string): Promise<boolean> {
   const h = host.toLowerCase().replace(/^www\./, "");
   const tails = suffixes(h);
+  for (const t of tails) if (ALLOWED_PLATFORMS.includes(t)) return false;
   for (const t of tails) if (KNOWN_PLATFORMS.includes(t)) return true;
   try {
     const n = await count(

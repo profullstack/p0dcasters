@@ -42,13 +42,14 @@ export default async function Home() {
           <h1>Podcasts that live on their own domain.</h1>
           <p className="lede">
             Every one of these <span className="count">{total.toLocaleString()}</span>{" "}
-            shows publishes from a domain it controls — not Spotify, not Anchor, not
-            Buzzsprout. This is what's left of podcasting's open web.
+            shows publishes from a domain it controls, or from Anchor, the free host where
+            independents start — not Buzzsprout, not Libsyn, not a network. This is
+            podcasting's open web. Missing one? <Link href="/submit">Add it</Link>.
           </p>
           <form className="searchbar" action="/search">
             <input
               name="q"
-              placeholder="Search 22,000 independent shows…"
+              placeholder="Search independent shows…"
               aria-label="Search podcasts"
             />
             <button type="submit">Search</button>
@@ -61,7 +62,7 @@ export default async function Home() {
               <b>{hosts.toLocaleString()}</b> distinct domains
             </div>
             <div>
-              <b>0</b> on a big platform
+              <b>0</b> on a paid platform
             </div>
           </div>
         </div>

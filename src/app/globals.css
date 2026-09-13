@@ -718,3 +718,21 @@ table.tools pre { margin: 8px 0 0; }
   padding: 12px 14px; overflow-x: auto; font-size: 13.5px;
 }
 .prose code { font-family: ui-monospace, Menlo, monospace; font-size: 0.93em; }
+
+/* The review queue at /admin/submissions. */
+.status-review .submission-status { color: var(--muted); font-style: italic; }
+.submit-preview { margin: 0 0 12px; cursor: default; }
+.submit-preview:hover { border-color: var(--border); }
+.review-item { padding: 18px 0 22px; border-bottom: 1px solid var(--border); }
+.review-desc { font-size: 15px; margin: 0 0 8px; }
+.review-meta { word-break: break-all; margin: 0 0 10px; }
+.review-actions input[type="text"] {
+  width: 100%; padding: 9px 12px; font-size: 14px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); margin-bottom: 10px;
+}
+.review-actions input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.review-actions .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.review-done { font-weight: 600; }
+.review-log { padding-left: 18px; }
+.review-log li { margin: 0 0 6px; }

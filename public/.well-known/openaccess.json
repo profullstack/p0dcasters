@@ -18,7 +18,10 @@
       }
     ]
   },
-  "scopes": {},
+  "scopes": {
+    "podcasts:submit": "Submit a podcast for listing as yourself: POST /api/submit {url}. The feed is read and checked at once and waits for a reviewer; the grant's principal is recorded as the submitter.",
+    "submissions:review": "See the review queue and approve or reject entries: GET /api/review, GET /api/review/{id}, POST /api/review/{id} {decision, reason}. Reviewer only."
+  },
   "honours": [
     "profullstack.com/all-access"
   ],
