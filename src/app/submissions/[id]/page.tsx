@@ -10,6 +10,7 @@ export const metadata: Metadata = { title: "Your submission", robots: { index: f
 const LABEL: Record<string, string> = {
   pending: "waiting",
   resolving: "reading the feed…",
+  review: "waiting for a person",
   listed: "listed",
   existing: "already listed",
   rejected: "not listed",
@@ -28,18 +29,23 @@ export default async function Submission({ params }: { params: Promise<{ id: str
 
   const open = rows.filter((r) => r.status === "pending" || r.status === "resolving").length;
   if (open > 0 && (await recoverBatch(id))) after(async () => { await drainBatch(id); });
-  const listed = rows.filter((r) => r.status === "listed").length;
+  const listed = rows.filter((r) => r.status === "listed" || r.status === "existing").length;
+  const review = rows.filter((r) => r.status === "review").length;
+  const summary = () => {
+    if (open > 0) return `${rows.length - open} of ${rows.length} checked. This page refreshes on its own.`;
+    const parts: string[] = [];
+    if (review) parts.push(`${review} ${review === 1 ? "show is" : "shows are"} read, checked and waiting for a person to list ${review === 1 ? "it" : "them"} — usually the same day`);
+    if (listed) parts.push(`${listed} ${listed === 1 ? "is" : "are"} listed`);
+    if (rows.length > review + listed) parts.push(`${rows.length - review - listed} not listed`);
+    return `${parts.join("; ")}.`;
+  };
 
   return (
     <div className="wrap narrow">
       {open > 0 && <meta httpEquiv="refresh" content="4" />}
       <div className="auth">
-        <h1>{open > 0 ? "Adding your shows" : "Done"}</h1>
-        <p className="muted">
-          {open > 0
-            ? `${rows.length - open} of ${rows.length} checked. This page refreshes on its own.`
-            : `${listed} ${listed === 1 ? "show" : "shows"} added${rows.length > listed ? `, ${rows.length - listed} not` : ""}.`}
-        </p>
+        <h1>{open > 0 ? "Checking your shows" : review > 0 ? "In the queue" : "Done"}</h1>
+        <p className="muted">{summary()}</p>
         <ul className="submission-rows">
           {rows.map((r) => (
             <li key={r.id} className={`status-${r.status}`}>
@@ -52,8 +58,9 @@ export default async function Submission({ params }: { params: Promise<{ id: str
           ))}
         </ul>
         <p className="muted small">
-          <Link href="/submit">Submit another</Link> · A show that was not listed can be resubmitted once the
-          feed is fixed; the reason beside it is the rule it missed.
+          <Link href="/submit">Submit another</Link> · A show waiting for a person needs nothing more from
+          you; once listed it lives at its own page like every other show here. One that was not listed can
+          be resubmitted once the feed is fixed; the reason beside it is the rule it missed.
         </p>
       </div>
     </div>

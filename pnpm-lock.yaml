@@ -11,6 +11,9 @@ importers:
       '@libsql/client':
         specifier: ^0.15.0
         version: 0.15.15
+      '@logicsrc/openaccess':
+        specifier: 0.3.0
+        version: 0.3.0
       '@profullstack/player':
         specifier: ^0.2.0
         version: 0.2.0(react@19.2.8)
@@ -62,6 +65,12 @@ packages:
 
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
+
+  '@hono/node-server@2.1.1':
+    resolution: {integrity: sha512-ELuehkj5VCBdgEw9zs+ivkKwyzzUCSQuE96YmiPvn1ECBoZCczbFXJLeEGMTYjphP6gydh4pHMqEYPVMYUVgQg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      hono: ^4
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -289,6 +298,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@logicsrc/openaccess@0.3.0':
+    resolution: {integrity: sha512-zGhn/IJSiFXSc0TJqfXYxRo2Od+LF5zCWILeksurf0hVGGleo0N7WEfk6M0lipts6pm46z7JFN5JPO4qJQZsJQ==}
+    engines: {node: '>=24'}
+    hasBin: true
+
   '@neon-rs/load@0.0.4':
     resolution: {integrity: sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw==}
 
@@ -503,6 +517,10 @@ packages:
   hls.js@1.7.1:
     resolution: {integrity: sha512-DlzIkeBAS9IIQ432k3BUf3HlwbsR0+trB1i2lDdN2gUkNkrehFurh0/48M5c1/EjlDkdGng1gwZIpwyPxvdZ/g==}
 
+  hono@4.13.7:
+    resolution: {integrity: sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ==}
+    engines: {node: '>=16.9.0'}
+
   is-unsafe@2.0.2:
     resolution: {integrity: sha512-HgbIHPBH0KHHCcjLfGsCvhtPTVxjaAZlXjwdz7/GQC40SjSe4sfQsar8J5VFo8JOSbarkpV0OLG95bbaNd9aAQ==}
 
@@ -672,6 +690,10 @@ snapshots:
     optional: true
 
   '@hexagon/base64@1.1.28': {}
+
+  '@hono/node-server@2.1.1(hono@4.13.7)':
+    dependencies:
+      hono: 4.13.7
 
   '@img/colour@1.1.0':
     optional: true
@@ -843,6 +865,11 @@ snapshots:
 
   '@libsql/win32-x64-msvc@0.5.29':
     optional: true
+
+  '@logicsrc/openaccess@0.3.0':
+    dependencies:
+      '@hono/node-server': 2.1.1(hono@4.13.7)
+      hono: 4.13.7
 
   '@neon-rs/load@0.0.4': {}
 
@@ -1077,6 +1104,8 @@ snapshots:
       fetch-blob: 3.2.0
 
   hls.js@1.7.1: {}
+
+  hono@4.13.7: {}
 
   is-unsafe@2.0.2: {}
 

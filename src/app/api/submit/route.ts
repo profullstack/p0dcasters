@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { parseSubmission, submitReply, wantsHtml } from "@profullstack/submit-feed";
 import type { AcceptedFeed, RejectedFeed } from "@profullstack/submit-feed";
 import { currentUser, origin } from "@/lib/auth/session";
+import { bearerPrincipal, SCOPE_SUBMIT } from "@/lib/openaccess";
 import {
   MAX_URLS,
   RATE_LIMIT,
@@ -25,11 +26,14 @@ export const maxDuration = 60;
  *   200   { ok, accepted, rejected, queued, total, submissionId, statusUrl }
  *   303   for a browser: to the show, or to the status page
  *
- * One URL resolves in the request, so the person who typed it lands on the
- * show. A list is recorded and resolved after the response, one feed at a
- * time, and the status page shows each land. No account is needed; the
- * budget is twenty requests an hour per address, and a signed-in listener is
- * remembered on the row but not treated differently.
+ * One URL resolves in the request, so the person who typed it sees at once
+ * whether the feed can be listed; a list is recorded and resolved after the
+ * response, one feed at a time, and the status page shows each land. A feed
+ * that passes waits for a reviewer (it comes back as `queued`, with the
+ * status page to watch), so only a show already here lands in `accepted`.
+ * No account is needed; the budget is twenty requests an hour per address.
+ * A signed-in listener, or an OpenAccess principal holding podcasts:submit,
+ * is remembered on the row as the submitter, which the reviewer sees.
  */
 export async function POST(req: Request) {
   const html = wantsHtml(req.headers.get("accept"));
@@ -66,8 +70,9 @@ export async function POST(req: Request) {
         });
   }
 
-  const user = await currentUser();
-  const { batchId, ids } = await createBatch(s.urls, { userId: user?.id ?? null, ipHash });
+  const [user, principal] = await Promise.all([currentUser(), bearerPrincipal(req)]);
+  const submittedBy = user?.email ?? (principal?.scopes.includes(SCOPE_SUBMIT) ? principal.sub : null);
+  const { batchId, ids } = await createBatch(s.urls, { userId: user?.id ?? null, ipHash, submittedBy });
   const statusUrl = `${site}/submissions/${batchId}`;
   const rejected: RejectedFeed[] = s.invalid.map((url) => ({ url, error: "invalid-url" }));
   const accepted: AcceptedFeed[] = [];
@@ -83,6 +88,15 @@ export async function POST(req: Request) {
     if (outcome === "slow") {
       after(async () => { await work; });
       return html ? Response.redirect(statusUrl, 303) : Response.json(submitReply({ queued: 1, submissionId: batchId, statusUrl }));
+    }
+    if (outcome && outcome.status === "review") {
+      // Read, checked, waiting for a person. The status page says so.
+      return html
+        ? Response.redirect(statusUrl, 303)
+        : Response.json({
+            ...submitReply({ accepted, rejected, queued: 1, submissionId: batchId, statusUrl }),
+            review: [{ url: s.urls[0], feedUrl: outcome.feedUrl, title: outcome.title }],
+          });
     }
     if (outcome && outcome.status !== "rejected") {
       const page = `${site}/podcast/${outcome.slug}`;

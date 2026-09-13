@@ -39,3 +39,19 @@ for (const sql of DDL) {
   await c.execute(sql);
   console.log("ok:", sql.split("\n")[0].trim());
 }
+
+// The review columns, added after the table (submissions were listed on the
+// spot at first; now a person approves them). SQLite has no ADD COLUMN IF NOT
+// EXISTS, so each is tried and a "duplicate column" error is the fine case.
+// src/lib/submit.ts does the same lazily, so a deploy never waits on this.
+for (const col of ["submitted_by TEXT", "reviewed_at INTEGER", "reviewed_by TEXT", "reason TEXT"]) {
+  try {
+    await c.execute(`ALTER TABLE submissions ADD COLUMN ${col}`);
+    console.log("added column:", col);
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e))) throw e;
+    console.log("column present:", col.split(" ")[0]);
+  }
+}
+const by = await c.execute("SELECT status, COUNT(*) AS n FROM submissions GROUP BY status");
+console.log("submissions:", by.rows.length ? by.rows.map((r) => `${r.status}=${r.n}`).join(" ") : "none");

@@ -188,6 +188,19 @@ export const TOOLS: Tool[] = [
         if (outcome.status === "rejected") {
           return { ok: false, accepted: [], rejected: [{ url: urls[0], error: outcome.error, message: outcome.message }], queued: 0, total: 1, statusUrl };
         }
+        if (outcome.status === "review") {
+          return {
+            ok: true,
+            accepted: [],
+            rejected: [],
+            queued: 1,
+            total: 1,
+            submissionId: batchId,
+            statusUrl,
+            review: [{ url: urls[0], feedUrl: outcome.feedUrl, title: outcome.title }],
+            note: "The feed was read and passes the rules; a person lists it after a look, usually the same day. Watch statusUrl.",
+          };
+        }
         return {
           ok: true,
           accepted: [{ url: urls[0], slug: outcome.slug, page: `${SITE}/podcast/${outcome.slug}`, existing: outcome.status === "existing", title: outcome.title, feedUrl: outcome.feedUrl }],

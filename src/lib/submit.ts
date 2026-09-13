@@ -5,6 +5,7 @@ import type { Podcast } from "@/lib/db";
 import { env, now, secret, sha256, token } from "@/lib/auth/crypto";
 import { normalizeLang } from "@/lib/format";
 import { isPlatformHost } from "@/lib/platforms";
+import { notifyReviewers } from "@/lib/review";
 
 /**
  * Feed submission, the site-specific half.
@@ -15,12 +16,14 @@ import { isPlatformHost } from "@/lib/platforms";
  * directory, the row it becomes, the slug it gets, and the ledger that
  * remembers it across a rebuild.
  *
- * A submission is listed at once. There is no review queue because listing
- * was never a decision anyone made by hand: a feed is in when it meets the
- * rules, and the rules are the same ones the rebuild applies to the Podcast
- * Index dump, checked here against the live feed instead. The row goes into
- * `podcasts` and its FTS index directly, and a copy is kept in `submissions`
- * so scripts/load_turso.mjs can put it back after the weekly reload.
+ * A submission is read and checked at once, against the same rules the
+ * rebuild applies to the Podcast Index dump, but it is listed only after a
+ * person has looked at it (src/lib/review.ts). The row it would become is
+ * kept as JSON on the `submissions` row in status `review`; approving inserts
+ * it into `podcasts` and its FTS index and moves the row to `listed`, which
+ * is the status scripts/load_turso.mjs puts back after the weekly reload.
+ * A feed that fails a rule is refused on the spot with the rule named, so the
+ * queue holds only shows that could be listed.
  */
 
 export const MAX_URLS = 50;
@@ -41,16 +44,41 @@ export type SubmissionRow = {
   feed_url: string | null;
   slug: string | null;
   title: string | null;
-  status: "pending" | "resolving" | "listed" | "existing" | "rejected";
+  status: "pending" | "resolving" | "review" | "listed" | "existing" | "rejected";
   error: string | null;
   message: string | null;
   created_at: number;
   resolved_at: number | null;
+  podcast?: string | null;
+  submitted_by?: string | null;
+  reviewed_at?: number | null;
+  reviewed_by?: string | null;
+  reason?: string | null;
 };
 
 export type Outcome =
   | { status: "listed" | "existing"; slug: string; title: string; feedUrl: string }
+  | { status: "review"; title: string; feedUrl: string; row: Omit<Podcast, "id" | "slug"> }
   | { status: "rejected"; error: string; message: string };
+
+// The review columns were added after the table (PR #21 listed on the spot).
+// Adding them lazily means a deploy never depends on running the migration
+// first; scripts/migrate_submissions.mjs adds the same ones for a fresh db.
+let columnsReady: Promise<void> | null = null;
+export function ensureReviewColumns(): Promise<void> {
+  if (!columnsReady) {
+    columnsReady = (async () => {
+      for (const col of ["submitted_by TEXT", "reviewed_at INTEGER", "reviewed_by TEXT", "reason TEXT"]) {
+        try {
+          await db().execute(`ALTER TABLE submissions ADD COLUMN ${col}`);
+        } catch {
+          /* already there */
+        }
+      }
+    })();
+  }
+  return columnsReady;
+}
 
 /** Hash an address with the site secret, so the ledger never holds an IP. */
 export function hashIp(ip: string | null): string | null {
@@ -81,16 +109,17 @@ export async function requestsThisHour(ipHash: string | null): Promise<number> {
 /** Record a batch of inputs as pending rows. */
 export async function createBatch(
   inputs: string[],
-  ctx: { userId: number | null; ipHash: string | null },
+  ctx: { userId: number | null; ipHash: string | null; submittedBy?: string | null },
 ): Promise<{ batchId: string; ids: string[] }> {
+  await ensureReviewColumns();
   const batchId = token(9);
   const ids = inputs.map(() => token(9));
   const t = now();
   await db().batch(
     inputs.map((input, i) => ({
-      sql: `INSERT INTO submissions(id, batch_id, input, status, user_id, ip_hash, created_at)
-            VALUES(?,?,?,'pending',?,?,?)`,
-      args: args([ids[i], batchId, input, ctx.userId, ctx.ipHash, t]),
+      sql: `INSERT INTO submissions(id, batch_id, input, status, user_id, ip_hash, created_at, submitted_by)
+            VALUES(?,?,?,'pending',?,?,?,?)`,
+      args: args([ids[i], batchId, input, ctx.userId, ctx.ipHash, t, ctx.submittedBy ?? null]),
     })),
     "write",
   );
@@ -131,14 +160,22 @@ export async function resolveSubmission(id: string): Promise<Outcome | null> {
     };
   }
 
-  const podcast = outcome.status === "listed" ? await one<Podcast>("SELECT * FROM podcasts WHERE slug = ?", [outcome.slug]) : null;
+  // What the ledger keeps: for a show waiting on review, the row it would be
+  // listed as (the reviewer sees the show, not a URL, and approval inserts
+  // exactly this); for one already listed, the row as it stands.
+  const podcast =
+    outcome.status === "review"
+      ? outcome.row
+      : outcome.status === "listed"
+        ? await one<Podcast>("SELECT * FROM podcasts WHERE slug = ?", [outcome.slug])
+        : null;
   await db().execute({
     sql: `UPDATE submissions SET status = ?, feed_url = ?, slug = ?, title = ?, error = ?, message = ?, podcast = ?, resolved_at = ?
           WHERE id = ?`,
     args: args([
       outcome.status,
       outcome.status === "rejected" ? null : outcome.feedUrl,
-      outcome.status === "rejected" ? null : outcome.slug,
+      outcome.status === "rejected" || outcome.status === "review" ? null : outcome.slug,
       outcome.status === "rejected" ? null : outcome.title,
       outcome.status === "rejected" ? outcome.error : null,
       outcome.status === "rejected" ? outcome.message : null,
@@ -149,7 +186,101 @@ export async function resolveSubmission(id: string): Promise<Outcome | null> {
   });
 
   if (outcome.status === "listed") void forward(outcome.feedUrl);
+  if (outcome.status === "review") {
+    void notifyReviewers({
+      title: outcome.title,
+      host: outcome.row.host,
+      episodes: outcome.row.episode_count,
+      feedUrl: outcome.feedUrl,
+      input: row.input,
+      by: row.submitted_by ?? null,
+    });
+  }
   return outcome;
+}
+
+// --- the review queue --------------------------------------------------------
+
+/** Rows in one status, newest first, for the queue and the API. */
+export async function submissionsByStatus(status: SubmissionRow["status"], limit = 200): Promise<SubmissionRow[]> {
+  await ensureReviewColumns();
+  return all<SubmissionRow>(
+    `SELECT * FROM submissions WHERE status = ? ORDER BY resolved_at DESC, created_at DESC LIMIT ?`,
+    [status, limit],
+  );
+}
+
+/** Rows a person has decided on, newest decision first. */
+export async function recentDecisions(limit = 30): Promise<SubmissionRow[]> {
+  await ensureReviewColumns();
+  return all<SubmissionRow>(
+    `SELECT * FROM submissions WHERE reviewed_at IS NOT NULL ORDER BY reviewed_at DESC LIMIT ?`,
+    [limit],
+  );
+}
+
+export async function submissionRow(id: string): Promise<SubmissionRow | null> {
+  await ensureReviewColumns();
+  return one<SubmissionRow>("SELECT * FROM submissions WHERE id = ?", [id]);
+}
+
+export type Decision =
+  | { ok: true; status: "listed" | "existing" | "rejected"; slug: string | null; title: string | null }
+  | { ok: false; error: string; status: number };
+
+/**
+ * Approve: the show is listed now, under a slug fixed from here on, from the
+ * row read when it was submitted -- re-read first so the listing is as fresh
+ * as the decision, falling back to that snapshot when the publisher is down.
+ * Reject: the row records who said no and why, and the same feed can be
+ * submitted again once whatever it was is fixed.
+ */
+export async function decideSubmission(id: string, decision: "approve" | "reject", by: string, reason: string | null): Promise<Decision> {
+  const row = await submissionRow(id);
+  if (!row) return { ok: false, error: "no such submission", status: 404 };
+  if (row.status !== "review") return { ok: false, error: `submission is ${row.status}, not waiting for review`, status: 409 };
+
+  if (decision === "reject") {
+    await db().execute({
+      sql: `UPDATE submissions SET status = 'rejected', error = 'declined', message = ?, reviewed_at = ?, reviewed_by = ?, reason = ? WHERE id = ?`,
+      args: args([reason ?? "Declined by the reviewer.", now(), by, reason, id]),
+    });
+    return { ok: true, status: "rejected", slug: null, title: row.title };
+  }
+
+  const feedUrl = row.feed_url ?? "";
+  const known = feedUrl ? await existing(feedUrl) : null;
+  if (known) {
+    await db().execute({
+      sql: `UPDATE submissions SET status = 'existing', slug = ?, reviewed_at = ?, reviewed_by = ?, reason = ? WHERE id = ?`,
+      args: args([known.slug, now(), by, reason, id]),
+    });
+    return { ok: true, status: "existing", slug: known.slug, title: known.title };
+  }
+
+  let stored: Omit<Podcast, "id" | "slug">;
+  try {
+    stored = JSON.parse(row.podcast ?? "") as Omit<Podcast, "id" | "slug">;
+  } catch {
+    return { ok: false, error: "the submission carries no show to list; submit the feed again", status: 409 };
+  }
+  let fresh: Omit<Podcast, "id" | "slug"> | null = null;
+  try {
+    const r = await resolveFeed(feedUrl, { kind: "podcast", timeoutMs: 10_000, userAgent: USER_AGENT, maxCandidates: 0 });
+    if (r.ok && r.feed.title) fresh = rowFromFeed(r.feed, feedUrl, stored.host);
+  } catch {
+    /* the snapshot stands */
+  }
+  const toList = fresh ?? stored;
+  const slug = await claimSlug(toList.title, feedUrl);
+  await insertPodcast({ ...toList, slug });
+  const listed = await one<Podcast>("SELECT * FROM podcasts WHERE slug = ?", [slug]);
+  await db().execute({
+    sql: `UPDATE submissions SET status = 'listed', slug = ?, title = ?, podcast = ?, reviewed_at = ?, reviewed_by = ?, reason = ? WHERE id = ?`,
+    args: args([slug, toList.title, listed ? JSON.stringify(listed) : JSON.stringify(toList), now(), by, reason, id]),
+  });
+  void forward(feedUrl);
+  return { ok: true, status: "listed", slug, title: toList.title };
 }
 
 /** Resolve every pending row in a batch, one at a time. */
@@ -181,14 +312,17 @@ export async function recoverBatch(batchId: string): Promise<boolean> {
 }
 
 /**
- * Turn one input into a listed show, or say why not.
+ * Turn one input into a show waiting for review, or say why not.
  *
  * The rules, in the order they are cheap to check: it must be a web address;
  * it must not already be here; it must resolve to a feed whose items carry
- * audio; its host must not be a hosting platform; it must have a title; it
- * must have published inside the directory's own 90-day window; and it must
- * not look like a bulk dump (ten or more episodes a day on average). Every
- * refusal is a code from the shared contract plus one sentence for a person.
+ * audio; its host must not be a hosting platform (Anchor excepted); it must
+ * have a title; it must have published inside the directory's own 90-day
+ * window; and it must not look like a bulk dump (ten or more episodes a day
+ * on average). Every refusal is a code from the shared contract plus one
+ * sentence for a person. A feed that passes is not listed here: the row it
+ * would become goes back to the caller for the ledger, and a reviewer lists
+ * it (decideSubmission).
  */
 export async function listFeed(input: string): Promise<Outcome> {
   const known = await existing(input);
@@ -217,7 +351,7 @@ export async function listFeed(input: string): Promise<Outcome> {
     return {
       status: "rejected",
       error: "hosted-platform",
-      message: `${host} is a hosting platform, and this directory lists only shows on their own domain. rssamplifier.com takes every feed.`,
+      message: `${host} is a hosting platform, and this directory lists only shows on their own domain (or on Anchor). rssamplifier.com takes every feed.`,
     };
   }
   if (!feed.title) {
@@ -241,9 +375,7 @@ export async function listFeed(input: string): Promise<Outcome> {
     };
   }
 
-  const slug = await claimSlug(feed.title, feedUrl);
-  await insertPodcast({ ...row, slug });
-  return { status: "listed", slug, title: feed.title, feedUrl };
+  return { status: "review", title: feed.title, feedUrl, row };
 }
 
 /** A show already listed under this feed URL, by either spelling of the scheme. */

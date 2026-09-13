@@ -48,12 +48,18 @@ plain HTTP below, described in \`/openapi.json\`.
 
 - **Add a show** — \`POST /api/submit\`
   JSON \`{"url": "<site or feed>"}\`, \`{"urls": [...]}\` (up to 50) or \`{"opml": "<opml>"}\`.
-  A site URL works: the feed is found from the page. One URL is resolved in the call and
-  the reply carries its page; a list is queued and \`statusUrl\` shows each land. A feed is
-  listed when its items carry audio, its host is not a hosting platform, and it published
-  inside the last 90 days; a refusal names the rule (\`rejected[].error\` and \`message\`).
-  Twenty requests an hour per address. Reply: \`{ok, accepted: [{url, slug, page,
-  existing}], rejected: [{url, error, message}], queued, total, submissionId, statusUrl}\`.
+  A site URL works: the feed is found from the page. One URL is resolved in the call; a
+  list is queued and \`statusUrl\` shows each land. A feed can be listed when its items
+  carry audio, its host is not a paid hosting platform (Anchor is allowed), and it
+  published inside the last 90 days; a refusal names the rule (\`rejected[].error\` and
+  \`message\`). A feed that passes is NOT listed by the call: a person reviews it first,
+  usually the same day, and the reply carries it as \`queued\` with \`review: [{url,
+  feedUrl, title}]\` and the \`statusUrl\` to watch. \`accepted\` holds only shows already
+  here. Twenty requests an hour per address. Reply: \`{ok, accepted: [{url, slug, page,
+  existing}], rejected: [{url, error, message}], queued, total, submissionId, statusUrl,
+  review?}\`. An OpenAccess bearer token (hub https://openaccess.logicsrc.com, scope
+  \`podcasts:submit\`) records its principal as the submitter; \`submissions:review\`
+  opens \`GET /api/review\` and \`POST /api/review/{id} {decision: approve|reject}\`.
 
 ## Limits worth knowing
 

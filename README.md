@@ -74,6 +74,7 @@ would silently repoint everyone's follows at other shows.
 | `AUTH_SECRET` | session and audio-proxy signing. **Required in production** |
 | `RESEND_API_KEY` | sending the magic link. Without it, outside production, the link is printed to the console instead |
 | `SUBMIT_FORWARD_TO` | where `/api/submit` also sends a listed feed. Defaults to `https://rssamplifier.com` in production; set it empty to stop forwarding |
+| `ADMIN_EMAILS` | comma-separated addresses that may review submissions at `/admin/submissions` and get an email per submission. Defaults to the operator's address in `src/lib/review.ts` |
 | `COINPAY_X402_KEY`, `CRAWL_PAY_TO` | selling crawl access to AI training crawlers (see below). Until both are set, training crawlers get `402` with an empty offer: nothing is sold, nothing is given away |
 
 ## Rebuilding the data

@@ -10,6 +10,17 @@ src.text_factory=lambda b:b.decode("utf-8","replace")
 cur=src.cursor()
 cur.execute("CREATE TEMP TABLE plat AS SELECT host FROM live GROUP BY host HAVING COUNT(*)>=25")
 
+# Platforms let through the 25-feed rule. Anchor (Spotify for Creators) is the
+# free host where most genuinely independent shows start, and by a wide margin
+# the largest host in the index (~99k live feeds, 40% of everything), so
+# excluding it as "commercial" threw out the long tail of one-person shows the
+# directory exists for. Decided 2026-09-13; mirrored in src/lib/platforms.ts so
+# the submit form agrees. Everything else on the platform list -- the paid
+# hosts and the networks -- stays out.
+ALLOWED_PLATFORMS = {"anchor.fm"}
+cur.execute("DELETE FROM plat WHERE host IN (%s)" % ",".join("?"*len(ALLOWED_PLATFORMS)), sorted(ALLOWED_PLATFORMS))
+print("platform hosts excluded:", cur.execute("SELECT COUNT(*) FROM plat").fetchone()[0], "allowed through:", sorted(ALLOWED_PLATFORMS))
+
 F="""host NOT IN (SELECT host FROM plat) AND episodeCount>=3
  AND TRIM(COALESCE(title,''))<>'' AND TRIM(COALESCE(description,''))<>'' AND TRIM(COALESCE(imageUrl,''))<>''"""
 
@@ -177,7 +188,7 @@ out.executemany("INSERT INTO podcasts VALUES(" + ",".join("?"*25) + ")", kept)
 out.execute("CREATE TABLE platform_hosts(host TEXT PRIMARY KEY, feeds INTEGER NOT NULL)")
 out.executemany("INSERT OR IGNORE INTO platform_hosts VALUES(?,?)",
     [(h.lower().strip(), n) for h, n in cur.execute("SELECT host, COUNT(*) FROM live GROUP BY host HAVING COUNT(*)>=25")
-     if h and h.lower().strip() not in PUBLIC_SUFFIX])
+     if h and h.lower().strip() not in PUBLIC_SUFFIX and h.lower().strip() not in ALLOWED_PLATFORMS])
 print("platform hosts:", out.execute("SELECT COUNT(*) FROM platform_hosts").fetchone()[0])
 # Collapse entries a reader cannot tell apart: same domain, same title, same
 # episode count, same latest episode. Sites that publish per-category feeds emit

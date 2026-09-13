@@ -283,8 +283,10 @@ log "loading into Turso (credential: $CRED_SOURCE; staged, then swapped in one t
 timeout -k 30 "$LOAD_TIMEOUT" "$NODE" "$SCRIPTS/load_turso.mjs" >> "$LOG" 2>&1 \
   || die "load_turso.mjs failed -- the previous directory keeps serving unless the log says 'swapped in'; next scheduled run retries"
 
+# At least the dump's rows: the loader merges listed submissions on top and
+# has already verified the exact total itself (rows + merged) before exiting 0.
 remote=$("$NODE" "$SCRIPTS/turso_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/null || true)
-[ "$remote" = "$rows" ] || die "prod has ${remote:-?} rows, expected $rows"
+[ -n "$remote" ] && [ "$remote" -ge "$rows" ] || die "prod has ${remote:-?} rows, expected at least $rows"
 
 printf '%s' "$sig" > "$STAMP"
 log "OK: $rows podcasts live (dump $lm)"
