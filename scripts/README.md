@@ -46,8 +46,16 @@ failure inside it rolls back. A `podcasts_new` left by a crash is dropped on the
 next attempt. There is no longer a "tables are dropped, rerun with FORCE=1" state.
 
 The same database holds the account tables — `users`, `sessions`, `login_tokens`,
-`credentials`, `follows` — created by `migrate_auth.mjs`, plus `refresh_runs`. The
-loader touches none of them. This is also why `follows` stores a slug rather than a
+`credentials`, `follows` — created by `migrate_auth.mjs`, plus `refresh_runs` and
+`submissions` (`migrate_submissions.mjs`). The loader drops none of them. It does
+*read* `submissions`: a show a publisher added through `/submit` was inserted into
+`podcasts` at the time, and the row is kept as JSON on the submission, so before the
+swap the loader re-reads each such feed (bounded, best effort), then inserts the ones
+the dump does not already carry into `podcasts_new` — unless the show has aged past
+the same 90-day rule as everything else. Where the dump now carries the feed, the
+dump's row wins and the submission's slug is kept on it so follows and links survive.
+`platform_hosts` (written by `export_indie.py`, the 25-feeds-per-host cut) is staged
+and swapped like `podcasts`; it is what `/api/submit` refuses platform feeds with. This is also why `follows` stores a slug rather than a
 `podcasts.id`: the reload reassigns ids, so a numeric key would come back pointing
 at somebody else's show.
 

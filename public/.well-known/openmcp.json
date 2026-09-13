@@ -1,0 +1,29 @@
+{
+  "openmcp": "0.1",
+  "mcp": "https://p0dcasters.com/api/mcp",
+  "name": "p0dcasters",
+  "description": "A directory of podcasts that publish from their own domain: search, read a show, list its episodes, and add one.",
+  "url": "https://p0dcasters.com",
+  "auth": {
+    "kind": "none"
+  },
+  "tags": [
+    "podcasts",
+    "rss",
+    "directory",
+    "self-hosted"
+  ],
+  "operator": "https://logicsrc.com/.well-known/openprofile.md",
+  "tools": [
+    "search",
+    "get_podcast",
+    "list_episodes",
+    "list_shows",
+    "browse",
+    "directory_stats",
+    "submit_feed"
+  ],
+  "catalogs": [
+    "https://openmcp.logicsrc.com"
+  ]
+}

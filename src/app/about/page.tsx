@@ -76,7 +76,7 @@ export default async function About() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Listing is automatic and there is no submission form, because nobody approves entries by hand. If your feed is in the Podcast Index and meets the inclusion rules, it appears at the next rebuild. To be removed, or to report wrong metadata, email hello@p0dcasters.com — though titles, descriptions and artwork are read from your feed, so correcting the feed corrects the listing everywhere.",
+            "Add it at https://p0dcasters.com/submit: paste the show's site or feed URL and it is checked against the inclusion rules and listed on the spot, no account needed. Shows in the Podcast Index that meet the rules also appear on their own at the next rebuild. To be removed, or to report wrong metadata, email hello@p0dcasters.com — though titles, descriptions and artwork are read from your feed, so correcting the feed corrects the listing everywhere.",
         },
       },
     ],
@@ -160,11 +160,13 @@ export default async function About() {
 
         <h2 id="get-listed">How do I get my show listed, or removed?</h2>
         <p>
-          Listing is automatic: there is no submission form because nobody approves entries
-          by hand. If your feed is in the Podcast Index and meets the rules above, it
-          appears at the next rebuild. To be taken out, or to report metadata that is
-          wrong, write to <Link href="/contact">us</Link> — though titles, descriptions and
-          artwork are read from your feed, so fixing the feed fixes it everywhere.
+          <Link href="/submit">Add it</Link>: paste the show&rsquo;s site or its feed and it is
+          checked against the rules above and listed on the spot. Nobody approves entries by
+          hand, so there is nothing to wait for; a feed that misses a rule is told which one.
+          Shows in the Podcast Index that meet the rules also appear on their own at the next
+          rebuild. To be taken out, or to report metadata that is wrong, write to{" "}
+          <Link href="/contact">us</Link> — though titles, descriptions and artwork are read
+          from your feed, so fixing the feed fixes it everywhere.
         </p>
       </section>
       <AdBanner />

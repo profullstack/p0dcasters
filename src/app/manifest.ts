@@ -41,6 +41,18 @@ export default function manifest(): MetadataRoute.Manifest {
     launch_handler: {
       client_mode: ["navigate-existing", "auto"],
     },
+    // "Share to p0dcasters" from a podcast's site lands on /submit with the
+    // box filled in. GET, so the page is the ordinary one and nothing has to
+    // be stored on the way; the endpoint behind it is the same /api/submit.
+    share_target: {
+      action: "/submit",
+      method: "GET",
+      params: { url: "url", text: "text", title: "title" },
+    },
+    shortcuts: [
+      { name: "Add a show", url: "/submit", description: "Submit a podcast by its site or feed URL" },
+      { name: "Following", url: "/following", description: "The shows you follow" },
+    ],
     background_color: "#fbfaf7",
     theme_color: "#fbfaf7",
     categories: ["entertainment", "news", "music"],

@@ -41,9 +41,11 @@ export default function Terms() {
 
         <h2>Publishers</h2>
         <p>
-          Listing is automatic and follows the rules on the{" "}
-          <Link href="/about">about page</Link> — nobody submits a show and nobody is paid
-          to be included. If your show is here and you would rather it were not, say so and
+          Listing follows the rules on the <Link href="/about">about page</Link>, whether a
+          show arrives from the Podcast Index or is <Link href="/submit">added</Link> by its
+          publisher — nobody is paid to be included and nobody approves entries by hand. By
+          submitting a feed you confirm you may share its address; a submission is passed to
+          rssamplifier.com as well. If your show is here and you would rather it were not, say so and
           it comes out. If it should be here and isn&rsquo;t, the about page explains which
           rule it is missing, and if that looks like a mistake on our side, tell us. Either
           way: <Link href="/contact">contact</Link>.
