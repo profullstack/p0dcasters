@@ -1,6 +1,7 @@
 import { createThrottle } from "@profullstack/throttle";
 import { SESSION_COOKIE } from "@/lib/auth/cookie";
 import { gateway } from "@/lib/crawl-gateway";
+import { houseCrawlerCredential } from "@/lib/house-crawlers";
 
 /**
  * The site-wide allowance: a hundred requests a minute, per caller, on every
@@ -44,7 +45,12 @@ export const throttle = createThrottle({
     sessionKey(request) ??
     request.headers.get("x-api-key")?.trim() ??
     /^(\S+)\s+(\S+)/.exec(request.headers.get("authorization")?.trim() ?? "")?.[2] ??
-    null,
+    /*
+     * A house crawler (nichedb.dev) on the two profile routes gets the same
+     * budget as a listener, so its backfill takes hours rather than days.
+     * Reasoning, and the exact routes, in lib/house-crawlers.ts.
+     */
+    houseCrawlerCredential(request),
   credential: { limit: 600, ceiling: 1200 },
   rules: [
     /* Sign-in stays address-bucketed, or a guess buys the listener budget. */
