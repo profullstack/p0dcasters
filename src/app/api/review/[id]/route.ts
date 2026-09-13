@@ -3,7 +3,7 @@ import { currentUser } from "@/lib/auth/session";
 import { bearerPrincipal, SCOPE_REVIEW } from "@/lib/openaccess";
 import { reviewerOf } from "@/lib/review";
 import { decideSubmission, submissionRow } from "@/lib/submit";
-import { publicRow } from "../route";
+import { publicRow } from "@/lib/review-row";
 
 export const dynamic = "force-dynamic";
 

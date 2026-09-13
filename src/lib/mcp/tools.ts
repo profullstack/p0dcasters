@@ -3,6 +3,10 @@ import { fetchEpisodes } from "@/lib/feed";
 import { browseCounts, directoryStats, listShows, searchShows, showBySlug, summary, SITE } from "@/lib/queries";
 import { MAX_URLS, RATE_LIMIT, clientIpFromHeader, createBatch, hashIp, requestsThisHour, resolveSubmission, drainBatch } from "@/lib/submit";
 import { toolError, rpcError, ERRORS } from "./protocol";
+import { bearerPrincipal, EDIT_SCOPE } from "@/lib/openaccess";
+import { findOrCreateUser } from "@/lib/auth/session";
+import { claimProfile, editorOf, rememberPrincipal, renderShowProfile, saveOverrides } from "@/lib/openprofile/store";
+import { profilePage, profileUrl } from "@/lib/openprofile/generate";
 
 /**
  * What an agent can do with the directory.
@@ -217,6 +221,116 @@ export const TOOLS: Tool[] = [
     },
   }) as Tool,
 ];
+
+/** The OpenAccess principal behind an MCP call, from its Authorization header. */
+async function principalOf(ctx: ToolContext) {
+  const auth = ctx.header("authorization");
+  if (!auth) return null;
+  return bearerPrincipal(new Request("https://p0dcasters.com/api/mcp", { headers: { authorization: auth } }));
+}
+
+function profileResult(slug: string, r: Awaited<ReturnType<typeof renderShowProfile>>, editable: boolean) {
+  return {
+    slug,
+    name: r.doc.name,
+    url: profileUrl(slug),
+    page: profilePage(slug),
+    public: r.public,
+    claimed: r.claimed,
+    editable,
+    updatedAt: new Date(r.updatedAt * 1000).toISOString(),
+    markdown: r.markdown,
+  };
+}
+
+TOOLS.push(
+  {
+    name: "get_openprofile",
+    title: "The podcaster's profile",
+    description:
+      "The person or organisation behind a show as an OpenProfile.md (logicsrc.com/openprofile) with the Broadcast section (logicsrc.com/openbroadcast): name, kind, site, avatar, accounts, topics, and the show's feed, cadence, language and since when. Generated from the feed the publisher serves, enriched from rssamplifier.com, corrected by the person once they have claimed it. Returns the Markdown and the URL the file is served at. A booking platform matches a Broadcast section against a guest's Guest section.",
+    inputSchema: { type: "object", properties: { slug: { type: "string" } }, required: ["slug"] },
+    annotations: { readOnlyHint: true, openWorldHint: true },
+    async run(args) {
+      const slug = String(args?.slug ?? "").trim();
+      if (!slug) throw invalid("slug is required");
+      const p = await showBySlug(slug);
+      if (!p) throw toolError(`No show with slug '${slug}'. Try search.`);
+      const r = await renderShowProfile(p);
+      if (!r.public) throw toolError("This profile is private.");
+      return profileResult(slug, r, false);
+    },
+  },
+  {
+    name: "update_openprofile",
+    title: "Correct a podcaster's profile",
+    description:
+      "Edit the profile on its owner's behalf. Takes either the whole OpenProfile.md as `markdown`, or a partial overlay: `identity` (keys to set, null removes), `headline`, `sections` (body by section name, `none` removes), `public`. The server keeps the difference from the generated document, so a section left alone keeps following the feed. Needs an OpenAccess bearer (hub https://openaccess.logicsrc.com, scope openprofile:edit) in the request's Authorization header, for a profile the person has claimed; an unclaimed profile is refused with the claim step.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        slug: { type: "string" },
+        markdown: { type: "string", description: "The whole file, as text." },
+        identity: { type: "object", description: "Identity keys to set; a null value removes the key." },
+        headline: { type: "string" },
+        sections: { type: "object", description: "Section bodies by name (accounts, topics, broadcast, guest, ...); `none` removes." },
+        public: { type: "boolean" },
+      },
+      required: ["slug"],
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    async run(args, ctx) {
+      const slug = String(args?.slug ?? "").trim();
+      if (!slug) throw invalid("slug is required");
+      const p = await showBySlug(slug);
+      if (!p) throw toolError(`No show with slug '${slug}'. Try search.`);
+      const principal = await principalOf(ctx as ToolContext);
+      const r = await renderShowProfile(p, { readFeed: false });
+      const editor = editorOf(r.row, null, principal);
+      if (!editor) {
+        throw toolError(
+          r.claimed
+            ? `Only the owner may edit this profile: present an OpenAccess token with scope ${EDIT_SCOPE} issued to them.`
+            : `This profile is unclaimed. Claim it first with claim_openprofile (the token needs the email scope and the address must be the feed's itunes:owner), or at ${profilePage(slug)}.`,
+        );
+      }
+      const overrides: Record<string, unknown> = {};
+      if (typeof args?.headline === "string") overrides.headline = args.headline;
+      if (args?.identity && typeof args.identity === "object") overrides.identity = args.identity;
+      if (args?.sections && typeof args.sections === "object") overrides.sections = args.sections;
+      const saved = await saveOverrides(
+        p,
+        { markdown: typeof args?.markdown === "string" ? args.markdown : undefined, overrides, public: typeof args?.public === "boolean" ? args.public : undefined },
+        editor,
+      );
+      if (principal) await rememberPrincipal(slug, principal.sub);
+      return { ...profileResult(slug, saved, true), by: editor.by };
+    },
+  },
+  {
+    name: "claim_openprofile",
+    title: "Claim a podcaster's profile",
+    description:
+      "Claim the profile behind a show as the person it is about. Needs an OpenAccess bearer with scopes openprofile:edit and email in the Authorization header; the claim goes through when the token's address is the feed's itunes:owner address, or when the show's site or feed description links to the profile URL. Nothing else is needed, and nobody reviews it.",
+    inputSchema: { type: "object", properties: { slug: { type: "string" } }, required: ["slug"] },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+    async run(args, ctx) {
+      const slug = String(args?.slug ?? "").trim();
+      if (!slug) throw invalid("slug is required");
+      const p = await showBySlug(slug);
+      if (!p) throw toolError(`No show with slug '${slug}'. Try search.`);
+      const principal = await principalOf(ctx as ToolContext);
+      if (!principal?.scopes.includes(EDIT_SCOPE) || !principal.email) {
+        throw toolError(`Present an OpenAccess token with scopes ${EDIT_SCOPE} and email, so the claim can be checked against the feed's owner address.`);
+      }
+      const user = await findOrCreateUser(principal.email);
+      const out = await claimProfile(p, user, { principal });
+      if (!out.ok) throw toolError(`${out.error}${out.checked.length ? ` (checked: ${out.checked.join(", ")})` : ""}`);
+      const r = await renderShowProfile(p, { readFeed: false });
+      return { ...profileResult(slug, r, true), method: out.method, owner: user.email };
+    },
+  },
+);
 
 export const TOOLS_BY_NAME = new Map(TOOLS.map((t) => [t.name, t]));
 

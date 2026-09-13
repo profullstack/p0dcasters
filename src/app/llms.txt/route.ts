@@ -48,6 +48,13 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - [A show](https://p0dcasters.com/podcast/steve-farrar): Show pages live at
   /podcast/<slug> and carry schema.org PodcastSeries JSON-LD with the feed URL,
   episode count, language and publisher.
+- [The podcaster](https://p0dcasters.com/podcast/steve-farrar/openprofile.md): Every show
+  serves the person behind it as an OpenProfile.md (logicsrc.com/openprofile) with the
+  Broadcast section (logicsrc.com/openbroadcast), at /podcast/<slug>/openprofile.md and
+  linked from the show page with rel="openprofile". Generated from the feed, enriched
+  from rssamplifier.com, corrected by the person once they claim it at
+  /podcast/<slug>/profile. All of them, newest change first, at
+  /api/openprofiles?since=&limit=&cursor= for a directory that pulls.
 
 ## Adding a show
 
@@ -62,9 +69,11 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
   scope podcasts:submit) records its principal as the submitter; scope
   submissions:review opens GET /api/review and POST /api/review/{id}.
 - [MCP](https://p0dcasters.com/mcp): search, get_podcast, list_episodes, list_shows,
-  browse, directory_stats and submit_feed at https://p0dcasters.com/api/mcp, no key.
+  browse, directory_stats, submit_feed, get_openprofile, update_openprofile and
+  claim_openprofile at https://p0dcasters.com/api/mcp, no key (the two writes take an
+  OpenAccess bearer with scope openprofile:edit).
 - [CLI](https://p0dcasters.com/cli): \`curl -fsSL https://p0dcasters.com/install.sh | sh\`
-  installs \`p0d\`: search, show, episodes, submit, opml.
+  installs \`p0d\`: search, show, episodes, submit, opml, profile.
 - [OpenAPI](https://p0dcasters.com/openapi.json): Every JSON endpoint, described.
 
 ## Taking the data

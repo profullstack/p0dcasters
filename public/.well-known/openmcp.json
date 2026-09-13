@@ -2,7 +2,7 @@
   "openmcp": "0.1",
   "mcp": "https://p0dcasters.com/api/mcp",
   "name": "p0dcasters",
-  "description": "A directory of podcasts that publish from their own domain: search, read a show, list its episodes, and add one.",
+  "description": "A directory of podcasts that publish from their own domain: search, read a show, list its episodes, add one, and read or edit the podcaster's OpenProfile.md.",
   "url": "https://p0dcasters.com",
   "auth": {
     "kind": "none"
@@ -21,7 +21,10 @@
     "list_shows",
     "browse",
     "directory_stats",
-    "submit_feed"
+    "submit_feed",
+    "get_openprofile",
+    "update_openprofile",
+    "claim_openprofile"
   ],
   "catalogs": [
     "https://openmcp.logicsrc.com"
