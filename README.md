@@ -60,7 +60,8 @@ Signed-in state is fetched from `/api/me` in the browser rather than read from c
 the root layout. A single `cookies()` call there would opt all 22k show pages out of
 static rendering.
 
-Create the tables with `node scripts/migrate_auth.mjs` (safe to re-run). They live in the
+Create the tables with `node scripts/migrate_auth.mjs` (safe to re-run), and the
+`submissions` table with `node scripts/migrate_submissions.mjs`. They live in the
 same Turso database as `podcasts` but the directory rebuild never touches them, and
 `follows` keys shows by **slug** — the reload reassigns `podcasts.id`, so a numeric key
 would silently repoint everyone's follows at other shows.
@@ -72,6 +73,7 @@ would silently repoint everyone's follows at other shows.
 | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | the database; falls back to `./data/p0dcasters.db` |
 | `AUTH_SECRET` | session and audio-proxy signing. **Required in production** |
 | `RESEND_API_KEY` | sending the magic link. Without it, outside production, the link is printed to the console instead |
+| `SUBMIT_FORWARD_TO` | where `/api/submit` also sends a listed feed. Defaults to `https://rssamplifier.com` in production; set it empty to stop forwarding |
 | `COINPAY_X402_KEY`, `CRAWL_PAY_TO` | selling crawl access to AI training crawlers (see below). Until both are set, training crawlers get `402` with an empty offer: nothing is sold, nothing is given away |
 
 ## Rebuilding the data

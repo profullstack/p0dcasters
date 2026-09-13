@@ -48,6 +48,19 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
   /podcast/<slug> and carry schema.org PodcastSeries JSON-LD with the feed URL,
   episode count, language and publisher.
 
+## Adding a show
+
+- [Submit](https://p0dcasters.com/submit): Paste a podcast's site or feed URL; the feed is
+  found, checked against the inclusion rules and listed on the spot. No account.
+- [POST /api/submit](https://p0dcasters.com/api/submit): The same as JSON —
+  {"url": "..."} or {"urls": [...]} or {"opml": "..."} — answering
+  {ok, accepted, rejected, queued, statusUrl}. Twenty requests an hour per address.
+- [MCP](https://p0dcasters.com/mcp): search, get_podcast, list_episodes, list_shows,
+  browse, directory_stats and submit_feed at https://p0dcasters.com/api/mcp, no key.
+- [CLI](https://p0dcasters.com/cli): \`curl -fsSL https://p0dcasters.com/install.sh | sh\`
+  installs \`p0d\`: search, show, episodes, submit, opml.
+- [OpenAPI](https://p0dcasters.com/openapi.json): Every JSON endpoint, described.
+
 ## Taking the data
 
 - [OPML export](https://p0dcasters.com/opml): The entire directory in one file, importable

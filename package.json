@@ -7,11 +7,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.15.0",
     "@profullstack/player": "^0.2.0",
+    "@profullstack/submit-feed": "^0.1.1",
     "@profullstack/throttle": "^0.2.2",
     "@profullstack/x402-gateway": "^0.6.0",
     "@simplewebauthn/browser": "^13.3.0",

@@ -30,7 +30,7 @@ export async function GET(
     const langs = await languageBuckets();
     // /search is deliberately absent — robots.txt disallows it, and a sitemap
     // that submits a disallowed URL is asking for a coverage error.
-    const statics = ["", "/browse", "/hosts", "/about", "/privacy", "/terms", "/contact"];
+    const statics = ["", "/browse", "/hosts", "/about", "/submit", "/mcp", "/cli", "/privacy", "/terms", "/contact"];
     return wrap([
       ...statics.map((p) => `  <url><loc>${SITE}${p}</loc><priority>0.9</priority></url>`),
       // Listed, but low: /crawlstats is a real page and worth being findable,

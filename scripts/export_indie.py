@@ -168,6 +168,17 @@ for r in rows:
                  lang,lb,(c1 or None),",".join(cats),ec,npd,opd,co,enc,dur,gen,per_week,score))
 
 out.executemany("INSERT INTO podcasts VALUES(" + ",".join("?"*25) + ")", kept)
+
+# The platform list, for the submit endpoint: a host carrying 25 or more live
+# feeds is a hosting platform and a feed submitted from one is refused with
+# the reason. Written here so the rule the API applies is the rule the cut was
+# made with, measured on the same dump. The bare public suffixes are dropped
+# for the same reason real_host exists: they are mis-filed rows, not hosts.
+out.execute("CREATE TABLE platform_hosts(host TEXT PRIMARY KEY, feeds INTEGER NOT NULL)")
+out.executemany("INSERT OR IGNORE INTO platform_hosts VALUES(?,?)",
+    [(h.lower().strip(), n) for h, n in cur.execute("SELECT host, COUNT(*) FROM live GROUP BY host HAVING COUNT(*)>=25")
+     if h and h.lower().strip() not in PUBLIC_SUFFIX])
+print("platform hosts:", out.execute("SELECT COUNT(*) FROM platform_hosts").fetchone()[0])
 # Collapse entries a reader cannot tell apart: same domain, same title, same
 # episode count, same latest episode. Sites that publish per-category feeds emit
 # a dozen of these with identical metadata. Keeping the shortest feed_url picks

@@ -51,6 +51,14 @@ export const throttle = createThrottle({
     { path: "/auth/", limit: 10, credential: false },
     { path: "/api/auth/", limit: 10, credential: false },
     /*
+     * Submissions fetch somebody else's server on the caller's behalf, so
+     * they stay address-bucketed and small. The endpoint keeps its own
+     * hourly ledger on top; this is the per-minute ceiling under it.
+     */
+    { path: "/api/submit", limit: 20, credential: false },
+    /* An agent session is many small calls; the MCP endpoint gets the reader budget. */
+    { path: "/api/mcp", limit: 300 },
+    /*
      * The machine-readable surfaces stay generous for the same reason they are
      * among the gateway's open paths: they are how an agent uses the directory
      * rather than copies it, and they cost one file to serve.

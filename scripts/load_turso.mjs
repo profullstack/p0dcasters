@@ -16,7 +16,8 @@
 //   P0D_LOCAL_DB overrides the local build to load (default: the data dir).
 //
 // The same database holds the account tables (users, sessions, login_tokens,
-// credentials, follows) and refresh_runs. Nothing here touches them.
+// credentials, follows), refresh_runs and submissions. Nothing here drops
+// them; submissions is READ so that shows publishers added are put back.
 import { DatabaseSync } from "node:sqlite";
 
 import { createClient } from "@libsql/client";
@@ -81,6 +82,131 @@ if (staged !== rows.length) {
   process.exit(1);
 }
 
+// --- 1b. the platform list --------------------------------------------------
+// export_indie.py writes it beside podcasts; a local build from before the
+// table existed simply leaves prod's copy alone.
+let platformRows = [];
+try {
+  platformRows = local.prepare("SELECT host, feeds FROM platform_hosts").all();
+} catch {
+  console.log("no platform_hosts in the local build; keeping prod's");
+}
+if (platformRows.length) {
+  await c.execute("DROP TABLE IF EXISTS platform_hosts_new");
+  await c.execute("CREATE TABLE platform_hosts_new(host TEXT PRIMARY KEY, feeds INTEGER NOT NULL)");
+  for (let i = 0; i < platformRows.length; i += BATCH) {
+    await c.batch(
+      platformRows.slice(i, i + BATCH).map((r) => ({
+        sql: "INSERT OR IGNORE INTO platform_hosts_new VALUES(?,?)",
+        args: [r.host, r.feeds],
+      })),
+      "write",
+    );
+  }
+  console.log("platform hosts staged:", platformRows.length);
+}
+
+// --- 1c. shows their publishers added --------------------------------------
+// `submissions` survives the reload (it is never dropped), and every row it
+// holds with status 'listed' carries the podcasts row it was inserted as. Those
+// go into the staged table too, so a submitted show is not lost when the dump
+// replaces the directory. Skipped when the dump now carries the same feed --
+// the dump's row wins and the submission's slug is kept on it so follows and
+// links survive -- and skipped once the show has aged past the directory's
+// own 90-day rule, exactly as a dump row would have. The stored metadata is
+// re-read from each feed first (bounded, best effort) so a show that kept
+// publishing since it was submitted is scored on its real state.
+const merged = await mergeSubmissions();
+console.log("submitted shows merged:", merged);
+
+async function mergeSubmissions() {
+  let subs;
+  try {
+    subs = (await c.execute("SELECT id, feed_url, slug, podcast FROM submissions WHERE status = 'listed' AND podcast IS NOT NULL")).rows;
+  } catch {
+    return 0; // table not created yet
+  }
+  if (!subs.length) return 0;
+  await refreshSubmissions(subs);
+  const cutoff = Math.floor(Date.now() / 1000) - 90 * 86400;
+  let n = 0;
+  for (const s of subs) {
+    let p;
+    try {
+      p = JSON.parse(s.podcast);
+    } catch {
+      continue;
+    }
+    const dump = (await c.execute({ sql: "SELECT slug FROM podcasts_new WHERE feed_url = ?", args: [p.feed_url] })).rows[0];
+    if (dump) {
+      if (dump.slug !== s.slug) {
+        const taken = (await c.execute({ sql: "SELECT 1 FROM podcasts_new WHERE slug = ?", args: [s.slug] })).rows[0];
+        if (!taken) await c.execute({ sql: "UPDATE podcasts_new SET slug = ? WHERE feed_url = ?", args: [s.slug, p.feed_url] });
+      }
+      continue;
+    }
+    if (Number(p.newest_pubdate) < cutoff) continue;
+    const slugTaken = (await c.execute({ sql: "SELECT 1 FROM podcasts_new WHERE slug = ?", args: [s.slug] })).rows[0];
+    if (slugTaken) continue;
+    const scols = cols.filter((k) => k !== "id");
+    await c.execute({
+      sql: `INSERT INTO podcasts_new(${scols.join(",")}) VALUES(${scols.map(() => "?").join(",")})`,
+      args: scols.map((k) => (k === "slug" ? s.slug : p[k] === undefined || p[k] === null ? null : p[k])),
+    });
+    n += 1;
+  }
+  return n;
+}
+
+// Re-read each submitted feed and refresh the stored row: episode count,
+// newest date, score. A feed that cannot be read keeps its last known row.
+async function refreshSubmissions(subs) {
+  let lib;
+  try {
+    lib = await import("@profullstack/submit-feed");
+  } catch {
+    console.log("submit-feed not installed; merging submissions as stored");
+    return;
+  }
+  const { resolveFeed } = lib;
+  const nowS = Math.floor(Date.now() / 1000);
+  let refreshed = 0;
+  const queue = [...subs];
+  const worker = async () => {
+    for (let s = queue.shift(); s; s = queue.shift()) {
+      let p;
+      try { p = JSON.parse(s.podcast); } catch { continue; }
+      const r = await resolveFeed(p.feed_url, { kind: "podcast", timeoutMs: 10_000, maxCandidates: 0,
+        userAgent: "p0dcasters/1.0 (+https://p0dcasters.com; podcast directory refresh)" });
+      if (!r.ok) continue;
+      const eps = r.feed.items.filter((i) => i.media?.kind === "audio")
+        .map((i) => ({ i, at: i.published ? Math.floor(Date.parse(i.published) / 1000) : 0 }))
+        .sort((a, b) => b.at - a.at);
+      const dated = eps.filter((e) => e.at > 0);
+      if (!dated.length) continue;
+      const newest = dated[0].at, oldest = dated[dated.length - 1].at, ec = eps.length;
+      const span = newest > oldest ? (newest - oldest) / 86400 : null;
+      const rate = span && span >= 7 ? ec / span : null;
+      const ageD = (nowS - newest) / 86400;
+      const fresh = ageD <= 7 ? 1 : ageD <= 30 ? 0.85 : ageD <= 60 ? 0.6 : 0.4;
+      Object.assign(p, {
+        title: r.feed.title || p.title,
+        description: (r.feed.description || p.description).slice(0, 4000),
+        image_url: r.feed.image ?? p.image_url,
+        episode_count: ec, newest_pubdate: newest, oldest_pubdate: oldest,
+        latest_audio: eps[0].i.media.url, latest_duration: eps[0].i.media.seconds,
+        per_week: rate ? Math.round(rate * 7 * 100) / 100 : null,
+        score: Math.round((Math.log1p(Math.min(ec, 500)) * fresh + Math.log1p((span ?? 0) / 30) * 0.5) * 10000) / 10000,
+      });
+      s.podcast = JSON.stringify(p);
+      await c.execute({ sql: "UPDATE submissions SET podcast = ?, refreshed_at = ? WHERE id = ?", args: [s.podcast, nowS, s.id] });
+      refreshed += 1;
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
+  console.log("submitted feeds re-read:", refreshed, "of", subs.length);
+}
+
 // --- 2. swap ------------------------------------------------------------------
 // One transaction. The FTS table is an external-content index over `podcasts`,
 // so it goes first and comes back last; the indexes are recreated on the
@@ -103,6 +229,9 @@ await c.batch(
     `INSERT INTO podcasts_fts(rowid,title,description,author,host)
        SELECT id,title,description,COALESCE(author,''),host FROM podcasts`,
     "INSERT INTO podcasts_fts(podcasts_fts) VALUES('optimize')",
+    ...(platformRows.length
+      ? ["DROP TABLE IF EXISTS platform_hosts", "ALTER TABLE platform_hosts_new RENAME TO platform_hosts"]
+      : []),
   ],
   "write",
 );
@@ -112,7 +241,8 @@ console.log("swapped in");
 const n = Number((await c.execute("SELECT COUNT(*) AS n FROM podcasts")).rows[0].n);
 const f = Number((await c.execute("SELECT COUNT(*) AS n FROM podcasts_fts")).rows[0].n);
 console.log("remote podcasts:", n, "fts rows:", f);
-if (n !== rows.length || f !== rows.length) {
-  console.error(`load_turso: remote has ${n} podcasts / ${f} fts rows, expected ${rows.length}`);
+const expected = rows.length + merged;
+if (n !== expected || f !== expected) {
+  console.error(`load_turso: remote has ${n} podcasts / ${f} fts rows, expected ${expected}`);
   process.exit(1);
 }

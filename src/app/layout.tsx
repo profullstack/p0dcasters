@@ -165,6 +165,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/browse">Browse</Link>
                   <Link href="/search">Search</Link>
                   <Link href="/hosts">Hosts</Link>
+                  <Link href="/submit">Add a show</Link>
                   <Link href="/about">About</Link>
                   <AccountNav />
                 </nav>
@@ -176,20 +177,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <p>
                   <strong>p0dcasters</strong> — independent, self-hosted podcasts only.
                   Feed metadata from the{" "}
-                  <a href="https://podcastindex.org">Podcast Index</a>, filtered to shows
-                  that publish from their own domain.
+                  <a href="https://podcastindex.org">Podcast Index</a> and from publishers who{" "}
+                  <Link href="/submit">add their own show</Link>, filtered to shows that
+                  publish from their own domain.
                 </p>
                 <p>
                   <Link href="/opml">Full directory as OPML</Link> ·{" "}
                   <Link href="/sitemap.xml">Sitemap</Link> ·{" "}
                   <Link href="/about">How this is built</Link> ·{" "}
                   <Link href="/crawlstats">Crawl status</Link> ·{" "}
+                  <Link href="/submit">Add a show</Link> ·{" "}
                   <Link href="/signup">Create a free account</Link> to follow shows
                 </p>
                 <p>
                   <Link href="/contact">Contact</Link> ·{" "}
                   <Link href="/privacy">Privacy</Link> ·{" "}
                   <Link href="/terms">Terms</Link>
+                </p>
+                <p className="small">
+                  Machine-readable: <Link href="/llms.txt">llms.txt</Link> ·{" "}
+                  <Link href="/skill.md">skill.md</Link> · <Link href="/mcp">MCP</Link> ·{" "}
+                  <Link href="/cli">CLI</Link> · <Link href="/openapi.json">OpenAPI</Link>
                 </p>
               </div>
             </footer>

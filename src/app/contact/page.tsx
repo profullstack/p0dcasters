@@ -27,13 +27,14 @@ export default function Contact() {
 
         <h2>Getting a show listed</h2>
         <p>
-          There is no submission form, because listing is not a decision anyone makes by
-          hand — a feed is in when it meets the rules on the{" "}
-          <Link href="/about">about page</Link>, and the directory rebuilds from the{" "}
-          <a href="https://podcastindex.org">Podcast Index</a>. So the two useful things to
-          check first are that your feed is in the Podcast Index at all, and that it is not
-          failing one of those rules. If both look right and it still isn&rsquo;t here, that is
-          worth an email.
+          <Link href="/submit">Add it yourself</Link>: the form takes the show&rsquo;s site or
+          feed URL, checks it against the rules on the{" "}
+          <Link href="/about">about page</Link>, and lists it on the spot. Listing is not a
+          decision anyone makes by hand, so if the form says no it names the rule, and fixing
+          the feed and submitting again is the whole appeal. The directory also rebuilds from
+          the <a href="https://podcastindex.org">Podcast Index</a>, so a show that meets the
+          rules arrives on its own eventually; the form is the way to skip the wait. If it
+          passes the rules and still isn&rsquo;t here, that is worth an email.
         </p>
 
         <h2>Getting a show removed, or its details fixed</h2>

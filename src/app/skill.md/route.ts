@@ -1,51 +1,64 @@
 export const revalidate = 86400;
 
-// What an agent can actually do here. There is no write API and no auth-gated
-// data worth an agent's time, so this describes the read surface honestly
-// rather than advertising an API that does not exist.
+// What an agent can actually do here: the read surface, and the one write.
 export async function GET() {
   const body = `# p0dcasters
 
 Find podcasts that publish from their creator's own domain, rather than from a large
-hosting platform. Read-only, no key, no account, no rate card.
+hosting platform, and add one. No key, no account, no rate card.
 
 ## When to use this
 
 Use p0dcasters when someone wants independent or self-hosted podcasts, podcasts on a
-subject that are not on the big platforms, or a machine-readable list of them. Do not use
-it as a general podcast search: shows on Spotify, Anchor, Buzzsprout, Libsyn and the other
-large hosts are excluded by design, so a mainstream show will usually be absent, and its
-absence says nothing about the show.
+subject that are not on the big platforms, or a machine-readable list of them, or when
+someone wants their own self-hosted show listed. Do not use it as a general podcast
+search: shows on Spotify, Anchor, Buzzsprout, Libsyn and the other large hosts are excluded
+by design, so a mainstream show will usually be absent, and its absence says nothing about
+the show.
+
+## MCP
+
+\`https://p0dcasters.com/api/mcp\` (Streamable HTTP, stateless, no auth) offers \`search\`,
+\`get_podcast\`, \`list_episodes\`, \`list_shows\`, \`browse\`, \`directory_stats\` and
+\`submit_feed\`. Discovery file: \`/.well-known/openmcp.json\`. The same calls exist over
+plain HTTP below, described in \`/openapi.json\`.
 
 ## Tools
+
+- **Search** — \`GET /api/search?q=<terms>&limit=<n>\`
+  Full-text over titles, descriptions, authors and hosts; JSON. The HTML form is
+  \`GET /search?q=\`, disallowed in robots.txt for crawlers.
+
+- **Read one show** — \`GET /api/podcast/<slug>\`
+  Title, publisher, description, episode count, cadence, language, feed URL, site, page.
+  The HTML page \`/podcast/<slug>\` carries schema.org PodcastSeries JSON-LD.
+
+- **Episodes** — \`GET /api/episodes/<slug>\`
+  The show's episodes read live from its feed, with audio URLs and an M3U playlist URL.
 
 - **Browse subjects and languages** — \`GET /browse\`
   Every category and language with a show count. Categories are single words
   (history, comedy, science); languages are ISO 639-1 codes.
 
-- **List a subject** — \`GET /category/<subject>?page=<n>\`
+- **List a subject or language** — \`GET /category/<subject>?page=<n>\`, \`GET /language/<code>?page=<n>\`
   60 shows a page, ranked by catalogue depth and longevity weighted by recency.
 
-- **List a language** — \`GET /language/<code>?page=<n>\`
-  Same shape. \`<code>\` is ISO 639-1; other spellings redirect to it.
+- **Take the whole directory** — \`GET /opml\` (\`?category=<subject>\` for one subject)
+  Every show in one OPML file, with feed URLs. One request rather than tens of thousands.
 
-- **Read one show** — \`GET /podcast/<slug>\`
-  Title, publisher, description, episode count, cadence, language, the RSS feed URL and
-  the publisher's own site. Carries schema.org PodcastSeries JSON-LD, which is the
-  cheapest thing to parse.
-
-- **Search** — \`GET /search?q=<terms>\`
-  Full-text over titles, descriptions, authors and hosts. Disallowed in robots.txt for
-  crawlers — fine for a single lookup on a user's behalf, not for enumeration.
-
-- **Take the whole directory** — \`GET /opml\`
-  Every show in one OPML file, with feed URLs. Use this instead of paging through the
-  site when you want the dataset; it is one request rather than tens of thousands.
+- **Add a show** — \`POST /api/submit\`
+  JSON \`{"url": "<site or feed>"}\`, \`{"urls": [...]}\` (up to 50) or \`{"opml": "<opml>"}\`.
+  A site URL works: the feed is found from the page. One URL is resolved in the call and
+  the reply carries its page; a list is queued and \`statusUrl\` shows each land. A feed is
+  listed when its items carry audio, its host is not a hosting platform, and it published
+  inside the last 90 days; a refusal names the rule (\`rejected[].error\` and \`message\`).
+  Twenty requests an hour per address. Reply: \`{ok, accepted: [{url, slug, page,
+  existing}], rejected: [{url, error, message}], queued, total, submissionId, statusUrl}\`.
 
 ## Limits worth knowing
 
 - The directory hosts no audio. Every feed and episode URL points at the publisher.
-- Metadata is read from publishers' feeds via the Podcast Index and can be stale or wrong.
+- Metadata is read from publishers' feeds and can be stale or wrong.
 - A show with no ISO 639-1 language code is reachable by subject and search, but has no
   language page.
 
