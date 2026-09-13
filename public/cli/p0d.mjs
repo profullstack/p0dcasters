@@ -65,6 +65,15 @@ export const COMMANDS = [
     examples: ['p0d submit example.org', 'p0d submit https://example.org/podcast.rss https://other.org', 'p0d submit subscriptions.opml'],
   },
   {
+    name: 'profile',
+    usage: 'profile <slug> | profile edit|claim|publish <slug>',
+    summary: "The podcaster's OpenProfile.md; claim and edit yours",
+    detail:
+      "`profile <slug>` prints the person behind a show as an OpenProfile.md (logicsrc.com/openprofile) with its Broadcast section. `profile claim <slug>` claims it as you; `profile edit <slug>` opens the file in $EDITOR (or takes --file) and saves it; `profile publish <slug> --public|--private` lists or hides it. The writes take an OpenAccess token (openaccess.logicsrc.com, scope openprofile:edit, plus email for a claim) in OPENACCESS_TOKEN or P0D_TOKEN.",
+    options: ['--file <openprofile.md>', '--public', '--private', '--json'],
+    examples: ['p0d profile steve-farrar', 'p0d profile claim steve-farrar', 'p0d profile edit steve-farrar --file me.md', 'p0d profile publish steve-farrar --private'],
+  },
+  {
     name: 'opml',
     usage: 'opml [category]',
     summary: 'The directory as OPML, to stdout',
@@ -252,6 +261,8 @@ export async function run(argv, io = {}) {
         if (body.queued) o.out(`${body.queued} queued — watch them land at ${body.statusUrl}`);
         return body.accepted?.length || body.queued ? 0 : 1;
       }
+      case 'profile':
+        return profile(rest, flags, base, request, o);
       case 'opml': {
         const path = rest[0] ? `/opml?category=${encodeURIComponent(rest[0])}` : '/opml';
         const res = await o.fetch(`${base}${path}`, { headers: { 'user-agent': `p0d/${VERSION}` } });
@@ -269,6 +280,70 @@ export async function run(argv, io = {}) {
   } catch (err) {
     return fail(o, `${name}: ${err instanceof Error ? err.message : String(err)}`);
   }
+}
+
+/**
+ * The podcaster's profile: read it, claim it, edit it, list or hide it.
+ * The token, when one is needed, is an OpenAccess bearer from the
+ * environment; the CLI never keeps one itself.
+ *
+ * @param {string[]} rest @param {Record<string, string|boolean>} flags @param {string} base
+ * @param {(path: string, init?: RequestInit) => Promise<any>} request @param {IO} o
+ */
+async function profile(rest, flags, base, request, o) {
+  const verbs = ['edit', 'claim', 'publish'];
+  const verb = verbs.includes(rest[0]) ? rest[0] : null;
+  const slug = verb ? rest[1] : rest[0];
+  if (!slug) return fail(o, `profile: give a slug${verb ? '' : ', or: profile edit|claim|publish <slug>'}`);
+  const token = o.env.OPENACCESS_TOKEN || o.env.P0D_TOKEN;
+  const auth = token ? { authorization: `Bearer ${token}` } : {};
+  const path = `/api/podcast/${encodeURIComponent(slug)}/openprofile`;
+  if (!verb) {
+    if (flags.json) return json(o, await request(path, { headers: auth }));
+    const res = await o.fetch(`${base}/podcast/${encodeURIComponent(slug)}/openprofile.md`, { headers: { accept: 'text/markdown', 'user-agent': `p0d/${VERSION}` } });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    o.out((await res.text()).replace(/\n$/, ''));
+    return 0;
+  }
+  if (!token) return fail(o, `profile ${verb}: set OPENACCESS_TOKEN (an OpenAccess grant for p0dcasters.com with scope openprofile:edit${verb === 'claim' ? ' and email' : ''})`);
+  if (verb === 'claim') {
+    const body = await request(`${path}/claim`, { method: 'POST', headers: { ...auth, 'content-type': 'application/json' }, body: '{}' });
+    if (flags.json) return json(o, body);
+    o.out(`claimed ${slug} as ${body.owner} (${body.method})\n${body.page}`);
+    return 0;
+  }
+  if (verb === 'publish') {
+    if (!flags.public && !flags.private) return fail(o, 'profile publish: say --public or --private');
+    const body = await request(path, { method: 'PUT', headers: { ...auth, 'content-type': 'application/json' }, body: JSON.stringify({ public: Boolean(flags.public) }) });
+    if (flags.json) return json(o, body);
+    o.out(`${slug} is now ${body.public ? 'public' : 'private'}`);
+    return 0;
+  }
+  // edit: the file from --file, or the current one through $EDITOR.
+  let markdown;
+  if (typeof flags.file === 'string') {
+    markdown = await o.readFile(flags.file);
+  } else {
+    const current = await request(path, { headers: auth });
+    const os = await import('node:os');
+    const fs = await import('node:fs/promises');
+    const nodePath = await import('node:path');
+    const { spawnSync } = await import('node:child_process');
+    const tmp = nodePath.join(os.tmpdir(), `${slug}.openprofile.md`);
+    await fs.writeFile(tmp, current.markdown, 'utf8');
+    const editor = o.env.VISUAL || o.env.EDITOR || 'vi';
+    const r = spawnSync(editor, [tmp], { stdio: 'inherit', shell: true });
+    if (r.status !== 0) return fail(o, `profile edit: ${editor} exited ${r.status}`);
+    markdown = await fs.readFile(tmp, 'utf8');
+    if (markdown === current.markdown) {
+      o.out('unchanged');
+      return 0;
+    }
+  }
+  const body = await request(path, { method: 'PUT', headers: { ...auth, 'content-type': 'text/markdown; charset=utf-8' }, body: markdown });
+  if (flags.json) return json(o, body);
+  o.out(`saved ${slug}\n${body.url}`);
+  return 0;
 }
 
 /** @param {IO} o @param {unknown} body */

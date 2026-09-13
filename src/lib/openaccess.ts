@@ -13,8 +13,10 @@ export const CLIENT_ID = "p0dcasters.com";
 
 export const SCOPE_SUBMIT = "podcasts:submit";
 export const SCOPE_REVIEW = "submissions:review";
+/** Edit an OpenProfile on its owner's behalf (logicsrc.com/openprofile). */
+export const EDIT_SCOPE = "openprofile:edit";
 
-export type Principal = { sub: string; scopes: string[] };
+export type Principal = { sub: string; scopes: string[]; email: string | null };
 
 let app: OpenAccessApp | null = null;
 function hub(): OpenAccessApp {
@@ -38,7 +40,10 @@ export async function bearerPrincipal(req: Request): Promise<Principal | null> {
     const sub = typeof claims.sub === "string" ? claims.sub : "";
     if (!sub) return null;
     const scope = typeof claims.scope === "string" ? claims.scope : "";
-    return { sub, scopes: scope.split(/\s+/).filter(Boolean) };
+    // The hub puts the person's address on the token when the grant carries
+    // the `email` scope; a profile claim by bearer needs it, an edit does not.
+    const email = typeof claims.email === "string" && claims.email.includes("@") ? claims.email.trim().toLowerCase() : null;
+    return { sub, scopes: scope.split(/\s+/).filter(Boolean), email };
   } catch {
     return null;
   }

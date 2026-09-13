@@ -736,3 +736,11 @@ table.tools pre { margin: 8px 0 0; }
 .review-done { font-weight: 600; }
 .review-log { padding-left: 18px; }
 .review-log li { margin: 0 0 6px; }
+
+/* The podcaster's profile at /podcast/<slug>/profile: the identity block and
+   the Broadcast keys as a definition list, the way the file reads. */
+.profile-identity { margin: 0 0 18px; display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-size: 15px; }
+.profile-identity div { display: contents; }
+.profile-identity dt { color: var(--muted); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 13.5px; padding-top: 2px; }
+.profile-identity dd { margin: 0; overflow-wrap: anywhere; }
+.panel.auth textarea { min-height: 320px; font-size: 13.5px; line-height: 1.55; }

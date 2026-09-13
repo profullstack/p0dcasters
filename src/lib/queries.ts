@@ -3,6 +3,7 @@ import type { Podcast } from "@/lib/db";
 import { tokenise, ftsQuery } from "@/lib/search";
 import { cadence, languageName, normalizeLang, safeImage } from "@/lib/format";
 import { playlistUrl } from "@/lib/playlist";
+import { profileUrl } from "@/lib/openprofile/generate";
 
 /**
  * The directory's reads, once, for every machine surface: the JSON routes,
@@ -30,6 +31,8 @@ export type ShowSummary = {
   site: string | null;
   page: string;
   playlist: string;
+  /** The podcaster's OpenProfile.md (logicsrc.com/openprofile). */
+  openprofile: string;
 };
 
 export function summary(p: Podcast, full = false): ShowSummary {
@@ -51,6 +54,7 @@ export function summary(p: Podcast, full = false): ShowSummary {
     site: p.link,
     page: `${SITE}/podcast/${p.slug}`,
     playlist: playlistUrl(p.slug),
+    openprofile: profileUrl(p.slug),
   };
 }
 

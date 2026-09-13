@@ -32,7 +32,15 @@ const nextConfig = {
   images: { unoptimized: true },
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // The podcaster's OpenProfile.md, discoverable from the show page
+      // without parsing it (logicsrc.com/openprofile, discovery rule 2).
+      {
+        source: "/podcast/:slug",
+        headers: [{ key: "Link", value: '<https://p0dcasters.com/podcast/:slug/openprofile.md>; rel="openprofile"' }],
+      },
+    ];
   },
 };
 export default nextConfig;

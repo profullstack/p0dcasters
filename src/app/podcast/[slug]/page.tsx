@@ -14,6 +14,7 @@ import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
 import PlaylistButtons from "@/components/PlaylistButtons";
 import ShareButton from "@/components/ShareButton";
 import { nixampUrl, playlistUrl } from "@/lib/playlist";
+import { profileUrl } from "@/lib/openprofile/generate";
 import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
 import TimeAgo from "@/components/TimeAgo";
 
@@ -126,6 +127,9 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* The podcaster's OpenProfile.md, where a directory or a booking
+          platform reads who is behind the show (logicsrc.com/openprofile). */}
+      <link rel="openprofile" href={profileUrl(p.slug)} />
       <div className="show">
         <div>
           <Art className="art" src={art} title={p.title} size={200} />
@@ -182,6 +186,9 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
             <a className="btn" href={site} rel="noopener nofollow">
               Website
             </a>
+            <Link className="btn" href={`/podcast/${encodeURIComponent(p.slug)}/profile`} title="Who is behind the show, as an OpenProfile.md; claim it if it is you">
+              Profile
+            </Link>
             {cats.map((c) => (
               <Link className="btn" key={c} href={`/category/${encodeURIComponent(c)}`}>
                 {titleCase(c)}

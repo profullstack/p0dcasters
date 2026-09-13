@@ -2,37 +2,11 @@ import { currentUser } from "@/lib/auth/session";
 import { bearerPrincipal, SCOPE_REVIEW } from "@/lib/openaccess";
 import { reviewerOf } from "@/lib/review";
 import { submissionsByStatus, type SubmissionRow } from "@/lib/submit";
+import { publicRow } from "@/lib/review-row";
 
 export const dynamic = "force-dynamic";
 
 const headers = { "cache-control": "private, no-store" };
-
-export function publicRow(r: SubmissionRow) {
-  let show: unknown = null;
-  try {
-    show = r.podcast ? JSON.parse(r.podcast) : null;
-  } catch {
-    show = null;
-  }
-  return {
-    id: r.id,
-    status: r.status,
-    input: r.input,
-    feedUrl: r.feed_url,
-    slug: r.slug,
-    title: r.title,
-    page: r.slug ? `https://p0dcasters.com/podcast/${r.slug}` : null,
-    submittedBy: r.submitted_by ?? null,
-    createdAt: r.created_at,
-    resolvedAt: r.resolved_at,
-    reviewedAt: r.reviewed_at ?? null,
-    reviewedBy: r.reviewed_by ?? null,
-    reason: r.reason ?? null,
-    error: r.error,
-    message: r.message,
-    show,
-  };
-}
 
 /**
  * GET /api/review?status=review — the queue, for reviewers: an admin session,

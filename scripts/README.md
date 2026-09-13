@@ -47,7 +47,9 @@ next attempt. There is no longer a "tables are dropped, rerun with FORCE=1" stat
 
 The same database holds the account tables — `users`, `sessions`, `login_tokens`,
 `credentials`, `follows` — created by `migrate_auth.mjs`, plus `refresh_runs` and
-`submissions` (`migrate_submissions.mjs`). The loader drops none of them. It does
+`submissions` (`migrate_submissions.mjs`), plus `podcast_profiles` and `profile_sources`
+(`migrate_profiles.mjs`: what a podcaster corrected on their OpenProfile.md and who
+claimed it, keyed by slug for the same reason `follows` is). The loader drops none of them. It does
 *read* `submissions`: a show a publisher added through `/submit` was inserted into
 `podcasts` at the time, and the row is kept as JSON on the submission, so before the
 swap the loader re-reads each such feed (bounded, best effort), then inserts the ones
