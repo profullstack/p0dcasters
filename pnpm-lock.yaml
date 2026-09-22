@@ -27,8 +27,8 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
       '@profullstack/x402-gateway':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
@@ -418,6 +418,10 @@ packages:
     resolution: {integrity: sha512-C2Xj8FZ0uHWeCXXqX5B4/gVFQmtSkiuOolzAgutjTfseNOHT3pUjljDZsTSxXFGgio54bCzVFqmEOUrIVk8RDA==}
     engines: {node: '>=20.0.0'}
 
+  '@profullstack/keys@0.1.0':
+    resolution: {integrity: sha512-Vys47LvS5ivhdZu4SYOxh9Le3DEmWhjP0+CtrU45RhXAbY0ZFG/2Dk9V1bIIUGDp8UWMJqctvUD21JrNjfh04w==}
+    engines: {node: '>=20.11'}
+
   '@profullstack/openprofile@0.1.1':
     resolution: {integrity: sha512-AvpR6fOqnn0IiRjMOo/WJHYA+3mMYFvjPEBKSOKdDY5pKAKidKic5fh6S+h6NKADayq6isa0q18eni8xoACG4A==}
     engines: {node: '>=22'}
@@ -441,6 +445,10 @@ packages:
 
   '@profullstack/x402-gateway@0.6.0':
     resolution: {integrity: sha512-n9/7NixIM9wVOMGWDc+3RtFsGABG+HAYfkZ11JxoEIlF/FDRGEXbvHFlNL/M97RNy01964FhAbQp34OMJoxqZg==}
+    engines: {node: '>=20.11'}
+
+  '@profullstack/x402-gateway@0.7.0':
+    resolution: {integrity: sha512-xsZRWHdOD9Y9EuRS4PsRmykVS2geOu/luY0jBlliOF3SEgxiLhgmx7ks+2jOUtGlq+cIfSonnk5eEObRGCOJ9w==}
     engines: {node: '>=20.11'}
 
   '@simplewebauthn/browser@13.3.0':
@@ -1008,6 +1016,8 @@ snapshots:
       tslib: 2.8.1
       tsyringe: 4.10.0
 
+  '@profullstack/keys@0.1.0': {}
+
   '@profullstack/openprofile@0.1.1': {}
 
   '@profullstack/player@0.2.0(react@19.2.8)':
@@ -1026,6 +1036,10 @@ snapshots:
       '@profullstack/x402-gateway': 0.6.0
 
   '@profullstack/x402-gateway@0.6.0': {}
+
+  '@profullstack/x402-gateway@0.7.0':
+    dependencies:
+      '@profullstack/keys': 0.1.0
 
   '@simplewebauthn/browser@13.3.0': {}
 
