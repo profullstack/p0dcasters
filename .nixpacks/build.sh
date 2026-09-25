@@ -1,0 +1,1 @@
+docker build /home/anthony/src/profullstack/p0dcasters/.claude/worktrees/dev2-p0dcasters.com-crycsn50 -f /home/anthony/src/profullstack/p0dcasters/.claude/worktrees/dev2-p0dcasters.com-crycsn50/.nixpacks/Dockerfile -t baf03001-cee8-4d57-8d76-e781e5a64238 --build-arg CI=true --build-arg NIXPACKS_METADATA=node --build-arg NODE_ENV=production --build-arg NPM_CONFIG_PRODUCTION=false
