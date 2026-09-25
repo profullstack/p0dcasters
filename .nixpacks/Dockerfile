@@ -21,7 +21,9 @@ RUN --mount=type=cache,id=x65XpAKSIH8-/root/local/share/pnpm/store/v3,target=/ro
 
 # build phase
 COPY . /app/.
-RUN --mount=type=cache,id=x65XpAKSIH8-next/cache,target=/app/.next/cache --mount=type=cache,id=x65XpAKSIH8-node_modules/cache,target=/app/node_modules/.cache pnpm run build
+# `next build` runs at container start (see CMD): the pages are ISR and prerender
+# against Turso, whose TURSO_* variables live in app.env on dev2 and reach the
+# container, not the image build (Railway exposed them to both).
 
 
 RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
@@ -30,5 +32,5 @@ RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
 # start
 COPY . /app
 
-CMD ["pnpm run start"]
+CMD ["pnpm run build && pnpm run start"]
 
