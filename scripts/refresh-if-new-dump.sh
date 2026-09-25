@@ -25,14 +25,15 @@
 #   * One run at a time. A lock file is held for the whole run, so a slow
 #     download never overlaps the next tick and the watchdog can kick a run
 #     without doubling up.
-#   * Nothing here talks to the Turso CLI. Its browser login expires after a
-#     week and it then answers "You are not logged in" on stdout with exit 0,
-#     which stalled the pipeline for nine days in September 2026 with every
-#     command reporting success. Credentials are a database token that does
-#     not expire, taken from the first source the database accepts: the cached
-#     token file, then the p0dcasters--prod vault, then the CLI if it happens
-#     to be logged in. A rejected token is thrown away and the chain re-walked.
-#   * Prod is never left empty. load_turso.mjs stages the new rows beside the
+#   * Nothing here talks to a vendor CLI. The Turso CLI's browser login used
+#     to expire after a week and then answer "You are not logged in" on stdout
+#     with exit 0, which stalled the pipeline for nine days in September 2026
+#     with every command reporting success. The credential is the database
+#     URL itself (postgres://user:password@host/db), taken from the first
+#     source the database accepts: the environment, the cached URL file, then
+#     the p0dcasters--prod vault. A rejected URL is thrown away and the chain
+#     re-walked.
+#   * Prod is never left empty. load_directory.mjs stages the new rows beside the
 #     live table and swaps them in one transaction, so a failure anywhere
 #     leaves the previous directory serving. The dump stamp is only advanced
 #     on success, so the next tick simply tries again -- and it skips the 1.8 GB
@@ -51,27 +52,21 @@ STAMP=$DATA/.last-dump-stamp
 DLSTAMP=$DATA/.dump-extracted-stamp
 LOG=$DATA/refresh.log
 LOCK=$DATA/.refresh.lock
-TOKENF=$DATA/.turso-token
-URLF=$DATA/.turso-url
+URLF=$DATA/.database-url
 URL=https://public.podcastindex.org/podcastindex_feeds.db.tgz
 UA='p0dcasters/1.0 (+https://p0dcasters.com)'
 
 NODE=/home/anthony/.local/share/mise/shims/node
 PY=/home/anthony/.local/share/mise/shims/python3
-TURSO=/home/anthony/.turso/turso
 LOGICSRC=/home/anthony/.local/bin/logicsrc
 export HOME=/home/anthony
 export PATH=/home/anthony/.local/share/mise/shims:/home/anthony/.local/bin:/usr/local/bin:/usr/bin:/bin
-
-# The database this feeds. A fixed hostname rather than a CLI lookup; the vault
-# copy overrides it if the two ever disagree.
-DEFAULT_DB_URL=libsql://p0dcasters-profullstack.aws-us-west-2.turso.io
 
 # A build that yields fewer than this many rows is treated as broken, and prod is
 # left alone. The directory has sat around 21.6k; a sudden collapse means the dump
 # or a script changed shape, not that podcasting ended.
 MIN_ROWS=${MIN_ROWS:-10000}
-# Ceiling on the Turso load, in seconds. A normal load takes about two minutes.
+# Ceiling on the database load, in seconds. A normal load takes a few minutes.
 LOAD_TIMEOUT=${LOAD_TIMEOUT:-1800}
 
 # This run's identity and its own slice of the log. The shared refresh.log is
@@ -93,54 +88,47 @@ log() {
 # --- credentials --------------------------------------------------------------
 # probe: does the database accept what is in the environment right now?
 probe() {
-  "$NODE" "$SCRIPTS/turso_sql.mjs" "SELECT 1" >/dev/null 2>&1
+  "$NODE" "$SCRIPTS/db_sql.mjs" "SELECT 1" >/dev/null 2>&1
 }
 
-# use_creds URL TOKEN SOURCE: export the pair if the database accepts it, and
-# cache it for the next run unless it came from the cache already.
+# use_creds URL SOURCE: export the URL if the database accepts it, and cache it
+# for the next run unless it came from the cache already.
 use_creds() {
-  [ -n "$1" ] && [ -n "$2" ] || return 1
-  TURSO_DATABASE_URL=$1
-  TURSO_AUTH_TOKEN=$2
-  export TURSO_DATABASE_URL TURSO_AUTH_TOKEN
+  [ -n "$1" ] || return 1
+  DATABASE_URL=$1
+  export DATABASE_URL
   if ! probe; then
-    unset TURSO_DATABASE_URL TURSO_AUTH_TOKEN
+    unset DATABASE_URL
     return 1
   fi
-  if [ "$3" != cache ]; then
-    (umask 077; printf '%s' "$2" > "$TOKENF"; printf '%s' "$1" > "$URLF")
-    log "turso credential refreshed from $3"
+  if [ "$2" != cache ]; then
+    (umask 077; printf '%s' "$1" > "$URLF")
+    log "database credential refreshed from $2"
   fi
-  CRED_SOURCE=$3
+  CRED_SOURCE=$2
   return 0
 }
 
-turso_env() {
-  if [ -n "${TURSO_DATABASE_URL:-}" ] && [ -n "${TURSO_AUTH_TOKEN:-}" ]; then return 0; fi
-  url=$(cat "$URLF" 2>/dev/null || echo "$DEFAULT_DB_URL")
+db_env() {
+  if [ -n "${DATABASE_URL:-}" ]; then
+    CRED_SOURCE=env
+    return 0
+  fi
 
-  # 1. The cached token. Database tokens are minted without an expiry, so this
-  #    is the normal path for months at a time.
-  use_creds "$url" "$(cat "$TOKENF" 2>/dev/null || true)" cache && return 0
+  # 1. The cached URL. The password does not expire, so this is the normal
+  #    path for months at a time.
+  use_creds "$(cat "$URLF" 2>/dev/null || true)" cache && return 0
 
-  # 2. The vault. The site's own URL and token, the same pair Railway runs on.
+  # 2. The vault. The site's own DATABASE_URL, the same one production runs on.
   vf=$(mktemp "${TMPDIR:-/tmp}/p0d-vault.XXXXXX")
   if "$LOGICSRC" teams pull profullstack p0dcasters prod --env "$vf" >/dev/null 2>&1; then
-    vurl=$(sed -n 's/^TURSO_DATABASE_URL=//p' "$vf" | tr -d "\"' \r")
-    vtok=$(sed -n 's/^TURSO_AUTH_TOKEN=//p' "$vf" | tr -d "\"' \r")
+    vurl=$(sed -n 's/^DATABASE_URL=//p' "$vf" | tr -d "\"' \r")
     rm -f "$vf"
-    use_creds "${vurl:-$url}" "$vtok" vault && return 0
+    use_creds "$vurl" vault && return 0
   fi
   rm -f "$vf"
 
-  # 3. The CLI, only while its login is alive. It exits 0 either way, so the
-  #    output is what has to be read.
-  if "$TURSO" auth whoami 2>/dev/null | grep -qv 'not logged in'; then
-    ctok=$("$TURSO" db tokens create p0dcasters 2>/dev/null | tail -1 || true)
-    use_creds "$url" "$ctok" cli && return 0
-  fi
-
-  log "no working Turso credential: cache, vault and CLI all failed"
+  log "no working database credential: environment, cache and vault all failed"
   return 1
 }
 
@@ -149,16 +137,16 @@ turso_env() {
 # reportable failure into a hang.
 record() {
   set +e
-  if turso_env; then
+  if db_env; then
     "$NODE" "$SCRIPTS/record_run.mjs" \
       --key "$RUN_KEY" --started "$STARTED" --log "$RUNLOG" "$@" >/dev/null 2>&1
     rc=$?
     if [ $rc -eq 3 ]; then
-      # Exit 3 is "the write was rejected"; a revoked cached token is the
-      # likeliest cause, so throw it away and walk the sources again.
-      rm -f "$TOKENF"
-      unset TURSO_DATABASE_URL TURSO_AUTH_TOKEN
-      if turso_env; then
+      # Exit 3 is "the write was rejected"; a rotated password in the cached
+      # URL is the likeliest cause, so throw it away and walk the sources again.
+      rm -f "$URLF"
+      unset DATABASE_URL
+      if db_env; then
         "$NODE" "$SCRIPTS/record_run.mjs" \
           --key "$RUN_KEY" --started "$STARTED" --log "$RUNLOG" "$@" >/dev/null 2>&1
         rc=$?
@@ -268,24 +256,24 @@ rows=$("$PY" -c "import sqlite3;print(sqlite3.connect('$DATA/p0dcasters.db').exe
 log "built $rows podcasts"
 [ "$rows" -ge "$MIN_ROWS" ] || die "only $rows rows (< $MIN_ROWS) -- refusing to touch prod"
 
-# --- 4. load into Turso -----------------------------------------------------
+# --- 4. load into the database ----------------------------------------------
 # Only past this point does prod change, and even then only in the final swap
-# transaction inside load_turso.mjs. Everything before it is staged beside the
-# live table.
+# transaction inside load_directory.mjs. Everything before it is staged beside
+# the live table.
 STEP=load
-turso_env || die "no working Turso credential (cache, vault, CLI) -- prod untouched"
+db_env || die "no working database credential (environment, cache, vault) -- prod untouched"
 
 # The outgoing count, so the run can say what the rebuild actually did.
-before=$("$NODE" "$SCRIPTS/turso_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/null || true)
+before=$("$NODE" "$SCRIPTS/db_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/null || true)
 record --status running --step load --prev-count "$before"
 
-log "loading into Turso (credential: $CRED_SOURCE; staged, then swapped in one transaction) ..."
-timeout -k 30 "$LOAD_TIMEOUT" "$NODE" "$SCRIPTS/load_turso.mjs" >> "$LOG" 2>&1 \
-  || die "load_turso.mjs failed -- the previous directory keeps serving unless the log says 'swapped in'; next scheduled run retries"
+log "loading into Postgres (credential: $CRED_SOURCE; staged, then swapped in one transaction) ..."
+timeout -k 30 "$LOAD_TIMEOUT" "$NODE" "$SCRIPTS/load_directory.mjs" >> "$LOG" 2>&1 \
+  || die "load_directory.mjs failed -- the previous directory keeps serving unless the log says 'swapped in'; next scheduled run retries"
 
 # At least the dump's rows: the loader merges listed submissions on top and
 # has already verified the exact total itself (rows + merged) before exiting 0.
-remote=$("$NODE" "$SCRIPTS/turso_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/null || true)
+remote=$("$NODE" "$SCRIPTS/db_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/null || true)
 [ -n "$remote" ] && [ "$remote" -ge "$rows" ] || die "prod has ${remote:-?} rows, expected at least $rows"
 
 printf '%s' "$sig" > "$STAMP"

@@ -1,6 +1,6 @@
 import { all, one, count, languageBuckets, languageVariants } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
-import { tokenise, ftsQuery } from "@/lib/search";
+import { tokenise, ftsQuery, SEARCH_WHERE, SEARCH_ORDER } from "@/lib/search";
 import { cadence, languageName, normalizeLang, safeImage } from "@/lib/format";
 import { playlistUrl } from "@/lib/playlist";
 import { profileUrl } from "@/lib/openprofile/generate";
@@ -66,10 +66,13 @@ function clip(s: string, n: number): string {
 export async function searchShows(q: string, limit = 30): Promise<Podcast[]> {
   const tokens = tokenise(q);
   if (!tokens.length) return [];
-  const sql = `SELECT p.* FROM podcasts_fts f JOIN podcasts p ON p.id = f.rowid
-               WHERE podcasts_fts MATCH ? ORDER BY bm25(podcasts_fts, 8.0, 1.0, 3.0, 4.0) LIMIT ?`;
-  let rows = await all<Podcast>(sql, [ftsQuery(tokens, "AND"), limit]);
-  if (!rows.length && tokens.length > 1) rows = await all<Podcast>(sql, [ftsQuery(tokens, "OR"), limit]);
+  const sql = `SELECT p.* FROM podcasts p WHERE ${SEARCH_WHERE} ORDER BY ${SEARCH_ORDER} LIMIT ?`;
+  const and = ftsQuery(tokens, "AND");
+  let rows = await all<Podcast>(sql, [and, and, limit]);
+  if (!rows.length && tokens.length > 1) {
+    const or = ftsQuery(tokens, "OR");
+    rows = await all<Podcast>(sql, [or, or, limit]);
+  }
   return rows;
 }
 

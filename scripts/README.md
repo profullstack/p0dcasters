@@ -21,35 +21,32 @@ python3 scripts/build_live.py               # -> p0dcasters_live.db
 # 3. Indie cut + scoring + FTS.
 python3 scripts/export_indie.py             # -> p0dcasters.db
 
-# 4. Load into Turso. The site's own credentials, from the vault -- not the
-#    Turso CLI, whose browser login expires weekly and then reports "not
-#    logged in" on stdout with exit 0.
+# 4. Load into Postgres. The site's own DATABASE_URL, from the vault.
 logicsrc teams pull profullstack p0dcasters prod --env /tmp/p0d.env
-export $(grep -E '^TURSO_(DATABASE_URL|AUTH_TOKEN)=' /tmp/p0d.env | xargs)
-node scripts/load_turso.mjs
+export $(grep -E '^DATABASE_URL=' /tmp/p0d.env | xargs)
+node scripts/load_directory.mjs
 ```
 
-`turso db create --from-file` needs a local `sqlite3` binary (absent on the dev box), and
-`--from-dump` accepts a 19 MB dump, reports success, and creates an **empty** database.
-`load_turso.mjs` batches the inserts over the client instead, which is why it exists.
+`load_directory.mjs` streams the rows over the client in multi-row inserts (the
+database is on another box; a statement per row would be a round trip per row).
 
 `analyze.py` profiles the raw dump — liveness, host concentration, the Tranco join. Run it
 when you want the numbers behind the About page.
 
 ## How the reload keeps prod serving
 
-`load_turso.mjs` never drops the live table first. It stages every row into
+`load_directory.mjs` never drops the live table first. It stages every row into
 `podcasts_new` while `podcasts` keeps serving, then swaps in one write transaction:
-drop the old table and its FTS index, rename the staged table into place, recreate
-the indexes and the FTS index. A failure before the swap leaves prod untouched; a
+drop the old table, rename the staged table into place, recreate the indexes
+(including the search index). A failure before the swap leaves prod untouched; a
 failure inside it rolls back. A `podcasts_new` left by a crash is dropped on the
 next attempt. There is no longer a "tables are dropped, rerun with FORCE=1" state.
 
 The same database holds the account tables — `users`, `sessions`, `login_tokens`,
-`credentials`, `follows` — created by `migrate_auth.mjs`, plus `refresh_runs` and
-`submissions` (`migrate_submissions.mjs`), plus `podcast_profiles` and `profile_sources`
-(`migrate_profiles.mjs`: what a podcaster corrected on their OpenProfile.md and who
-claimed it, keyed by slug for the same reason `follows` is). The loader drops none of them. It does
+`credentials`, `follows` — plus `refresh_runs` and `submissions`, plus `podcast_profiles`
+and `profile_sources` (what a podcaster corrected on their OpenProfile.md and who
+claimed it, keyed by slug for the same reason `follows` is); all of them come from
+`db/schema.pg.sql`. The loader drops none of them. It does
 *read* `submissions`: a show a publisher added through `/submit` was inserted into
 `podcasts` at the time, and the row is kept as JSON on the submission, so before the
 swap the loader re-reads each such feed (bounded, best effort), then inserts the ones
@@ -66,9 +63,9 @@ the loader until a person has approved it: only rows in status `listed` are merg
 `podcasts.id`: the reload reassigns ids, so a numeric key would come back pointing
 at somebody else's show.
 
-`turso_sql.mjs` runs one statement with the same credentials (`node
-scripts/turso_sql.mjs "SELECT COUNT(*) FROM podcasts"`); it is what the refresh
-script uses instead of `turso db shell`.
+`db_sql.mjs` runs one statement with the same credentials (`node
+scripts/db_sql.mjs "SELECT COUNT(*) FROM podcasts"`, `--rows` for TSV, `--file` to
+apply a SQL file); it is what the refresh script uses.
 ## Automatic refresh
 
 `refresh-if-new-dump.sh` does the whole thing above, but only when Podcast Index has
@@ -104,11 +101,11 @@ the Turso CLI's browser login had expired, and it answers "You are not logged in
 stdout with exit status 0, so `turso db show --url` handed the loader a sentence as a
 URL and `turso db shell` "succeeded" at dropping nothing. What changed:
 
-- **No CLI in the pipeline.** Credentials are a database token, which does not expire.
-  The script takes the first pair the database actually accepts: the cached
-  `~/p0dcasters-data/.turso-token`, then the `p0dcasters--prod` vault via `logicsrc`,
-  then the CLI if it happens to be logged in. A rejected token is discarded and the
-  chain re-walked, so a revoked credential heals on the next run.
+- **No CLI in the pipeline.** The credential is the database URL itself. The script
+  takes the first one the database actually accepts: `DATABASE_URL` in the environment,
+  the cached `~/p0dcasters-data/.database-url`, then the `p0dcasters--prod` vault via
+  `logicsrc`. A rejected URL is discarded and the chain re-walked, so a rotated password
+  heals on the next run.
 - **One run at a time.** `flock` on `~/p0dcasters-data/.refresh.lock`; an overlapping
   tick exits at once. Cron wraps the run in `timeout 3h`.
 - **Retries are cheap.** The dump stamp only advances on success, so a failed run is
@@ -135,10 +132,9 @@ are no longer used.
 ## Reporting itself to /crawlstats
 
 Every run writes a row into `refresh_runs`, which is the only thing the
-[/crawlstats](https://p0dcasters.com/crawlstats) page reads about the pipeline. Create
-the table once with `node scripts/migrate_runs.mjs` (safe to re-run), and do **not** add
-it to the drop list above — like the account tables it has to survive a rebuild, and it
-is the history the page is made of.
+[/crawlstats](https://p0dcasters.com/crawlstats) page reads about the pipeline. The
+table is part of `db/schema.pg.sql`; do **not** add it to the drop list above — like the
+account tables it has to survive a rebuild, and it is the history the page is made of.
 
 `record_run.mjs` does the writing, called by `refresh-if-new-dump.sh` at each state
 change. Three things about it are deliberate:
@@ -147,11 +143,9 @@ change. Three things about it are deliberate:
   evidence, visible from production, that the cron entry still exists. Their absence is
   the failure the page is for, and it is invisible if only rebuilds are logged.
 - **Recording never fails a rebuild.** A lost status line is bookkeeping; a refused write
-  is retried once with a freshly minted token and then given up on.
-- **The Turso token is cached** in `~/p0dcasters-data/.turso-token`. `turso db tokens
-  create` mints a non-expiring credential every time it is called, and a script running
-  four times a day would otherwise leave a thousand live tokens on the database in a
-  year. Deleting the file is safe: the next run mints another.
+  is retried once with a freshly pulled URL and then given up on.
+- **The database URL is cached** in `~/p0dcasters-data/.database-url` so the vault is
+  not pulled four times a day. Deleting the file is safe: the next run pulls it again.
 
 A successful run also stores a `category -> count` snapshot. `podcasts` is dropped and
 reloaded whole, so a count taken today does not exist tomorrow; those snapshots are what

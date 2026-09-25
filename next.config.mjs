@@ -29,6 +29,9 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // The database client (and pg underneath it) runs in the Node server only;
+  // keep them external so the bundler never tries to pull them in.
+  serverExternalPackages: ["@profullstack/libsql-pg", "pg"],
   images: { unoptimized: true },
   poweredByHeader: false,
   async headers() {

@@ -129,7 +129,7 @@ export async function createBatch(
 export async function batchRows(batchId: string): Promise<SubmissionRow[]> {
   return all<SubmissionRow>(
     `SELECT id, batch_id, input, feed_url, slug, title, status, error, message, created_at, resolved_at
-     FROM submissions WHERE batch_id = ? ORDER BY created_at, rowid`,
+     FROM submissions WHERE batch_id = ? ORDER BY created_at, id`,
     [batchId],
   );
 }
@@ -401,7 +401,7 @@ async function sameShow(title: string, hosts: string[]): Promise<{ slug: string;
   if (!title || !hs.length) return null;
   const row = await one<{ slug: string; title: string; feed_url: string }>(
     `SELECT slug, title, feed_url FROM podcasts
-     WHERE title = ? COLLATE NOCASE AND host IN (${hs.map(() => "?").join(",")}) LIMIT 1`,
+     WHERE lower(title) = lower(?) AND host IN (${hs.map(() => "?").join(",")}) LIMIT 1`,
     [title.trim(), ...hs],
   );
   return row ? { slug: row.slug, title: row.title, feedUrl: row.feed_url } : null;
@@ -497,14 +497,8 @@ async function insertPodcast(row: Omit<Podcast, "id">): Promise<void> {
     sql: `INSERT INTO podcasts(${cols.join(",")}) VALUES(${cols.map(() => "?").join(",")})`,
     args: args(cols.map((c) => row[c])),
   });
-  const inserted = await one<{ id: number }>("SELECT id FROM podcasts WHERE slug = ?", [row.slug]);
-  if (inserted) {
-    // External-content FTS: rows are not indexed until told about.
-    await db().execute({
-      sql: "INSERT INTO podcasts_fts(rowid, title, description, author, host) VALUES(?,?,?,?,?)",
-      args: args([inserted.id, row.title, row.description, row.author ?? "", row.host]),
-    });
-  }
+  // Search is an expression index over the row itself (db/schema.pg.sql), so
+  // there is no separate FTS table to tell about the new show.
 }
 
 /**

@@ -22,8 +22,8 @@ RUN --mount=type=cache,id=x65XpAKSIH8-/root/local/share/pnpm/store/v3,target=/ro
 # build phase
 COPY . /app/.
 # `next build` runs at container start (see CMD): the pages are ISR and prerender
-# against Turso, whose TURSO_* variables live in app.env on dev2 and reach the
-# container, not the image build (Railway exposed them to both).
+# against the database, whose DATABASE_URL lives in app.env on dev2 and reaches the
+# container, not the image build.
 
 
 RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile

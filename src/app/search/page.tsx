@@ -5,7 +5,7 @@ import Card from "@/components/Card";
 import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
-import { tokenise, ftsQuery } from "@/lib/search";
+import { tokenise, ftsQuery, SEARCH_WHERE, SEARCH_ORDER } from "@/lib/search";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -16,12 +16,13 @@ export const metadata: Metadata = {
 async function search(q: string): Promise<Podcast[]> {
   const tokens = tokenise(q);
   if (!tokens.length) return [];
-  const sql = `SELECT p.* FROM podcasts_fts f JOIN podcasts p ON p.id = f.rowid
-               WHERE podcasts_fts MATCH ? ORDER BY bm25(podcasts_fts, 8.0, 1.0, 3.0, 4.0) LIMIT 60`;
+  const sql = `SELECT p.* FROM podcasts p WHERE ${SEARCH_WHERE} ORDER BY ${SEARCH_ORDER} LIMIT 60`;
   // AND first for precision; fall back to OR so a long query still returns something.
-  let rows = await all<Podcast>(sql, [ftsQuery(tokens, "AND")]);
+  const and = ftsQuery(tokens, "AND");
+  let rows = await all<Podcast>(sql, [and, and]);
   if (!rows.length && tokens.length > 1) {
-    rows = await all<Podcast>(sql, [ftsQuery(tokens, "OR")]);
+    const or = ftsQuery(tokens, "OR");
+    rows = await all<Podcast>(sql, [or, or]);
   }
   return rows;
 }
