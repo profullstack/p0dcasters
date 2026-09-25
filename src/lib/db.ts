@@ -1,22 +1,40 @@
-import { createClient, type Client } from "@libsql/client";
+import { createClient, type Client } from "@profullstack/libsql-pg";
 import { normalizeLang } from "@/lib/format";
 
 // Next inlines `process.env.FOO` at build time. Reading through a variable key
-// keeps the lookup dynamic so the value is read from the real runtime env on
-// Railway instead of being frozen (and dropped) into the build output.
+// keeps the lookup dynamic so the value is read from the real runtime env
+// instead of being frozen (and dropped) into the build output.
 function env(key: string): string | undefined {
   return process.env[key];
+}
+
+/**
+ * The only database is Postgres. `@profullstack/libsql-pg` keeps the
+ * `@libsql/client` surface every query here was written against and rewrites
+ * the remaining SQLite idioms per statement, so the callers did not change.
+ * There is no file-database fallback any more: a missing or non-Postgres URL
+ * is a deploy error, and it fails here at first use rather than limping along
+ * against an empty local file.
+ */
+export function databaseUrl(): string {
+  const url = env("DATABASE_URL")?.trim();
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL is not set (postgres://... required)" +
+        (env("TURSO_DATABASE_URL") ? "; TURSO_DATABASE_URL is no longer read, the database moved to Postgres" : ""),
+    );
+  }
+  if (!/^postgres(ql)?:\/\//.test(url)) {
+    throw new Error(`DATABASE_URL must be postgres:// or postgresql://, got ${url.split(":")[0]}://...`);
+  }
+  return url;
 }
 
 let client: Client | null = null;
 
 export function db(): Client {
   if (client) return client;
-  const url = env("TURSO_DATABASE_URL");
-  const authToken = env("TURSO_AUTH_TOKEN");
-  client = url
-    ? createClient({ url, authToken })
-    : createClient({ url: "file:./data/p0dcasters.db" });
+  client = createClient({ url: databaseUrl(), dialect: "sqlite" });
   return client;
 }
 

@@ -59,7 +59,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
   if (!p) notFound();
 
   const more = await all<Podcast>(
-    `SELECT * FROM podcasts WHERE category IS ? AND id <> ? ORDER BY score DESC LIMIT 6`,
+    `SELECT * FROM podcasts WHERE category IS NOT DISTINCT FROM ? AND id <> ? ORDER BY score DESC LIMIT 6`,
     [p.category, p.id],
   );
   const sameHost = await all<Podcast>(

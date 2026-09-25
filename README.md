@@ -26,8 +26,11 @@ here only inverted, as one signal for identifying platforms to exclude.
 
 ## Stack
 
-Next.js (App Router) on Node, Turso/libSQL, deployed on Railway. Search is SQLite FTS5;
-raw input is tokenised before it reaches `MATCH`, since FTS5 treats punctuation as query
+Next.js (App Router) on Node, Postgres through
+[`@profullstack/libsql-pg`](https://github.com/profullstack/libsql-pg), which keeps the
+`@libsql/client` surface the queries were written against. The schema is
+`db/schema.pg.sql`. Search is a weighted tsvector expression index (`p0d_search_vector`);
+raw input is tokenised before it reaches `to_tsquery`, which treats punctuation as query
 syntax and would otherwise 500.
 
 ## Listening
@@ -60,9 +63,9 @@ Signed-in state is fetched from `/api/me` in the browser rather than read from c
 the root layout. A single `cookies()` call there would opt all 22k show pages out of
 static rendering.
 
-Create the tables with `node scripts/migrate_auth.mjs` (safe to re-run), and the
-`submissions` table with `node scripts/migrate_submissions.mjs`. They live in the
-same Turso database as `podcasts` but the directory rebuild never touches them, and
+Every table is created by `db/schema.pg.sql` (idempotent; `psql "$DATABASE_URL" -f
+db/schema.pg.sql`). The account tables live in the same Postgres database as
+`podcasts` but the directory rebuild never touches them, and
 `follows` keys shows by **slug** — the reload reassigns `podcasts.id`, so a numeric key
 would silently repoint everyone's follows at other shows.
 
@@ -70,7 +73,7 @@ would silently repoint everyone's follows at other shows.
 
 | Variable | Needed for |
 | --- | --- |
-| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | the database; falls back to `./data/p0dcasters.db` |
+| `DATABASE_URL` | the database, `postgres://...`; the app refuses to start on anything else (schema: `db/schema.pg.sql`) |
 | `AUTH_SECRET` | session and audio-proxy signing. **Required in production** |
 | `RESEND_API_KEY` | sending the magic link. Without it, outside production, the link is printed to the console instead |
 | `SUBMIT_FORWARD_TO` | where `/api/submit` also sends a listed feed. Defaults to `https://rssamplifier.com` in production; set it empty to stop forwarding |
@@ -81,7 +84,7 @@ would silently repoint everyone's follows at other shows.
 
 ```sh
 python3 ../p0dcasters-data/export_indie.py    # writes p0dcasters.db
-turso db shell p0dcasters < dump.sql
+DATABASE_URL=postgres://... node scripts/load_directory.mjs
 ```
 
 ## Data-quality fixes applied
@@ -113,11 +116,11 @@ Two things shape how it is built:
   it is the only outage this page can detect on its own.
 - **It is uncached, and every relative figure is derived at render.** Caching an object
   holding "last checked 20 minutes ago" freezes that sentence, and a page that reports a
-  dead pipeline as cheerfully current is worse than no page. The reads are one libSQL
-  batch each and the directory is 21k rows, so this costs a round trip, not a scan.
+  dead pipeline as cheerfully current is worse than no page. The reads are one batch
+  each and the directory is 21k rows, so this costs a round trip, not a scan.
 
 Its history comes from `refresh_runs`, written by the pipeline itself — see
-`scripts/README.md`. Create the table with `node scripts/migrate_runs.mjs`, and do **not**
+`scripts/README.md`. The table is part of `db/schema.pg.sql`, and do **not**
 add it to the rebuild's drop list: like the account tables it has to survive a reload,
 because it is the only record of anything that happened before the current directory
 existed.

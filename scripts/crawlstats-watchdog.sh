@@ -13,7 +13,7 @@
 #   30 * * * * /bin/sh /home/anthony/p0dcasters/scripts/crawlstats-watchdog.sh
 #
 # The Resend key is the site's own, from the p0dcasters--prod vault, cached
-# beside the Turso token. ALERT_TO overrides the recipient.
+# beside the database URL. ALERT_TO overrides the recipient.
 set -u
 
 DATA=/home/anthony/p0dcasters-data

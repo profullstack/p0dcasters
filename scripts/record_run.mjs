@@ -22,7 +22,7 @@
 // one run without carrying a row id around.
 import { readFileSync } from "node:fs";
 
-import { createClient } from "@libsql/client";
+import { createClient } from "@profullstack/libsql-pg";
 
 // How much of a run's log to keep. A normal rebuild logs a dozen lines; a
 // failing one can log a Python traceback per script, and there is no reason for
@@ -38,9 +38,13 @@ if (!opts.key || !opts.status) {
   process.exit(2);
 }
 
-const url = process.env.TURSO_DATABASE_URL || "file:./data/p0dcasters.db";
-const authToken = process.env.TURSO_AUTH_TOKEN;
-const c = createClient(url.startsWith("file:") ? { url } : { url, authToken });
+const url = process.env.DATABASE_URL;
+if (!url || !/^postgres(ql)?:\/\//.test(url)) {
+  console.error("record_run: DATABASE_URL (postgres://...) is required");
+  process.exit(3);
+}
+// Plain Postgres SQL throughout: nothing here needs the SQLite rewriter.
+const c = createClient({ url, dialect: "postgres", pool: { max: 1 } });
 
 const now = Math.floor(Date.now() / 1000);
 const done = opts.status !== "running";
@@ -132,10 +136,11 @@ try {
   console.log(`record_run: ${opts.key} ${opts.status}${opts.step ? ` (${opts.step})` : ""}`);
 } catch (err) {
   console.error("record_run: write failed:", err.message);
-  // 3 tells the caller to mint a fresh Turso token and try once more; the
+  // 3 tells the caller to fetch a fresh database URL and try once more; the
   // cached one is the likeliest thing to have gone stale.
   process.exit(3);
 }
+await c.close();
 
 /**
  * @param {string[]} argv
@@ -158,8 +163,7 @@ function parse(argv) {
 }
 
 /**
- * libSQL cannot bind `undefined`: it throws remotely but binds as null against a
- * local file, so a dev run would never catch it. Everything optional goes
+ * Never bind `undefined`: the client rejects it. Everything optional goes
  * through here or an explicit `?? null`.
  *
  * @param {string|undefined} v
