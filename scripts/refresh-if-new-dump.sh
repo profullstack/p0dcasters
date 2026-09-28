@@ -87,8 +87,13 @@ log() {
 
 # --- credentials --------------------------------------------------------------
 # probe: does the database accept what is in the environment right now?
+# Its error goes to the log: on 2026-09-28 a missing node module read as
+# "no working database credential" for three days because this was silent.
 probe() {
-  "$NODE" "$SCRIPTS/db_sql.mjs" "SELECT 1" >/dev/null 2>&1
+  perr=$("$NODE" "$SCRIPTS/db_sql.mjs" "SELECT 1" 2>&1 >/dev/null) && return 0
+  why=$(printf '%s\n' "$perr" | grep -m1 -E '^[A-Za-z]*Error|^db_sql:') || why=$(printf '%s\n' "$perr" | grep -v '^[[:space:]]*$' | tail -1)
+  log "probe failed: $(printf '%s' "$why" | sed -E 's#(://[^:/@]*:)[^@]*@#\1***@#g' | cut -c1-300)"
+  return 1
 }
 
 # use_creds URL SOURCE: export the URL if the database accepts it, and cache it
@@ -189,6 +194,14 @@ if ! flock -n 9; then
   FINISHED=1
   log "another refresh holds $LOCK -- leaving it alone"
   exit 0
+fi
+
+# --- 0b. dependencies ------------------------------------------------------------
+# Cron runs a checkout that is updated by `git pull`, which never installs. A new
+# dependency (PR #29 added @profullstack/libsql-pg) then breaks every script that
+# touches the database. A frozen install takes about a second when nothing changed.
+if ! (cd "$SCRIPTS/.." && pnpm install --frozen-lockfile --prefer-offline --config.confirm-modules-purge=false >>"$RUNLOG" 2>&1); then
+  log "dependency install failed in $SCRIPTS/.. -- see this run's log"
 fi
 
 record --status running --step check
