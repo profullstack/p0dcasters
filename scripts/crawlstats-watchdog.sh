@@ -35,17 +35,39 @@ log() { echo "$(date -u '+%Y-%m-%dT%H:%M:%SZ') $*" >> "$LOG"; }
 
 # Prints: STATE IDLE_HOURS LAST_STATUS LAST_CHECK_AT
 state() {
-  curl -sS -m 30 "$API" 2>/dev/null | "$PY" -c '
+  body=$(mktemp "${TMPDIR:-/tmp}/p0d-health.XXXXXX") || { echo "unreachable 0 - -"; return; }
+  attempt=1
+  while [ "$attempt" -le 3 ]; do
+    code=$(curl -sS --connect-timeout 10 -m 30 -o "$body" -w '%{http_code}' "$API" 2>/dev/null)
+    rc=$?
+    parsed=
+    if [ "$rc" -eq 0 ] && [ "$code" = 200 ]; then
+      parsed=$("$PY" -c '
 import json, sys
 try:
     d = json.load(sys.stdin)
+    h = d.get("health") or {}
+    p = d.get("pipeline") or {}
+    s = h.get("state")
+    if s not in ("healthy", "degraded", "stalled", "unknown"):
+        raise ValueError("missing or invalid health state")
+    print(s, round(h.get("idleHours") or 0, 1),
+          p.get("lastCheckStatus") or "-", p.get("lastCheckAt") or "-")
 except Exception:
-    print("unreachable 0 - -"); sys.exit()
-h = d.get("health") or {}
-p = d.get("pipeline") or {}
-print(h.get("state") or "unknown", round(h.get("idleHours") or 0, 1),
-      p.get("lastCheckStatus") or "-", p.get("lastCheckAt") or "-")
-'
+    sys.exit(1)
+' < "$body")
+    fi
+    if [ -n "$parsed" ]; then
+      rm -f "$body"
+      echo "$parsed"
+      return
+    fi
+    log "status API attempt $attempt/3 failed (curl exit $rc, HTTP ${code:-000}; response missing or invalid)"
+    [ "$attempt" -eq 3 ] || sleep 10
+    attempt=$((attempt + 1))
+  done
+  rm -f "$body"
+  echo "unreachable 0 - -"
 }
 
 set -- $(state)
@@ -59,9 +81,11 @@ log "api says $s (idle ${idle}h, last check $last at $at)"
 # --- recover ------------------------------------------------------------------
 log "kicking refresh-if-new-dump.sh"
 timeout -k 60 3h /bin/sh "$SCRIPTS/refresh-if-new-dump.sh" >/dev/null 2>&1
-log "refresh exited $?"
+rc=$?
+log "refresh exited $rc"
 set -- $(state)
 s2=${1:-unreachable}
+idle=${2:-0}; last=${3:--}; at=${4:--}
 log "api now says $s2"
 if [ "$s2" = healthy ]; then
   rm -f "$ALERTED"
@@ -88,16 +112,27 @@ if [ -z "$key" ]; then
 fi
 
 payload=$(mktemp "${TMPDIR:-/tmp}/p0d-alert.XXXXXX")
-"$PY" - "$s2" "$idle" "$last" "$at" "$ALERT_TO" "$DATA/refresh.log" > "$payload" <<'EOF'
+"$PY" - "$s2" "$idle" "$last" "$at" "$ALERT_TO" "$DATA/refresh.log" "$rc" > "$payload" <<'EOF'
 import json, sys
-state, idle, last, at, to, logf = sys.argv[1:7]
+state, idle, last, at, to, logf, rc = sys.argv[1:8]
 try:
     tail = "".join(open(logf, encoding="utf-8", errors="replace").readlines()[-30:])
 except Exception as e:
     tail = f"(could not read {logf}: {e})"
+unreachable = state == "unreachable"
 text = (
-    f"p0dcasters.com/crawlstats reports {state}.\n\n"
+    ("The crawlstats status API could not be read after repeated attempts. "
+     "Crawler health is unknown; this does not establish that the refresh failed.\n\n"
+     if unreachable else f"p0dcasters.com/crawlstats reports {state}.\n\n")
+    +
     f"Last recorded check: {last} at {at} ({idle}h ago).\n"
+    # A stall means nothing has been recorded since; the last row is whatever
+    # the final successful run wrote (usually "skipped"), not the cause.
+    + (f"The refresh the watchdog just ran exited {rc}, so it is failing before it "
+       "can record a run. The status above is the last run that did record, not "
+       "the reason for the stall; the log tail below has the actual error.\n"
+       if rc not in ("0", "") and not unreachable else "")
+    +
     "The watchdog already re-ran scripts/refresh-if-new-dump.sh once and the API "
     "still does not say healthy, so this needs a person.\n\n"
     "Tail of ~/p0dcasters-data/refresh.log:\n\n" + tail
@@ -105,7 +140,8 @@ text = (
 print(json.dumps({
     "from": "p0dcasters <noreply@p0dcasters.com>",
     "to": [to],
-    "subject": f"[p0dcasters] directory refresh is {state}",
+    "subject": ("[p0dcasters] status API unreachable; crawler health unknown"
+                if unreachable else f"[p0dcasters] directory refresh is {state}"),
     "text": text,
 }))
 EOF

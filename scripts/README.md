@@ -119,6 +119,14 @@ URL and `turso db shell` "succeeded" at dropping nothing. What changed:
   refresh once and checks again. If the page still is not healthy it emails
   `anthony@profullstack.com` through Resend (key from the same vault, cached in
   `.resend-key`), at most once every 12 hours, with the tail of `refresh.log`.
+  Status requests retry transport errors, non-200 responses and invalid JSON up
+  to three times, ten seconds apart, before recovery or alerting. Each failed
+  attempt logs its HTTP status and curl exit code in `watchdog.log`. An unreadable
+  API is reported as unknown crawler health, separately from a failed refresh.
+  When the kicked refresh itself exits non-zero, the alert says so: a stalled
+  page still shows the last run that managed to record (usually `skipped`), and
+  that row is not the cause. The 2026-09-25 stall read "last check: skipped" for
+  three days while every run died on a missing module before it could record.
 
 ```
 0 */6 * * * /usr/bin/timeout -k 60 3h /bin/sh /home/anthony/p0dcasters/scripts/refresh-if-new-dump.sh
