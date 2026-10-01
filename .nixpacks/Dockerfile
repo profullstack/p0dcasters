@@ -17,18 +17,20 @@
 
 FROM oven/bun:1.4.0-slim
 WORKDIR /app
+# The build at start writes .next/, so the non-root user owns /app. Installing and
+# copying as that user (rather than a `chown -R` afterwards) keeps node_modules in
+# one layer instead of two.
+RUN chown bun:bun /app
+USER bun
 # Install before NODE_ENV=production: bun skips devDependencies under it, and the
 # build needs typescript and the @types packages.
-COPY package.json bun.lock ./
+COPY --chown=bun:bun package.json bun.lock ./
 RUN bun install --frozen-lockfile
-COPY . .
+COPY --chown=bun:bun . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
-# The build at start writes .next/, so the non-root user owns the tree.
-RUN chown -R bun:bun /app
-USER bun
 EXPOSE 3000
 # The build runs first, so give it time before health counts.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=300s --retries=3 \
