@@ -175,8 +175,11 @@ const IJ = {
   feed_url: 'https://ij.org/feed/podcast/unpublished-opinions/',
 };
 
-test('the package throws on the real link, so generation must not hand it over raw', () => {
-  assert.throws(() => normaliseUrl(IJ.link), URIError);
+test('the package (0.1.2+) keys the real link instead of throwing', () => {
+  // 0.1.1 threw URIError here; generation still repairs the URL as well, so
+  // a profile never carries a malformed escape whatever the package does.
+  assert.equal(normaliseUrl(IJ.link), 'ij.org/podcasts/%podcast-type%');
+  assert.equal(normaliseUrl(wellFormedUrl(IJ.link)), normaliseUrl(IJ.link));
 });
 
 test('a show whose link has a malformed percent-escape still generates a profile', () => {
