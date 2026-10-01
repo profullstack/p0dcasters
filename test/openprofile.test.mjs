@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseOpenProfile, broadcasts, accounts, topics, kindOf, identityValue, applyOverrides, overridesFromDocument, renderOpenProfile } from '@profullstack/openprofile';
+import { parseOpenProfile, broadcasts, accounts, topics, kindOf, identityValue, applyOverrides, overridesFromDocument, renderOpenProfile, normaliseUrl, identityKeys, mergeProfiles } from '@profullstack/openprofile';
 import {
   generateProfile,
   cadenceBand,
@@ -11,6 +11,7 @@ import {
   encodeCursor,
   decodeCursor,
   profileUrl,
+  wellFormedUrl,
 } from '../src/lib/openprofile/generate.ts';
 import { parseChannel } from '../src/lib/openprofile/channel.ts';
 
@@ -157,4 +158,52 @@ test('the listing cursor round-trips and rejects junk', () => {
   assert.deepEqual(decodeCursor(encodeCursor(c)), c);
   assert.equal(decodeCursor('not-a-cursor'), null);
   assert.equal(decodeCursor(''), null);
+});
+
+// The row that 500'd /api/openprofiles?cursor=MTc4NTc2NzA0NDo3NTM3NTAw&limit=500
+// on 2026-10-01 (nichedb's pull, every three minutes): ij.org's feed links the
+// show to an unrendered WordPress placeholder, and the package's normaliseUrl
+// decodes the path and throws "URIError: URI malformed".
+const IJ = {
+  ...SHOW,
+  slug: 'unpublished-opinions',
+  title: 'Unpublished Opinions',
+  link: 'https://ij.org/podcasts/%podcast-type%/',
+  host: 'ij.org',
+  author: 'Institute for Justice',
+  owner: 'Institute for Justice',
+  feed_url: 'https://ij.org/feed/podcast/unpublished-opinions/',
+};
+
+test('the package throws on the real link, so generation must not hand it over raw', () => {
+  assert.throws(() => normaliseUrl(IJ.link), URIError);
+});
+
+test('a show whose link has a malformed percent-escape still generates a profile', () => {
+  const doc = generateProfile(IJ, {
+    accounts: ['https://example.com/a%zz', 'https://example.com/%FF'],
+    funding: [{ label: 'Give', url: 'https://ij.org/donate/%giving-page%' }, { label: 'Bad', url: 'https://ij.org/donate/%campaign%' }],
+  });
+  const md = renderOpenProfile(doc);
+  assert.equal(identityValue(doc, 'Web'), 'https://ij.org/podcasts/%25podcast-type%25/');
+  assert.deepEqual(accounts(doc).map((a) => a.url), ['https://example.com/a%25zz']);
+  assert.match(md, /Give: https:\/\/ij\.org\/donate\/%25giving-page%25/);
+  assert.doesNotMatch(md, /Bad:/); // "%ca" is a real escape, not UTF-8: dropped
+  // Everything downstream that keys by URL now works on it.
+  assert.doesNotThrow(() => identityKeys(doc));
+  assert.doesNotThrow(() => mergeProfiles([doc, parseOpenProfile(md)]));
+  assert.doesNotThrow(() => applyOverrides(doc, null));
+});
+
+test('wellFormedUrl repairs a stray %, keeps real escapes, and drops what will not decode', () => {
+  assert.equal(wellFormedUrl('https://ij.org/podcasts/%podcast-type%/'), 'https://ij.org/podcasts/%25podcast-type%25/');
+  assert.equal(wellFormedUrl('https://a.example/caf%C3%A9'), 'https://a.example/caf%C3%A9');
+  assert.equal(wellFormedUrl('https://a.example/100%'), 'https://a.example/100%25');
+  assert.equal(wellFormedUrl('https://a.example/%E0%A4%A'), null);
+  assert.equal(wellFormedUrl('https://a.example/%FF'), null);
+  assert.equal(wellFormedUrl('ftp://a.example/'), null);
+  assert.equal(wellFormedUrl(null), null);
+  for (const u of ['https://ij.org/podcasts/%podcast-type%/', 'https://a.example/100%']) {
+    assert.doesNotThrow(() => normaliseUrl(wellFormedUrl(u)));
+  }
 });

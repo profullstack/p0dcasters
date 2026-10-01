@@ -143,11 +143,38 @@ function since(unix: number | null | undefined): string | null {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-function https(url: string | null | undefined): string | null {
+/**
+ * A feed-supplied URL made safe to put in a profile, or null.
+ *
+ * The package keys identities with normaliseUrl, which runs
+ * decodeURIComponent over the path and throws on a malformed escape. Feeds
+ * carry them: ij.org's "Unpublished Opinions" links to
+ * `https://ij.org/podcasts/%podcast-type%/`, an unrendered WordPress
+ * placeholder, and that one row 500'd every /api/openprofiles page it fell on.
+ * A "%" that does not start an escape is what the publisher meant literally,
+ * so it becomes "%25". A path that still will not decode (escapes that are not
+ * UTF-8, like "%FF") is dropped rather than guessed at.
+ */
+export function wellFormedUrl(url: string | null | undefined): string | null {
   const u = (url ?? "").trim();
   if (!/^https?:\/\//i.test(u)) return null;
-  return u;
+  const repaired = u.replace(/%(?![0-9a-f]{2})/gi, "%25");
+  let path: string;
+  try {
+    path = new URL(repaired).pathname;
+  } catch {
+    // Not parseable: normaliseUrl lowercases it without decoding, so it is safe.
+    return repaired;
+  }
+  try {
+    decodeURIComponent(path);
+  } catch {
+    return null;
+  }
+  return repaired;
 }
+
+const https = wellFormedUrl;
 
 function categories(row: ShowRow): string[] {
   const list = (row.categories ?? "")
@@ -193,7 +220,7 @@ export function generateProfile(row: ShowRow, extras: ChannelExtras = {}): OpenP
     Cadence: cadenceBand(row.per_week),
     Language: langTag(row),
     Since: since(row.oldest_pubdate),
-    Feed: row.feed_url,
+    Feed: wellFormedUrl(row.feed_url),
     Listen: showPage(row.slug),
     Topics: cats.length ? cats.join(", ") : null,
     Description: firstSentence(row.description, 300),
@@ -201,7 +228,10 @@ export function generateProfile(row: ShowRow, extras: ChannelExtras = {}): OpenP
 
   const links = listSection(
     "Links",
-    (extras.funding ?? []).filter((f) => https(f.url)).map((f) => `${f.label || "Support"}: ${f.url}`),
+    (extras.funding ?? []).flatMap((f) => {
+      const url = https(f.url);
+      return url ? [`${f.label || "Support"}: ${url}`] : [];
+    }),
   );
 
   return makeOpenProfile({

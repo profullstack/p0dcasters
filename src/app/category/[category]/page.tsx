@@ -6,7 +6,7 @@ import Card from "@/components/Card";
 import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
-import { titleCase } from "@/lib/format";
+import { safeDecode, titleCase } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 import Link from "next/link";
 import TimeAgo from "@/components/TimeAgo";
@@ -20,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category } = await params;
-  const name = titleCase(decodeURIComponent(category));
+  const name = titleCase(safeDecode(category));
   return {
     title: `${name} podcasts`,
     description: `Independent, self-hosted ${name.toLowerCase()} podcasts — every show publishes from its own domain.`,
@@ -37,7 +37,7 @@ export default async function Category({
 }) {
   const { category } = await params;
   const { page } = await searchParams;
-  const cat = decodeURIComponent(category);
+  const cat = safeDecode(category);
   const pg = Math.max(1, parseInt(page || "1", 10) || 1);
 
   const total = await count("SELECT COUNT(*) AS n FROM podcasts WHERE category = ?", [cat]);
