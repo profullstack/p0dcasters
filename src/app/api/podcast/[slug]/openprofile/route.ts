@@ -67,6 +67,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ slug: st
   try {
     saved = await saveOverrides(p, input, editor);
   } catch (e) {
+    // A URL with a malformed percent-escape ("%podcast-type%") is the caller's
+    // input to fix, not a server fault and not a size problem.
+    if (e instanceof URIError) {
+      return Response.json({ ok: false, error: "a URL in the profile has a malformed percent-escape; write a literal % as %25" }, { status: 400, headers });
+    }
     return Response.json({ ok: false, error: (e as Error).message }, { status: 413, headers });
   }
   if (editor.via === "openaccess" && principal) await rememberPrincipal(slug, principal.sub);

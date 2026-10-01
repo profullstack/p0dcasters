@@ -194,7 +194,15 @@ export async function assembleProfile(p: Podcast, opts: { readFeed?: boolean } =
     rssamplifierProfile(p.feed_url),
   ]);
   const local = generateProfile(p, channel ? { accounts: channel.accounts, funding: channel.funding, ownerName: channel.ownerName } : {});
-  return other ? mergeProfiles([local, other]) : local;
+  if (!other) return local;
+  try {
+    return mergeProfiles([local, other]);
+  } catch (e) {
+    // Another directory's document can carry a URL the package cannot
+    // normalise (a malformed percent-escape). Ours stands on its own.
+    console.warn(`[openprofile] could not merge rssamplifier's profile for ${p.slug}: ${(e as Error).message}`);
+    return local;
+  }
 }
 
 /** The profile as served: the assembled document with the owner's corrections over it. */
@@ -383,10 +391,18 @@ export async function listProfiles(opts: { since?: string | null; limit?: number
     [...params, limit + 1],
   );
   const page = rows.slice(0, limit);
-  const openprofiles = page.map((r) => {
-    const doc = applyOverrides(generateProfile(r), parseOverrides(r.pp_overrides));
+  // One bad row must not fail the page: a 500 here leaves the puller retrying
+  // the same cursor forever, and nothing after the row is ever read.
+  const openprofiles = page.flatMap((r): Listed[] => {
+    let doc: OpenProfileDoc;
+    try {
+      doc = applyOverrides(generateProfile(r), parseOverrides(r.pp_overrides));
+    } catch (e) {
+      console.warn(`[openprofile] skipped ${r.slug} in the listing: ${(e as Error).message}`);
+      return [];
+    }
     const updated = Number(r.pp_updated ?? r.newest_pubdate ?? 0);
-    return {
+    return [{
       id: r.slug,
       name: doc.name ?? r.title,
       url: profileUrl(r.slug),
@@ -395,7 +411,7 @@ export async function listProfiles(opts: { since?: string | null; limit?: number
       updatedAt: new Date(updated * 1000).toISOString(),
       accounts: accountsOf(doc).map((a) => a.url),
       web: identityValue(doc, "Web"),
-    };
+    }];
   });
   const last = page[page.length - 1];
   const next = rows.length > limit && last ? encodeCursor({ updatedAt: Number(last.pp_updated ?? last.newest_pubdate ?? 0), id: Number(last.id) }) : null;
