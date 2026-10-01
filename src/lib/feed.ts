@@ -1,5 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 import { playableUrl } from "./audio";
+import { MAX_FEED_BYTES, closeTruncatedFeed, readCappedText } from "./feed-body";
+import { TtlLru } from "./lru";
 
 export type Episode = {
   id: string;
@@ -163,19 +165,96 @@ export function parseFeed(xml: string): Episode[] {
   return out;
 }
 
-export async function fetchEpisodes(feedUrl: string): Promise<Episode[]> {
+/** How long a parsed feed is reused before it is fetched again. */
+const EPISODE_TTL_MS = 30 * 60 * 1000;
+/** A feed that failed or came back empty is retried sooner. */
+const EMPTY_TTL_MS = 5 * 60 * 1000;
+const EPISODE_CACHE_ENTRIES = 500;
+/** Rough ceiling, in bytes, on everything the episode cache holds. */
+const EPISODE_CACHE_BYTES = 64 * 1024 * 1024;
+
+function weighEpisodes(list: Episode[]): number {
+  let n = 64;
+  for (const e of list) {
+    n +=
+      96 +
+      2 *
+        (e.id.length +
+          e.title.length +
+          e.audio.length +
+          e.source.length +
+          e.description.length +
+          (e.image?.length ?? 0) +
+          (e.link?.length ?? 0));
+  }
+  return n;
+}
+
+/**
+ * Parsed episodes by feed URL. The fetch itself is not cached by Next: a big
+ * feed is over the 2 MB data-cache limit, so it was fetched and parsed again
+ * on every request. Holding the parsed result here is both smaller and
+ * cheaper than holding the XML.
+ */
+export const episodeCache = new TtlLru<string, Episode[]>({
+  maxEntries: EPISODE_CACHE_ENTRIES,
+  ttlMs: EPISODE_TTL_MS,
+  maxWeight: EPISODE_CACHE_BYTES,
+  weigh: weighEpisodes,
+});
+
+/** Concurrent requests for the same feed share one fetch. */
+const inflight = new Map<string, Promise<Episode[]>>();
+
+/** Truncations already reported, so a big feed logs once, not per request. */
+const reported = new Set<string>();
+function reportOnce(feedUrl: string, message: string): void {
+  if (reported.has(feedUrl)) return;
+  if (reported.size >= 1000) reported.clear();
+  reported.add(feedUrl);
+  console.warn(`[feed] ${message}: ${feedUrl}`);
+}
+
+async function loadEpisodes(feedUrl: string): Promise<Episode[]> {
   try {
     const res = await fetch(feedUrl, {
       headers: { "user-agent": UA, accept: "application/rss+xml, application/xml, */*" },
       signal: AbortSignal.timeout(9000),
-      // Feeds move at publishing speed, not request speed. Half an hour of
-      // cache keeps one popular show from being re-fetched on every play.
-      cache: "force-cache",
-      next: { revalidate: 1800 },
+      // Never into Next's data cache: big feeds are over its 2 MB limit and
+      // the parsed result is cached in episodeCache instead.
+      cache: "no-store",
     });
-    if (!res.ok) return [];
-    return parseFeed(await res.text());
+    if (!res.ok) {
+      res.body?.cancel().catch(() => {});
+      return [];
+    }
+    const body = await readCappedText(res, MAX_FEED_BYTES);
+    if (!body.truncated) return parseFeed(body.text);
+
+    const xml = closeTruncatedFeed(body.text);
+    if (!xml) {
+      reportOnce(feedUrl, `feed over ${MAX_FEED_BYTES} bytes with no complete item, skipped`);
+      return [];
+    }
+    reportOnce(feedUrl, `feed over ${MAX_FEED_BYTES} bytes, kept the newest items`);
+    return parseFeed(xml);
   } catch {
     return [];
   }
+}
+
+export async function fetchEpisodes(feedUrl: string): Promise<Episode[]> {
+  const hit = episodeCache.get(feedUrl);
+  if (hit) return hit;
+  const pending = inflight.get(feedUrl);
+  if (pending) return pending;
+
+  const p = loadEpisodes(feedUrl)
+    .then((episodes) => {
+      episodeCache.set(feedUrl, episodes, episodes.length ? EPISODE_TTL_MS : EMPTY_TTL_MS);
+      return episodes;
+    })
+    .finally(() => inflight.delete(feedUrl));
+  inflight.set(feedUrl, p);
+  return p;
 }
