@@ -1,36 +1,37 @@
-FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+# syntax=docker/dockerfile:1
+#
+# p0dcasters.com, run on Bun.
+#
+# This file lives at .nixpacks/Dockerfile because that is the path dev2's compose
+# stack builds (cli-tools dev2/dev2-site provision records it per site). It used to
+# be nixpacks output (Node + pnpm); it is now a hand-written Bun image, so do not
+# regenerate it with nixpacks.
+#
+# `next build` runs at CONTAINER START, not image build, exactly as before: the
+# prerendered pages read the directory from Postgres, and DATABASE_URL lives only
+# in app.env on dev2 (cli-tools sites.d/p0dcasters.com.json says the same).
+#
+# Contract with /home/anthony/www/p0dcasters.com on dev2, unchanged: listens on
+# 3000 inside the container, answers / for the deploy health check, reads its
+# secrets from app.env at run time.
 
-ENTRYPOINT ["/bin/bash", "-l", "-c"]
-WORKDIR /app/
-
-
-COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
-RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
-
-
-ARG CI NIXPACKS_METADATA NODE_ENV NPM_CONFIG_PRODUCTION
-ENV CI=$CI NIXPACKS_METADATA=$NIXPACKS_METADATA NODE_ENV=$NODE_ENV NPM_CONFIG_PRODUCTION=$NPM_CONFIG_PRODUCTION
-
-# setup phase
-# noop
-
-# install phase
-ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
-COPY . /app/.
-RUN --mount=type=cache,id=x65XpAKSIH8-/root/local/share/pnpm/store/v3,target=/root/.local/share/pnpm/store/v3 pnpm i --frozen-lockfile
-
-# build phase
-COPY . /app/.
-# `next build` runs at container start (see CMD): the pages are ISR and prerender
-# against the database, whose DATABASE_URL lives in app.env on dev2 and reaches the
-# container, not the image build.
-
-
-RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
-
-
-# start
-COPY . /app
-
-CMD ["pnpm run build && pnpm run start"]
-
+FROM oven/bun:1.4.0-slim
+WORKDIR /app
+# Install before NODE_ENV=production: bun skips devDependencies under it, and the
+# build needs typescript and the @types packages.
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+COPY . .
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+# The build at start writes .next/, so the non-root user owns the tree.
+RUN chown -R bun:bun /app
+USER bun
+EXPOSE 3000
+# The build runs first, so give it time before health counts.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=300s --retries=3 \
+  CMD bun -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
+# `bun --bun next build` then `bun --bun next start`: Next builds and serves on Bun.
+CMD ["sh", "-c", "bun run build && exec bun run start"]

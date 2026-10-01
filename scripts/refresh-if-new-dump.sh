@@ -200,7 +200,9 @@ fi
 # Cron runs a checkout that is updated by `git pull`, which never installs. A new
 # dependency (PR #29 added @profullstack/libsql-pg) then breaks every script that
 # touches the database. A frozen install takes about a second when nothing changed.
-if ! (cd "$SCRIPTS/.." && pnpm install --frozen-lockfile --prefer-offline --config.confirm-modules-purge=false >>"$RUNLOG" 2>&1); then
+# The repo moved from pnpm to Bun (bun.lock); the .mjs steps below still run on node,
+# which reads the flat node_modules bun writes for a single-package repo.
+if ! (cd "$SCRIPTS/.." && bun install --frozen-lockfile >>"$RUNLOG" 2>&1); then
   log "dependency install failed in $SCRIPTS/.. -- see this run's log"
 fi
 

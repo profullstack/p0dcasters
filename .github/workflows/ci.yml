@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  test:
+    name: install, typecheck, test (Bun)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The version comes from packageManager in package.json, the same Bun the
+      # image (.nixpacks/Dockerfile) pins.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run test
+      # No `next build` here: the prerendered pages read the directory from
+      # Postgres, so the build runs at container start on dev2 with DATABASE_URL.

@@ -1,13 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
+import * as nodeModule from 'node:module';
 import { XMLParser } from 'fast-xml-parser';
 import { readCappedText, closeTruncatedFeed, MAX_FEED_BYTES } from '../src/lib/feed-body.ts';
 import { TtlLru } from '../src/lib/lru.ts';
 
 // src/ uses extensionless relative imports (Next resolves them); plain node
-// needs the .ts spelled out, so add it for this test's imports only.
-registerHooks({
+// needs the .ts spelled out, so add it for this test's imports only. Bun resolves
+// them natively and has no registerHooks, so the hook is node-only.
+nodeModule.registerHooks?.({
   resolve(specifier, context, next) {
     if (/^\.\.?\//.test(specifier) && !/\.[cm]?[jt]sx?$/.test(specifier) && context.parentURL?.includes('/src/')) {
       return next(`${specifier}.ts`, context);
