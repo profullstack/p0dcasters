@@ -1,7 +1,11 @@
-import { count, languageBuckets, all } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 import { titleCase, languageName } from "@/lib/format";
 
-export const revalidate = 86400;
+const { count, languageBuckets, all } = cachedDb(86400);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 86400 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 
 /**
  * llms.txt is the index; this is the body behind it — the whole orienting text

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { all, count, languageBuckets } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 import { titleCase, languageName, clamp, safeImage } from "@/lib/format";
 import TimeAgo from "@/components/TimeAgo";
 import type { Podcast } from "@/lib/db";
@@ -10,7 +10,11 @@ import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
-export const revalidate = 300;
+const { all, count, languageBuckets } = cachedDb(300);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 300 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 
 // The one page that had no canonical of its own. Everything else sets one in
 // its generateMetadata, so "/" was the only URL with nothing pinning it.
