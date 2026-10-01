@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
-import { all, languageBuckets } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 import { titleCase, languageName } from "@/lib/format";
 import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
-export const revalidate = 300;
+const { all, languageBuckets } = cachedDb(300);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 300 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Browse",
   description: "Browse independent, self-hosted podcasts by subject and language.",

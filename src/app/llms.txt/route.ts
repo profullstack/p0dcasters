@@ -1,6 +1,10 @@
-import { count, languageBuckets } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 
-export const revalidate = 86400;
+const { count, languageBuckets } = cachedDb(86400);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 86400 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 
 // Generated rather than written down, so the counts in it cannot drift away
 // from the directory the way a hand-maintained file would.

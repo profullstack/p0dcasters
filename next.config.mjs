@@ -29,6 +29,10 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  // Dynamic pages stream their metadata into <body> by default, except for a
+  // short list of bots. The DB-backed pages used to be prerendered, with title,
+  // canonical and og:* in <head>; keep them there for every client.
+  htmlLimitedBots: /.*/,
   // The database client (and pg underneath it) runs in the Node server only;
   // keep them external so the bundler never tries to pull them in.
   serverExternalPackages: ["@profullstack/libsql-pg", "pg"],

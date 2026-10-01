@@ -1,6 +1,10 @@
-import { all } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 
-export const revalidate = 86400;
+const { all } = cachedDb(86400);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 86400 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 
 // Strip C0 control bytes: a raw one anywhere makes the OPML unparseable, and
 // feed titles out of the wild do contain them. Built via RegExp so the source

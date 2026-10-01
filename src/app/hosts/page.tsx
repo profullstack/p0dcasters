@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
-import { all } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
 import Ad from "@/components/Ad";
 import AdBanner from "@/components/AdBanner";
 import { adPlan, AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
-export const revalidate = 300;
+const { all } = cachedDb(300);
+
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 300 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Domains",
   description:

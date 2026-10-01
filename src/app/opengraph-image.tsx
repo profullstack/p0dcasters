@@ -1,12 +1,16 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { count } from "@/lib/db";
+import { cachedDb } from "@/lib/cached-db";
+
+const { count } = cachedDb(86400);
 
 // The show/domain totals below are read from the db, and the directory is
 // rebuilt on its own schedule — without this the card would be frozen with
 // whatever the last deploy happened to see. Same cadence as sitemap.xml.
-export const revalidate = 86400;
+// Rendered per request, not at build: the build must not need the database.
+// The reads are memoised for 86400 s (the old ISR window) in lib/cached-db.
+export const dynamic = "force-dynamic";
 
 export const alt = "p0dcasters — the independent podcast directory";
 export const size = { width: 1200, height: 630 };

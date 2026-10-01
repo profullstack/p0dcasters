@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: install, typecheck, test (Bun)
+    name: install, typecheck, test, build (Bun)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,5 +20,6 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun run test
-      # No `next build` here: the prerendered pages read the directory from
-      # Postgres, so the build runs at container start on dev2 with DATABASE_URL.
+      # The build must not need the database (it runs in the image, with no
+      # DATABASE_URL): routes that read Postgres render per request.
+      - run: bun run build
