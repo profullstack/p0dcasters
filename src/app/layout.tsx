@@ -198,6 +198,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/skill.md">skill.md</Link> · <Link href="/mcp">MCP</Link> ·{" "}
                   <Link href="/cli">CLI</Link> · <Link href="/openapi.json">OpenAPI</Link>
                 </p>
+                <nav className="webring small" aria-label="Profullstack webring">
+                  <a
+                    href="https://rssamplifier.com/ring/profullstack/previous?from=https%3A%2F%2Fp0dcasters.com%2F"
+                    rel="prev"
+                  >
+                    {"<<"}
+                  </a>{" "}
+                  <a href="https://rssamplifier.com/ring/profullstack">Profullstack</a>{" "}
+                  <a
+                    href="https://rssamplifier.com/ring/profullstack/next?from=https%3A%2F%2Fp0dcasters.com%2F"
+                    rel="next"
+                  >
+                    {">>"}
+                  </a>
+                </nav>
               </div>
             </footer>
           </PlayerProvider>
