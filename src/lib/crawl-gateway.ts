@@ -18,7 +18,14 @@ function env(key: string): string | undefined {
 // Meta-ExternalFetcher, Applebot-Extended / Applebot). The extras below are the
 // agents the old hand-written robots.txt named that the library does not, kept
 // on the record so an auditor grepping for them still finds a decision.
-export const TRAINING = [...TRAINING_AGENTS, "cohere-ai"];
+//
+// Lightpanda is a headless browser, not a crawler with an operator page, but on
+// 2026-10-06 it was 86% of the site's traffic: 999 residential addresses in one
+// hour, each loading one page plus its prefetches (~81 requests in 27 s) and
+// leaving. That stays under the per-address allowance in lib/throttle.ts, and
+// because it runs JavaScript every visit counted as a live reader in the
+// analytics (322 "active users"). It names itself, so it is charged like GPTBot.
+export const TRAINING = [...TRAINING_AGENTS, "cohere-ai", "Lightpanda"];
 export const RETRIEVAL = [
   ...RETRIEVAL_AGENTS,
   "Applebot",
