@@ -160,7 +160,7 @@ h2.sec {
 .prose code { font-family: ui-monospace, Menlo, monospace; font-size: 13.5px; background: var(--surface-2); padding: 2px 6px; border-radius: 4px; }
 
 footer.site {
-  border-top: 1px solid var(--border); margin-top: 50px; padding: 30px 0 46px;
+  border-top: 1px solid var(--border); margin-top: 50px; padding: 30px 0 14px;
   color: var(--muted); font-size: 13.5px;
 }
 footer.site a { color: var(--muted); text-decoration: underline; }
@@ -353,7 +353,7 @@ ol.episodes { list-style: none; padding: 0; margin: 0 0 18px; }
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 /* Keeps the footer clear of the bar without measuring it. */
-body:has(.player) footer.site { padding-bottom: 122px; }
+body:has(.player) .pfs-footer { padding-bottom: 122px; }
 
 .player-seek { height: 5px; background: var(--surface-2); cursor: pointer; }
 .player-seek:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -426,7 +426,7 @@ body:has(.player) footer.site { padding-bottom: 122px; }
   .player-controls button.ghost[aria-label="Previous episode"],
   .player-controls button.ghost[aria-label="Next episode"] { display: none; }
   .player-inner { gap: 10px; padding: 9px 14px; }
-  body:has(.player) footer.site { padding-bottom: 110px; }
+  body:has(.player) .pfs-footer { padding-bottom: 110px; }
 }
 
 .btn.ghosted { opacity: .45; pointer-events: none; }
