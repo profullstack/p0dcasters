@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import Script from "next/script";
+import { Footer } from "@profullstack/footer/react";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
@@ -188,42 +189,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/submit">Add a show</Link> ·{" "}
                   <Link href="/signup">Create a free account</Link> to follow shows
                 </p>
-                <p>
-                  <Link href="/contact">Contact</Link> ·{" "}
-                  <Link href="/privacy">Privacy</Link> ·{" "}
-                  <Link href="/terms">Terms</Link>
-                </p>
                 <p className="small">
                   Machine-readable: <Link href="/llms.txt">llms.txt</Link> ·{" "}
                   <Link href="/skill.md">skill.md</Link> · <Link href="/mcp">MCP</Link> ·{" "}
                   <Link href="/cli">CLI</Link> · <Link href="/openapi.json">OpenAPI</Link>
                 </p>
-                <nav className="webring small" aria-label="Profullstack webring">
-                  <a
-                    href="https://rssamplifier.com/ring/profullstack/previous?from=https%3A%2F%2Fp0dcasters.com%2F"
-                    rel="prev"
-                    title="Previous site"
-                  >
-                    {"<<"}
-                  </a>{" "}
-                  <a href="https://rssamplifier.com/ring/profullstack">Profullstack</a>{" "}
-                  <a
-                    href="https://rssamplifier.com/ring/profullstack/next?from=https%3A%2F%2Fp0dcasters.com%2F"
-                    rel="next"
-                    title="Next site"
-                  >
-                    {">>"}
-                  </a>{" "}
-                  <a
-                    href="https://rssamplifier.com/ring/profullstack/random?from=https%3A%2F%2Fp0dcasters.com%2F"
-                    title="Random site"
-                    aria-label="Random site"
-                  >
-                    {"⚄"}
-                  </a>
-                </nav>
               </div>
             </footer>
+            <Footer
+              site="https://p0dcasters.com/"
+              links={[
+                { label: "Contact", href: "/contact" },
+                { label: "Privacy", href: "/privacy" },
+                { label: "Terms", href: "/terms" },
+              ]}
+            />
           </PlayerProvider>
         </SessionProvider>
 
