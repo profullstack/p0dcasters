@@ -156,8 +156,14 @@ async function mergeSubmissions() {
       continue;
     }
     if (Number(p.newest_pubdate) < cutoff) continue;
-    const slugTaken = (await c.execute({ sql: "SELECT 1 FROM podcasts_new WHERE slug = ?", args: [s.slug] })).rows[0];
-    if (slugTaken) continue;
+    // The submission's slug was claimed first and is what follows and links
+    // point at. A dump row that took the same slug later (a show new to the
+    // build, since 2026-10-12 often one from a hosting platform) moves aside
+    // to -<id>, the suffix export_indie.py uses for a clash.
+    const holder = (await c.execute({ sql: "SELECT id FROM podcasts_new WHERE slug = ?", args: [s.slug] })).rows[0];
+    if (holder) {
+      await c.execute({ sql: "UPDATE podcasts_new SET slug = slug || '-' || id WHERE id = ?", args: [holder.id] });
+    }
     const scols = cols.filter((k) => k !== "id");
     await c.execute({
       sql: `INSERT INTO podcasts_new(${scols.join(",")}) VALUES(${scols.map(() => "?").join(",")})`,
