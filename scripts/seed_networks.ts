@@ -32,17 +32,44 @@ async function fetchText(url: string): Promise<string> {
 
 const decode = (s: string) => s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
-async function seedUrls(seed: Seed): Promise<string[]> {
-  const body = await fetchText(seed.url);
+function extract(body: string, seed: Seed, base: string): string[] {
   const re =
     seed.kind === "opml" && !seed.pattern ? /xmlUrl\s*=\s*"([^"]+)"/gi : new RegExp(seed.pattern ?? "$^", "gi");
   const out: string[] = [];
   for (const m of body.matchAll(re)) {
-    const u = decode(m[1] ?? m[0]).trim();
+    const hit = decode(m[1] ?? m[0]).trim();
+    const u = seed.template ? seed.template.replace("{1}", hit) : hit;
     try {
-      out.push(new URL(u, seed.url).toString());
+      out.push(new URL(u, base).toString());
     } catch {
       /* not a URL */
+    }
+  }
+  return out;
+}
+
+async function seedUrls(seed: Seed): Promise<string[]> {
+  let body = await fetchText(seed.url);
+  if (seed.where) {
+    const { list, field, equals } = seed.where;
+    const items = (JSON.parse(body)[list] ?? []) as Record<string, unknown>[];
+    body = items.filter((i) => i[field] === equals).map((i) => JSON.stringify(i)).join("\n");
+  }
+  if (!seed.follow) return extract(body, seed, seed.url);
+  const pages = new Set<string>();
+  for (const m of body.matchAll(new RegExp(seed.follow, "gi"))) {
+    try {
+      pages.add(new URL(decode(m[1] ?? m[0]), seed.followBase ?? seed.url).toString());
+    } catch {
+      /* not a URL */
+    }
+  }
+  const out: string[] = [];
+  for (const page of pages) {
+    try {
+      out.push(...extract(await fetchText(page), seed, page));
+    } catch {
+      /* one show page down is not the seed down */
     }
   }
   return out;

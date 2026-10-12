@@ -14,7 +14,22 @@ import data from "./networks.json";
  * lists the network shows the dump does not have.
  */
 
-export type Seed = { kind: "opml" | "json" | "html"; url: string; pattern?: string };
+/**
+ * Where a network lists its own feeds. `pattern` is matched globally and its
+ * first group (or the whole match) is the feed URL, or the `{1}` in `template`.
+ * `follow` makes it two levels: the index's `follow` matches are pages
+ * (resolved against `followBase`), and `pattern` runs on each of those.
+ * `where` keeps only the items of a JSON list whose `field` equals a value.
+ */
+export type Seed = {
+  kind: "opml" | "json" | "html";
+  url: string;
+  pattern?: string;
+  template?: string;
+  follow?: string;
+  followBase?: string;
+  where?: { list: string; field: string; equals: string };
+};
 
 export type Network = {
   slug: string;
