@@ -1,27 +1,42 @@
-import sqlite3, os, re, math, time, unicodedata
+import sqlite3, os, re, math, time, unicodedata, json
 
-SRC="/home/anthony/p0dcasters-data/p0dcasters_live.db"
-DST="/home/anthony/p0dcasters-data/p0dcasters.db"
+SRC=os.environ.get("P0D_LIVE_DB","/home/anthony/p0dcasters-data/p0dcasters_live.db")
+DST=os.environ.get("P0D_OUT_DB","/home/anthony/p0dcasters-data/p0dcasters.db")
+PREV=os.environ.get("P0D_PREV_DB",DST)
 NOW=int(time.time()); D=86400
+
+# Slugs are URLs people follow, link and bookmark, so a show keeps the slug the
+# last build gave it. Read before the old build is replaced; a first build, or a
+# build from before this existed, simply starts clean.
+prev_slugs={}
+if os.path.exists(PREV):
+    try:
+        old=sqlite3.connect(f"file:{PREV}?mode=ro",uri=True)
+        prev_slugs=dict(old.execute("SELECT feed_url, slug FROM podcasts").fetchall())
+        old.close()
+    except Exception as e:
+        print("previous slugs unreadable:", e)
 if os.path.exists(DST): os.remove(DST)
+print(f"previous slugs kept: {len(prev_slugs):,}")
 
 src=sqlite3.connect(f"file:{SRC}?mode=ro",uri=True)
 src.text_factory=lambda b:b.decode("utf-8","replace")
 cur=src.cursor()
-cur.execute("CREATE TEMP TABLE plat AS SELECT host FROM live GROUP BY host HAVING COUNT(*)>=25")
 
-# Platforms let through the 25-feed rule. Anchor (Spotify for Creators) is the
-# free host where most genuinely independent shows start, and by a wide margin
-# the largest host in the index (~99k live feeds, 40% of everything), so
-# excluding it as "commercial" threw out the long tail of one-person shows the
-# directory exists for. Decided 2026-09-13; mirrored in src/lib/platforms.ts so
-# the submit form agrees. Everything else on the platform list -- the paid
-# hosts and the networks -- stays out.
-ALLOWED_PLATFORMS = {"anchor.fm"}
-cur.execute("DELETE FROM plat WHERE host IN (%s)" % ",".join("?"*len(ALLOWED_PLATFORMS)), sorted(ALLOWED_PLATFORMS))
-print("platform hosts excluded:", cur.execute("SELECT COUNT(*) FROM plat").fetchone()[0], "allowed through:", sorted(ALLOWED_PLATFORMS))
+# Every host is listed. Until 2026-10-12 a host carrying 25 or more live feeds
+# was a "platform" and its shows were left out (Anchor excepted), which made
+# this a directory of self-hosted shows only; the directory now lists every
+# live show wherever it is hosted. The 25-feed rule survives as a label: it is
+# what platform_hosts below records, and what /self-hosted filters on.
+#
+# The networks (src/lib/networks.json) publish from domains of their own --
+# twit.tv, npr.org, files.bbci.co.uk -- and some of those clear 25 feeds. They
+# are publishers, not hosting companies, so their hosts are never labelled
+# platforms.
+NETWORKS=json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","src","lib","networks.json")))["networks"]
+NETWORK_HOSTS={h.lower() for n in NETWORKS for h in n["match"].get("hosts",[])}
 
-F="""host NOT IN (SELECT host FROM plat) AND episodeCount>=3
+F="""episodeCount>=3
  AND TRIM(COALESCE(title,''))<>'' AND TRIM(COALESCE(description,''))<>'' AND TRIM(COALESCE(imageUrl,''))<>''"""
 
 rows=cur.execute(f"""SELECT id,url,title,link,itunesAuthor,itunesOwnerName,explicit,imageUrl,
@@ -152,7 +167,7 @@ out.execute("""CREATE TABLE podcasts(
  oldest_pubdate INTEGER, created_on INTEGER, latest_audio TEXT, latest_duration INTEGER,
  generator TEXT, per_week REAL, score REAL NOT NULL)""")
 
-kept=[]; dropped_auto=0; seen_slug={}
+kept=[]; dropped_auto=0
 for r in rows:
     (fid,url,title,link,author,owner,exp,img,gen,npd,lang,opd,ec,pop,co,host,enc,guid,desc,
      c1,c2,c3,c4,c5,dur)=r
@@ -170,36 +185,51 @@ for r in rows:
     score=round(depth*fresh + longevity*0.5,4)
     host=real_host(host,url)
     cats=[c for c in (c1,c2,c3,c4,c5) if c]
-    base=slugify(title) or f"podcast"
-    s=base
-    if s in seen_slug: s=f"{base}-{fid}"
-    seen_slug[s]=1
     lb=norm_lang(lang)
-    kept.append((fid,s,guid,url,title,desc[:4000],img,link,host,author,owner,1 if exp else 0,
+    kept.append((fid,None,guid,url,title,desc[:4000],img,link,host,author,owner,1 if exp else 0,
                  lang,lb,(c1 or None),",".join(cats),ec,npd,opd,co,enc,dur,gen,per_week,score))
 
-out.executemany("INSERT INTO podcasts VALUES(" + ",".join("?"*25) + ")", kept)
-
-# The platform list, for the submit endpoint: a host carrying 25 or more live
-# feeds is a hosting platform and a feed submitted from one is refused with
-# the reason. Written here so the rule the API applies is the rule the cut was
-# made with, measured on the same dump. The bare public suffixes are dropped
-# for the same reason real_host exists: they are mis-filed rows, not hosts.
-out.execute("CREATE TABLE platform_hosts(host TEXT PRIMARY KEY, feeds INTEGER NOT NULL)")
-out.executemany("INSERT OR IGNORE INTO platform_hosts VALUES(?,?)",
-    [(h.lower().strip(), n) for h, n in cur.execute("SELECT host, COUNT(*) FROM live GROUP BY host HAVING COUNT(*)>=25")
-     if h and h.lower().strip() not in PUBLIC_SUFFIX and h.lower().strip() not in ALLOWED_PLATFORMS])
-print("platform hosts:", out.execute("SELECT COUNT(*) FROM platform_hosts").fetchone()[0])
 # Collapse entries a reader cannot tell apart: same domain, same title, same
 # episode count, same latest episode. Sites that publish per-category feeds emit
 # a dozen of these with identical metadata. Keeping the shortest feed_url picks
 # the canonical top-level feed. Deliberately NOT keyed on (host,title) alone --
-# some stations run many distinct programmes under one generic title.
-out.execute("""DELETE FROM podcasts WHERE id NOT IN (
-  SELECT id FROM (SELECT id, ROW_NUMBER() OVER (
-      PARTITION BY host, LOWER(TRIM(title)), episode_count, newest_pubdate
-      ORDER BY LENGTH(feed_url), id) rn FROM podcasts) WHERE rn = 1)""")
-print("after dedupe:", out.execute("SELECT COUNT(*) FROM podcasts").fetchone()[0])
+# some stations run many distinct programmes under one generic title. Done
+# before slugs are handed out, so a dropped twin cannot take the clean slug.
+best={}
+for k in kept:
+    key=(k[8],k[4].strip().lower(),k[16],k[17])
+    if key not in best or (len(k[3]),k[0]) < (len(best[key][3]),best[key][0]): best[key]=k
+kept=list(best.values())
+print("after dedupe:", len(kept))
+
+# Slugs: a show the last build listed keeps its slug; the rest are handed out
+# best score first, so where two shows share a title the better-established one
+# gets the clean slug and the other gets -<id>.
+seen_slug=set()
+kept=[list(k) for k in kept]
+for k in kept:
+    old=prev_slugs.get(k[3])
+    if old and old not in seen_slug:
+        k[1]=old; seen_slug.add(old)
+for k in sorted(kept, key=lambda k: -k[24]):
+    if k[1]: continue
+    base=slugify(k[4]) or "podcast"
+    s=base if base not in seen_slug else f"{base}-{k[0]}"
+    while s in seen_slug: s=f"{s}-x"
+    k[1]=s; seen_slug.add(s)
+
+out.executemany("INSERT INTO podcasts VALUES(" + ",".join("?"*25) + ")", kept)
+
+# The platform list: a host carrying 25 or more live feeds is a hosting
+# platform. Nothing is excluded for it any more; the site uses it to label a
+# show "hosted on ..." and to build /self-hosted. The bare public suffixes are
+# dropped for the same reason real_host exists: they are mis-filed rows, not
+# hosts. The networks' own domains are dropped because they are publishers.
+out.execute("CREATE TABLE platform_hosts(host TEXT PRIMARY KEY, feeds INTEGER NOT NULL)")
+out.executemany("INSERT OR IGNORE INTO platform_hosts VALUES(?,?)",
+    [(h.lower().strip(), n) for h, n in cur.execute("SELECT host, COUNT(*) FROM live GROUP BY host HAVING COUNT(*)>=25")
+     if h and h.lower().strip() not in PUBLIC_SUFFIX and h.lower().strip() not in NETWORK_HOSTS])
+print("platform hosts:", out.execute("SELECT COUNT(*) FROM platform_hosts").fetchone()[0])
 
 out.execute("CREATE UNIQUE INDEX i_slug ON podcasts(slug)")
 out.execute("CREATE INDEX i_cat ON podcasts(category)")

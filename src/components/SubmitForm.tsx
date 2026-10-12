@@ -126,11 +126,10 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
       )}
 
       <p className="muted small">
-        A show can be listed when its feed has episodes with audio, publishes from its own
-        domain or from Anchor rather than a paid hosting platform, and has an episode inside
-        the last 90 days. Anything on a platform is welcome at{" "}
-        <a href="https://rssamplifier.com/submit">rssamplifier.com</a> instead. Listed
-        submissions are also passed along there. Agents and scripts: the same endpoint takes
+        A show can be listed when its feed has episodes with audio and an episode inside the
+        last 90 days. Any host is fine: your own domain, Anchor, Buzzsprout, Libsyn or any
+        other platform. Listed submissions are also passed along to{" "}
+        <a href="https://rssamplifier.com">rssamplifier.com</a>. Agents and scripts: the same endpoint takes
         JSON, see <Link href="/skill.md">skill.md</Link>, the <Link href="/mcp">MCP server</Link>{" "}
         or the <Link href="/cli">CLI</Link>; an <a href="https://openaccess.logicsrc.com">OpenAccess</a>{" "}
         grant for <code>podcasts:submit</code> puts your name on the submission.
@@ -140,6 +139,5 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
 }
 
 function describe(code: string): string {
-  if (code === "hosted-platform") return `${explainError(code)} rssamplifier.com takes every feed.`;
   return explainError(code);
 }

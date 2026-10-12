@@ -54,10 +54,20 @@ the dump does not already carry into `podcasts_new` — unless the show has aged
 the same 90-day rule as everything else. Where the dump now carries the feed, the
 dump's row wins and the submission's slug is kept on it so follows and links survive.
 `platform_hosts` (written by `export_indie.py`, the 25-feeds-per-host cut) is staged
-and swapped like `podcasts`; it is what `/api/submit` refuses platform feeds with.
-`anchor.fm` is deleted from that cut on purpose (`ALLOWED_PLATFORMS` in
-`export_indie.py`, mirrored in `src/lib/platforms.ts`, since 2026-09-13), which is why
-the directory is ~5x the size it was before that date. A submission is not listed by
+and swapped like `podcasts`. Since 2026-10-12 it excludes nothing: every live show is
+listed wherever it is hosted (~387k, up from ~117k), and the table only labels a show
+"hosted on …" and draws the line `/self-hosted` filters on. The networks' own domains
+(`src/lib/networks.json`) are kept out of it, since they are publishers.
+`export_indie.py` also keeps every show's slug from the previous build (read from the
+old `p0dcasters.db` before it is replaced) and hands new slugs out best score first.
+`P0D_LIVE_DB`, `P0D_OUT_DB` and `P0D_PREV_DB` override its paths for a test build.
+
+`seed_networks.ts` (Bun, `DATABASE_URL` set) runs after a successful load. It reads
+each network's `seeds` (OPML, JSON or HTML feed lists) and `feeds` from
+`src/lib/networks.json` and lists the feeds the dump does not carry, through the same
+rules as `/submit`, approved as `network:<slug>` without the reviewer email. They are
+`listed` submissions, so the loader carries them across rebuilds. `DRY_RUN=1` only
+prints what each seed yields. A submission is not listed by
 the loader until a person has approved it: only rows in status `listed` are merged, and
 `review` rows wait in the queue at `/admin/submissions`. This is also why `follows` stores a slug rather than a
 `podcasts.id`: the reload reassigns ids, so a numeric key would come back pointing

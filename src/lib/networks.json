@@ -1,0 +1,13 @@
+{
+  "networks": [
+    {
+      "slug": "twit",
+      "name": "TWiT",
+      "site": "https://twit.tv",
+      "description": "This Week in Tech, Leo Laporte's technology network.",
+      "match": { "hosts": ["twit.tv"], "urlPrefixes": [], "owners": [] },
+      "seeds": [],
+      "feeds": []
+    }
+  ]
+}

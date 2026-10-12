@@ -35,7 +35,7 @@ export const COMMANDS = [
     usage: 'search <query>',
     summary: 'Search the directory',
     detail:
-      'Full-text search over titles, descriptions, authors and domains. Every show here publishes from its own domain, so a show on Spotify or Anchor will not be found, and that says nothing about the show.',
+      'Full-text search over titles, descriptions, authors and domains. Shows on every host are listed, from their own domain, a hosting platform or a network library; a show with no episode in 90 days is not.',
     options: ['--limit <n>', '--json'],
     examples: ['p0d search bookbinding', 'p0d search "linux podcast" --limit 5 --json'],
   },
@@ -60,7 +60,7 @@ export const COMMANDS = [
     usage: 'submit <url|file.opml> …',
     summary: 'Add a show to the directory',
     detail:
-      'Give it the show\'s site or its feed, several of either, or an OPML file. The feed is found from a site URL, checked against the rules (audio episodes, its own domain, an episode inside 90 days) and listed on the spot; a refusal names the rule. No account needed; twenty requests an hour per address.',
+      'Give it the show\'s site or its feed, several of either, or an OPML file. The feed is found from a site URL, checked against the rules (audio episodes, an episode inside 90 days; any host) and queued for a person to list; a refusal names the rule. No account needed; twenty requests an hour per address.',
     options: ['--json'],
     examples: ['p0d submit example.org', 'p0d submit https://example.org/podcast.rss https://other.org', 'p0d submit subscriptions.opml'],
   },

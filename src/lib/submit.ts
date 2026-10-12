@@ -4,7 +4,6 @@ import { all, one, db, args } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import { env, now, secret, sha256, token } from "@/lib/auth/crypto";
 import { normalizeLang } from "@/lib/format";
-import { isPlatformHost } from "@/lib/platforms";
 import { notifyReviewers } from "@/lib/review";
 
 /**
@@ -139,8 +138,10 @@ export async function batchRows(batchId: string): Promise<SubmissionRow[]> {
  *
  * Claims the row first (pending -> resolving) so two workers never resolve
  * the same submission; a row already claimed is left to whoever has it.
+ * `notify: false` skips the reviewer email, for a caller that decides the
+ * row itself (scripts/seed_networks.ts lists a network's own feeds).
  */
-export async function resolveSubmission(id: string): Promise<Outcome | null> {
+export async function resolveSubmission(id: string, opts: { notify?: boolean } = {}): Promise<Outcome | null> {
   const claimed = await db().execute({
     sql: "UPDATE submissions SET status = 'resolving' WHERE id = ? AND status = 'pending'",
     args: [id],
@@ -186,7 +187,7 @@ export async function resolveSubmission(id: string): Promise<Outcome | null> {
   });
 
   if (outcome.status === "listed") void forward(outcome.feedUrl);
-  if (outcome.status === "review") {
+  if (outcome.status === "review" && opts.notify !== false) {
     void notifyReviewers({
       title: outcome.title,
       host: outcome.row.host,
@@ -316,9 +317,9 @@ export async function recoverBatch(batchId: string): Promise<boolean> {
  *
  * The rules, in the order they are cheap to check: it must be a web address;
  * it must not already be here; it must resolve to a feed whose items carry
- * audio; its host must not be a hosting platform (Anchor excepted); it must
- * have a title; it must have published inside the directory's own 90-day
- * window; and it must not look like a bulk dump (ten or more episodes a day
+ * audio; it must have a title (any host is fine: since 2026-10-12 a show on
+ * a hosting platform is listed like any other); it must have published
+ * inside the directory's own 90-day window; and it must not look like a bulk dump (ten or more episodes a day
  * on average). Every refusal is a code from the shared contract plus one
  * sentence for a person. A feed that passes is not listed here: the row it
  * would become goes back to the caller for the ledger, and a reviewer lists
@@ -347,13 +348,6 @@ export async function listFeed(input: string): Promise<Outcome> {
   // otherwise be listed twice, as title and title-2.
   const twin = await sameShow(feed.title, [host, hostOf(feed.link ?? "") ?? ""]);
   if (twin) return { status: "existing", ...twin };
-  if (await isPlatformHost(host)) {
-    return {
-      status: "rejected",
-      error: "hosted-platform",
-      message: `${host} is a hosting platform, and this directory lists only shows on their own domain (or on Anchor). rssamplifier.com takes every feed.`,
-    };
-  }
   if (!feed.title) {
     return { status: "rejected", error: "not-eligible", message: "The feed has no title." };
   }
@@ -502,8 +496,7 @@ async function insertPodcast(row: Omit<Podcast, "id">): Promise<void> {
 }
 
 /**
- * Tell rssamplifier.com too. Every self-hosted podcast is a small-web feed
- * that directory wants, and it takes the same contract, so a show submitted
+ * Tell rssamplifier.com too. It takes every feed and the same contract, so a show submitted
  * here reaches both. Best effort and never awaited: a slow sibling must not
  * slow a submission here. SUBMIT_FORWARD_TO="" turns it off.
  */

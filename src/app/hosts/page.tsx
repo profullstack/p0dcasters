@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Domains",
   description:
-    "The domains publishing independent podcasts — each one self-hosted rather than sitting on a platform.",
+    "The domains carrying the most podcasts in the directory — hosting platforms, network libraries and the biggest self-hosted publishers.",
   alternates: { canonical: "/hosts" },
 };
 
@@ -32,9 +32,10 @@ export default async function Hosts() {
       <section>
         <h1 style={{ fontSize: 30, margin: "0 0 6px", letterSpacing: "-0.02em" }}>Domains</h1>
         <p style={{ color: "var(--muted)", margin: "0 0 22px", maxWidth: "62ch" }}>
-          Most independent publishers run exactly one show from their own domain. These are
-          the 300 domains carrying the most, and none of them is a hosting platform — those
-          are excluded by construction.
+          The 300 domains carrying the most shows. Near the top are the hosting platforms —
+          a domain with 25 or more live feeds counts as one — and the broadcasters&rsquo;
+          libraries. Most publishers on their own domain run exactly one show; those are
+          under <Link href="/self-hosted">self-hosted</Link>.
         </p>
         <div className="rows">
           {rows.flatMap((h, i) => {

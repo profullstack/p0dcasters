@@ -18,12 +18,11 @@ export async function GET() {
 
   const body = `# p0dcasters
 
-> An index of ${total.toLocaleString()} podcasts that publish from a domain their creator
-> controls, across ${hosts.toLocaleString()} distinct domains, plus shows on Anchor,
-> Spotify's free host. Feeds on Buzzsprout, Libsyn and the other paid platforms are
-> deliberately excluded, so this is a view of the independent part of podcasting and
-> nothing else. Free to use, hosts no audio itself, and every listing links to the
-> publisher.
+> An index of ${total.toLocaleString()} live podcasts with an RSS feed, on any host,
+> across ${hosts.toLocaleString()} distinct domains: shows on their own domain, shows on
+> Anchor, Buzzsprout, Libsyn and the other hosting platforms, and the big network
+> libraries (TWiT, NPR, BBC, CBC, ABC Australia, PRX, Relay FM and others). Free to use,
+> hosts no audio itself, and every listing links to the publisher.
 
 p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 
@@ -31,9 +30,10 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 
 - [About](https://p0dcasters.com/about): The inclusion rules in full — a feed is listed
   when it returned HTTP 200 on the last fetch, published within 90 days, has at least
-  three episodes with a title, description and artwork, sits on a domain carrying fewer
-  than 25 live feeds (Anchor excepted), and does not average ten or more episodes a day. Also explains the
-  ranking (catalogue depth and longevity, weighted by recency) and why ranking by domain
+  three episodes with a title, description and artwork, and does not average ten or more
+  episodes a day. Any host qualifies; a domain carrying 25 or more live feeds is labelled a
+  hosting platform, which decides nothing about listing. Also explains the ranking
+  (catalogue depth and longevity, weighted by recency) and why ranking by domain
   popularity does not work here.
 - [Terms](https://p0dcasters.com/terms): Free, no paid tier, nothing hosted here.
 - [Privacy](https://p0dcasters.com/privacy): What an account stores and how to delete it.
@@ -44,6 +44,10 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - [Home](https://p0dcasters.com/): Deep catalogues still publishing, plus this week's
   episodes.
 - [Browse](https://p0dcasters.com/browse): Every subject and every language, with counts.
+- [Networks](https://p0dcasters.com/networks): The broadcasters and podcast networks that
+  publish their library as RSS, each at /networks/<slug>.
+- [Self-hosted](https://p0dcasters.com/self-hosted): Only the shows that publish from a
+  domain their creator controls, not a hosting platform.
 - [Hosts](https://p0dcasters.com/hosts): The domains publishing the most shows here.
 - [A subject](https://p0dcasters.com/category/history): Category pages live at
   /category/<subject>, paginated with ?page=N.
@@ -95,8 +99,10 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - Search results at /search are excluded in robots.txt: they are generated per query and
   duplicate the category and language pages. Use /browse or the OPML export instead.
 - Show metadata belongs to the publisher, is read from their feed, and can be stale.
-- No show here is hosted on a paid podcast platform; Anchor, the free one, is the single
-  exception. That is the defining property of the directory, not a claim about quality.
+- Shows on every host are listed. "Hosted on <platform>" on a show page is a measured
+  label (25+ live feeds on the domain), and "self-hosted" means the feed is on a domain
+  below that line. Neither is a claim about quality.
+- A show is listed only while it is publishing: no episode in 90 days and it drops out.
 `;
 
   return new Response(body, {

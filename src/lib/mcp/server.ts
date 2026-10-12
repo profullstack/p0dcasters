@@ -25,10 +25,10 @@ export const SERVER_INFO = { name: "p0dcasters", title: "p0dcasters", version: "
 export const CAPABILITIES = { tools: {}, resources: {} };
 
 export const INSTRUCTIONS = [
-  "p0dcasters is a directory of podcasts that publish from their creator's own domain",
-  "rather than from a hosting platform. Shows on Spotify, Anchor, Buzzsprout, Libsyn and",
-  "the other large hosts are excluded by design, so a mainstream show will usually be",
-  "absent and its absence says nothing about it. No key, no account, no rate card.",
+  "p0dcasters is a directory of every live podcast with an RSS feed, on any host: shows on",
+  "their own domain, shows on Anchor, Buzzsprout, Libsyn and the other hosting platforms,",
+  "and the big network libraries (TWiT, NPR, BBC and others). A show is listed while it is",
+  "still publishing: an episode inside 90 days. No key, no account, no rate card.",
   "",
   "Start with `search` for a subject you can name, or `browse` for the categories and",
   "languages that exist and then `list_shows`. `get_podcast` reads one show; `list_episodes`",
@@ -36,9 +36,9 @@ export const INSTRUCTIONS = [
   "`directory_stats` gives the totals and the OPML export for taking everything at once.",
   "",
   "`submit_feed` adds a show. A site URL is enough: the feed is found from the page,",
-  "checked against the rules (audio episodes, its own domain, an episode inside 90 days)",
-  "and listed on the spot; a refusal names the rule. Anything on a platform belongs at",
-  "rssamplifier.com instead, which takes every feed and is told about submissions here.",
+  "checked against the rules (audio episodes, an episode inside 90 days; any host) and",
+  "queued for a person to list; a refusal names the rule. Listed shows are also passed",
+  "along to rssamplifier.com.",
 ].join("\n");
 
 function resources() {

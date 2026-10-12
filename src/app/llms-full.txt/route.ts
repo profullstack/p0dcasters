@@ -58,35 +58,45 @@ export async function GET() {
 
 ## What this is
 
-p0dcasters is a directory of ${total.toLocaleString()} podcasts that publish from a domain
-their own creator controls, spread across ${hosts.toLocaleString()} distinct domains and
+p0dcasters is a directory of ${total.toLocaleString()} live podcasts with an RSS feed, on
+any host, spread across ${hosts.toLocaleString()} distinct domains and
 ${episodes.toLocaleString()} episodes between them.
 
-Podcasting was designed as an open format: an RSS feed at a URL you control. Most of it no
-longer works that way. Of the feeds in the Podcast Index, roughly 40% sit on a single host —
-Spotify's Anchor — and the ten largest hosts account for about three quarters of everything.
-This directory is the remainder.
+Podcasting is an open format: an RSS feed at a URL. That holds wherever the feed lives —
+on the creator's own domain, on a hosting platform such as Anchor, Buzzsprout or Libsyn,
+or in a broadcaster's library such as TWiT, NPR, the BBC, CBC or ABC Australia. Most of
+the feeds in the Podcast Index are dead; this directory is the part still publishing.
 
-It is free, has no paid tier, and hosts no audio: every listing links to the publisher's own
-domain. It is operated by Profullstack. Contact: hello@p0dcasters.com
+It is free, has no paid tier, and hosts no audio: every listing links to the publisher's
+feed. It is operated by Profullstack. Contact: hello@p0dcasters.com
 
 ## What gets in
 
-Starting from the Podcast Index public database, a feed is listed when it:
+Any host qualifies. Starting from the Podcast Index public database and the networks' own
+published feed lists, a feed is listed when it:
 
 - returned HTTP 200 on the last fetch, and published within the last 90 days;
-- is not on a hosting platform or broadcaster — defined as any domain carrying 25 or more
-  live feeds, which removes every major host;
 - has at least three episodes, plus a title, description and artwork;
 - isn't a bulk-dump content farm — feeds averaging ten or more episodes a day over their
-  lifetime are excluded.
+  lifetime are left out.
+
+Near-identical copies of the same feed on one host are collapsed into one.
+
+## Platforms, networks, self-hosted
+
+- A domain carrying 25 or more live feeds in the Podcast Index is labelled a hosting
+  platform, and its shows say "Hosted on <platform>". The threshold is measured at every
+  rebuild. It decides nothing about whether a show is listed.
+- A show on a domain below that line is self-hosted. All of them:
+  https://p0dcasters.com/self-hosted
+- Broadcasters and podcast networks that publish their library as RSS are grouped at
+  https://p0dcasters.com/networks, each at /networks/<slug>.
 
 ## How it is ordered
 
 Shows are ranked by catalogue depth and longevity, weighted by recency — not by raw recency
-alone, and not by popularity. Ranking by domain popularity would bury independent feeds
-under the handful of large domains that survive the host filter, which would defeat the
-point of the filter.
+alone, and not by popularity. Ranking by domain popularity would measure the platforms'
+traffic rather than the shows, and bury every show on its own small domain.
 
 ## What an account is for
 
@@ -123,14 +133,17 @@ Every language, with counts: https://p0dcasters.com/browse
 - Show metadata belongs to the publisher, is read from their feed, and can be stale.
 - /search is disallowed in robots.txt: results are generated per query and duplicate the
   category and language pages. Use /browse or the OPML export.
-- "Independent" here means self-hosted and nothing else. It is a statement about where a
-  feed lives, not a judgement about the show.
+- "Self-hosted" and "Hosted on <platform>" are statements about where a feed lives, not
+  judgements about the show.
+- A show that has not published in 90 days is not listed, wherever it is hosted.
 
 ## Pages
 
 - https://p0dcasters.com/ — home
 - https://p0dcasters.com/about — inclusion rules, ranking, data source
 - https://p0dcasters.com/browse — every subject and language, with counts
+- https://p0dcasters.com/networks — broadcasters and podcast networks, by library
+- https://p0dcasters.com/self-hosted — only the shows on their creator's own domain
 - https://p0dcasters.com/hosts — the domains publishing the most shows here
 - https://p0dcasters.com/crawlstats — what the pipeline behind the directory is doing
 - https://p0dcasters.com/contact — listing, removal, corrections, security

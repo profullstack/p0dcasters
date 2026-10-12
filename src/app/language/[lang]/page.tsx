@@ -24,7 +24,7 @@ export async function generateMetadata({
   const name = languageName(code ?? safeDecode(lang));
   return {
     title: `${name} podcasts`,
-    description: `Independent, self-hosted podcasts in ${name}. Every show publishes from a domain its creator controls.`,
+    description: `Podcasts in ${name} with an RSS feed, on any host — self-hosted shows, hosting platforms and network libraries.`,
     // The canonical is the normalised code, so the variant spellings that all
     // resolve here consolidate onto one URL.
     alternates: { canonical: `/language/${code ?? lang}` },
@@ -89,7 +89,7 @@ export default async function Language({
           listingJsonLd({
             path: `/language/${code}`,
             name: `${languageName(code)} podcasts`,
-            description: `${total.toLocaleString()} independent, self-hosted podcasts in ${languageName(code)}.`,
+            description: `${total.toLocaleString()} live podcasts in ${languageName(code)}, on any host.`,
             crumb: languageName(code),
             rows,
             page: pg,
@@ -101,15 +101,14 @@ export default async function Language({
           {languageName(code)}
         </h1>
         <p style={{ color: "var(--muted)", margin: "0 0 14px" }}>
-          {total.toLocaleString()} independent shows
+          {total.toLocaleString()} shows
         </p>
         {pg === 1 && (
         <div className="blurb">
           <p>
-            Independent podcasts published in {languageName(code)}, each from a domain its
-            own creator controls. Feeds on Spotify&rsquo;s Anchor, Buzzsprout, Libsyn and the
-            other large hosts are excluded from the directory, so this is the self-hosted
-            part of {languageName(code)} podcasting rather than a chart of it.
+            Podcasts published in {languageName(code)} that are still publishing, each read
+            from its own RSS feed — on the creator&rsquo;s own domain, on a hosting platform
+            or in a broadcaster&rsquo;s library. Ordered by catalogue, not by a chart.
           </p>
           <ul>
             <li>

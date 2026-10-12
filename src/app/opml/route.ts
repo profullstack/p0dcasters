@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
   const body =
     `<?xml version="1.0" encoding="UTF-8"?>\n<opml version="2.0">\n<head>\n` +
-    `  <title>p0dcasters - independent podcasts${cat ? ` (${esc(cat)})` : ""}</title>\n` +
+    `  <title>p0dcasters - podcasts${cat ? ` (${esc(cat)})` : ""}</title>\n` +
     `  <dateCreated>${new Date().toUTCString()}</dateCreated>\n</head>\n<body>\n` +
     rows
       .map(

@@ -48,7 +48,7 @@ export const TOOLS: Tool[] = [
     name: "search",
     title: "Search the directory",
     description:
-      "Full-text search over the titles, descriptions, authors and domains of every self-hosted podcast listed. Returns shows, each with its slug, feed URL, page and playlist. Shows on Spotify, Anchor, Buzzsprout and the other hosting platforms are excluded by design, so a mainstream show being absent says nothing about it.",
+      "Full-text search over the titles, descriptions, authors and domains of every podcast listed, on any host (own domain, hosting platform or network library). Returns shows, each with its slug, feed URL, page and playlist. Only shows with an episode inside the last 90 days are listed.",
     inputSchema: {
       type: "object",
       properties: {

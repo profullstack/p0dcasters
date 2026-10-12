@@ -15,7 +15,7 @@ export default function Terms() {
       <section className="prose">
         <h1 style={{ fontSize: 31, margin: "0 0 18px", letterSpacing: "-0.02em" }}>Terms</h1>
         <p>
-          p0dcasters is a free index of podcasts that publish from their own domains. There
+          p0dcasters is a free index of podcasts with a public RSS feed, on any host. There
           is no paid tier, no subscription and nothing to buy. An account is optional and
           costs nothing; it exists so you can follow shows and keep that list across
           devices.
@@ -23,9 +23,9 @@ export default function Terms() {
 
         <h2>What is and isn&rsquo;t hosted here</h2>
         <p>
-          Nothing here is hosted by us. Every listing points at a feed on the publisher&rsquo;s
-          own domain, and the artwork and audio you see and hear are fetched from that
-          domain directly. The shows, their episodes and their artwork belong to the people
+          Nothing here is hosted by us. Every listing points at the publisher&rsquo;s feed,
+          wherever it is hosted, and the artwork and audio you see and hear are fetched from
+          there directly. The shows, their episodes and their artwork belong to the people
           who made them, and their own terms govern them. Directory metadata comes from the{" "}
           <a href="https://podcastindex.org">Podcast Index</a>.
         </p>

@@ -23,7 +23,7 @@ export async function generateMetadata({
   const name = titleCase(safeDecode(category));
   return {
     title: `${name} podcasts`,
-    description: `Independent, self-hosted ${name.toLowerCase()} podcasts — every show publishes from its own domain.`,
+    description: `${name} podcasts with an RSS feed, on any host — self-hosted shows, hosting platforms and network libraries. Listen in the browser.`,
     alternates: { canonical: `/category/${category}` },
   };
 }
@@ -72,7 +72,7 @@ export default async function Category({
           listingJsonLd({
             path: `/category/${category}`,
             name: `${titleCase(cat)} podcasts`,
-            description: `${total.toLocaleString()} independent, self-hosted ${cat} podcasts — every show publishes from a domain its creator controls.`,
+            description: `${total.toLocaleString()} live ${cat} podcasts with an RSS feed, on any host.`,
             crumb: titleCase(cat),
             rows,
             page: pg,
@@ -84,15 +84,15 @@ export default async function Category({
           {titleCase(cat)}
         </h1>
         <p style={{ color: "var(--muted)", margin: "0 0 14px" }}>
-          {total.toLocaleString()} independent shows
+          {total.toLocaleString()} shows
         </p>
         {pg === 1 && (
         <div className="blurb">
           <p>
-            Every {cat.toLowerCase()} podcast here publishes from a domain its own creator
-            controls. None of them sits on Spotify&rsquo;s Anchor, Buzzsprout, Libsyn or any
-            other large host: those domains are excluded from the directory by construction,
-            so this is the self-hosted remainder of the subject rather than a ranking of it.
+            Every {cat.toLowerCase()} podcast here is still publishing — an episode inside the
+            last 90 days — and is read from its own RSS feed, wherever that feed lives: the
+            creator&rsquo;s own domain, Anchor, Buzzsprout, Libsyn, another host, or a
+            network&rsquo;s library. The category is the one the publisher declares.
           </p>
           <ul>
             <li>

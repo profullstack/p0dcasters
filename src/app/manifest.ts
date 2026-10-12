@@ -22,10 +22,10 @@ export default function manifest(): MetadataRoute.Manifest {
     // Without it a launcher keys the installed app on start_url and a change
     // there orphans the existing install instead of updating it.
     id: "/",
-    name: "p0dcasters — the independent podcast directory",
+    name: "p0dcasters — the open podcast directory",
     short_name: "p0dcasters",
     description:
-      "A directory of podcasts that live on their own domains. Every show here is self-hosted, off the big platforms.",
+      "Every podcast with a feed — on any host. Self-hosted shows, every hosting platform, and the big network libraries.",
     start_url: "/",
     scope: "/",
     display: "standalone",

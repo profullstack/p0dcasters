@@ -17,6 +17,8 @@ import { nixampUrl, playlistUrl } from "@/lib/playlist";
 import { profileUrl } from "@/lib/openprofile/generate";
 import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
 import TimeAgo from "@/components/TimeAgo";
+import { networkOf } from "@/lib/networks";
+import { hostedOn } from "@/lib/platforms";
 
 export const revalidate = 3600;
 
@@ -70,6 +72,8 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
   const cats = (p.categories || "").split(",").filter(Boolean);
   const site = p.link || `https://${p.host}`;
   const rate = cadence(p.per_week);
+  const network = networkOf(p);
+  const hosted = network ? null : await hostedOn(p.host);
   // The player's track travels to a client component too, so upgrade it here
   // rather than leaving an http:// URL in the serialised payload.
   const show = { slug: p.slug, title: p.title, image: safeImage(p.image_url) };
@@ -96,9 +100,11 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
         inLanguage: normalizeLang(p.lang_base ?? p.language) ?? undefined,
         ...(p.category ? { genre: titleCase(p.category) } : {}),
         ...(p.author ? { author: { "@type": "Person", name: p.author } } : {}),
-        // The show is published on the creator's own domain — that is the whole
-        // premise of the directory, so say so rather than implying we host it.
-        publisher: { "@type": "Organization", name: p.author || p.host, url: site },
+        // The publisher is the network when there is one, otherwise whoever the
+        // feed names -- never us: nothing is hosted here.
+        publisher: network
+          ? { "@type": "Organization", name: network.name, url: network.site }
+          : { "@type": "Organization", name: p.author || p.host, url: site },
         isPartOf: { "@id": "https://p0dcasters.com/#website" },
       },
       // Where this page sits, so a result can be shown in context rather than
@@ -141,6 +147,19 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
             <a href={site} rel="noopener nofollow">
               {p.host}
             </a>
+            {network ? (
+              <>
+                {" · "}
+                <Link href={`/networks/${network.slug}`}>{network.name}</Link>
+              </>
+            ) : hosted?.kind === "platform" ? (
+              <> · hosted on {hosted.name}</>
+            ) : (
+              <>
+                {" · "}
+                <Link href="/self-hosted">self-hosted</Link>
+              </>
+            )}
           </p>
           <p className="desc">{p.description}</p>
 

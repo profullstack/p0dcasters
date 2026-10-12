@@ -57,6 +57,7 @@ URL=https://public.podcastindex.org/podcastindex_feeds.db.tgz
 UA='p0dcasters/1.0 (+https://p0dcasters.com)'
 
 NODE=/home/anthony/.local/share/mise/shims/node
+BUN=/home/anthony/.local/share/mise/shims/bun
 PY=/home/anthony/.local/share/mise/shims/python3
 LOGICSRC=/home/anthony/.local/bin/logicsrc
 export HOME=/home/anthony
@@ -293,6 +294,13 @@ remote=$("$NODE" "$SCRIPTS/db_sql.mjs" "SELECT COUNT(*) FROM podcasts" 2>/dev/nu
 
 printf '%s' "$sig" > "$STAMP"
 log "OK: $rows podcasts live (dump $lm)"
+
+# The network shows the dump does not carry (src/lib/networks.json seeds). Best
+# effort and after the swap: the directory is already live, a failure here is
+# logged and the next run tries again. Listed seeds are submissions, so the
+# loader keeps them across rebuilds.
+( cd "$SCRIPTS/.." && timeout -k 30 1200 "$BUN" scripts/seed_networks.ts ) >> "$LOG" 2>&1 \
+  || log "seed_networks failed (non-fatal); see above"
 FINISHED=1
 record --status ok --step load --count "$rows" --prev-count "$before" \
   --message "$rows podcasts live"

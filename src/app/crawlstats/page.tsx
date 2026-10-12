@@ -37,8 +37,8 @@ export const metadata: Metadata = {
  * stopped being true in August. That failure gets a page.
  *
  * "Crawl" here is one weekly-ish pass, not a continuous poller. p0dcasters does
- * not fetch 21,000 feeds itself — it takes the Podcast Index dump, cuts the
- * independent shows out of it, and replaces the directory wholesale. So the
+ * not fetch every feed itself — it takes the Podcast Index dump, cuts the
+ * live shows out of it, and replaces the directory wholesale. So the
  * questions this page answers are: is the cron check still running, when did a
  * rebuild last land, what did it change, and how much of the directory is
  * drifting towards the 90-day cutoff that will drop it.
@@ -169,7 +169,7 @@ export default async function CrawlStatsPage() {
             />
             <Stage
               label="Rebuild"
-              what="download, extract, cut the independent shows out"
+              what="download, extract, cut the live shows out"
               state={history.lastFailure && history.lastFailure === history.lastCheck ? "failed" : lastRebuild ? "ok" : "unknown"}
               cadence="when the dump moves"
               at={lastRebuild?.started_at ?? null}

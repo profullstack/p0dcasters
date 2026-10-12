@@ -12,7 +12,7 @@ const { count } = cachedDb(86400);
 // The reads are memoised for 86400 s (the old ISR window) in lib/cached-db.
 export const dynamic = "force-dynamic";
 
-export const alt = "p0dcasters — the independent podcast directory";
+export const alt = "p0dcasters — the open podcast directory";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -90,7 +90,7 @@ export default async function Image() {
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: "Serif", fontSize: 56, lineHeight: 1.2, color: INK }}>
-            Podcasts that live on their own domains.
+            Every podcast with a feed — on any host.
           </div>
           <div
             style={{
@@ -101,7 +101,7 @@ export default async function Image() {
               marginTop: 22,
             }}
           >
-            Every show here is self-hosted — no Spotify, no Anchor, no Buzzsprout.
+            Self-hosted shows, every hosting platform, and networks like TWiT, NPR and the BBC.
             Listen in the browser and follow your favourites.
           </div>
         </div>
