@@ -126,6 +126,10 @@ if (platformRows.length) {
 // own 90-day rule, exactly as a dump row would have. The stored metadata is
 // re-read from each feed first (bounded, best effort) so a show that kept
 // publishing since it was submitted is scored on its real state.
+// The dump rows carry their Podcast Index ids explicitly, so the identity
+// sequence is still at 1; a merged submission takes the next value and would
+// collide with a loaded id (it did once the directory covered ~385k ids).
+await c.execute("SELECT setval(pg_get_serial_sequence('podcasts_new', 'id'), (SELECT COALESCE(MAX(id), 1) FROM podcasts_new))");
 const merged = await mergeSubmissions();
 console.log("submitted shows merged:", merged);
 
