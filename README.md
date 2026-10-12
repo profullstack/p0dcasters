@@ -1,28 +1,37 @@
 # p0dcasters
 
-A directory of podcasts that live on their own domain.
+Every podcast with a feed — on any host.
 
-Of the 4.7M feeds in the [Podcast Index](https://podcastindex.org), ~40% sit on Anchor
-alone and the ten largest hosts carry about three quarters of everything. This lists the
-remainder: **21,628 shows on 13,408 distinct domains**, each publishing from a domain its
-creator controls.
+The live part of the [Podcast Index](https://podcastindex.org) (about 9% of its 4.7M
+feeds) plus the big network libraries that publish RSS: shows on their own domain, shows
+on Anchor, Buzzsprout, Libsyn and every other host, and TWiT, NPR, BBC, CBC, ABC
+Australia, PRX, Relay FM and the other networks. Hundreds of thousands of shows.
 
 ## Inclusion rules
 
-A feed is listed when it:
+Any host qualifies. A feed is listed when it:
 
 - returned HTTP 200 on the last fetch and published within 90 days;
-- is **not** on a hosting platform or broadcaster — any domain carrying 25+ live feeds
-  (308 domains, including every major host);
 - has 3+ episodes plus a title, description and artwork;
 - is not a bulk-dump content farm (10+ episodes/day averaged over its lifetime).
 
+Near-identical copies of one feed on the same host are collapsed.
+
+## Platforms, networks, self-hosted
+
+- A domain carrying 25+ live feeds is a **hosting platform** (`platform_hosts`, measured
+  at every rebuild). It is a label on the show ("Hosted on Buzzsprout"), not a filter.
+  Until 2026-10 it was the filter: the directory listed only the shows below that line.
+- Those shows, on their creator's own domain, are still listed together at `/self-hosted`.
+- `/networks` groups the broadcasters and podcast networks whose whole library is RSS,
+  each at `/networks/<slug>`.
+
 ## Why popularity ranking is not used
 
-93% of live feeds already sit on a domain in the global top million, because they are all
-on the same twenty platforms. Domain popularity measures the platform, never the show, and
-the domains *absent* from those rankings are precisely the independent ones. It is used
-here only inverted, as one signal for identifying platforms to exclude.
+93% of live feeds sit on a domain in the global top million, because they are on the same
+twenty platforms. Domain popularity measures the platform, never the show, and would bury
+every show on its own small domain. Shows are ordered by catalogue depth and longevity,
+weighted by recency.
 
 ## Stack
 
@@ -60,7 +69,7 @@ whether it was rate limited, and even when Resend is down, so it cannot be used 
 enumerate who has an account.
 
 Signed-in state is fetched from `/api/me` in the browser rather than read from cookies in
-the root layout. A single `cookies()` call there would opt all 22k show pages out of
+the root layout. A single `cookies()` call there would opt every show page out of
 static rendering.
 
 Every table is created by `db/schema.pg.sql` (idempotent; `psql "$DATABASE_URL" -f
@@ -83,7 +92,7 @@ would silently repoint everyone's follows at other shows.
 ## Rebuilding the data
 
 ```sh
-python3 ../p0dcasters-data/export_indie.py    # writes p0dcasters.db
+python3 ../p0dcasters-data/export_indie.py    # writes p0dcasters.db (the whole live catalogue, every host; the name is historical)
 DATABASE_URL=postgres://... node scripts/load_directory.mjs
 ```
 
@@ -117,7 +126,8 @@ Two things shape how it is built:
 - **It is uncached, and every relative figure is derived at render.** Caching an object
   holding "last checked 20 minutes ago" freezes that sentence, and a page that reports a
   dead pipeline as cheerfully current is worse than no page. The reads are one batch
-  each and the directory is 21k rows, so this costs a round trip, not a scan.
+  each, so the cost is a round trip per batch. (It was written for a 21k-row directory;
+  re-check the render time now that the directory holds every host.)
 
 Its history comes from `refresh_runs`, written by the pipeline itself — see
 `scripts/README.md`. The table is part of `db/schema.pg.sql`, and do **not**

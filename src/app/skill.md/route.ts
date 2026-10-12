@@ -4,17 +4,16 @@ export const revalidate = 86400;
 export async function GET() {
   const body = `# p0dcasters
 
-Find podcasts that publish from their creator's own domain, rather than from a large
-hosting platform, and add one. No key, no account, no rate card.
+Find any live podcast with an RSS feed — on its own domain, on a hosting platform, or in a
+network's library — and add one. No key, no account, no rate card.
 
 ## When to use this
 
-Use p0dcasters when someone wants independent or self-hosted podcasts, podcasts on a
-subject that are not on the big platforms, or a machine-readable list of them, or when
-someone wants their own self-hosted show listed. Do not use it as a general podcast
-search: shows on Spotify, Anchor, Buzzsprout, Libsyn and the other large hosts are excluded
-by design, so a mainstream show will usually be absent, and its absence says nothing about
-the show.
+Use p0dcasters when someone wants podcasts on a subject or in a language, a show's feed
+URL or episodes, a machine-readable list of shows (OPML), the shows of a network such as
+TWiT, NPR or the BBC (\`/networks\`), only self-hosted shows (\`/self-hosted\`), or when
+someone wants their show listed. Shows on every host are here; a show is absent when it
+has no public RSS feed or has not published in 90 days.
 
 ## MCP
 
@@ -44,14 +43,13 @@ plain HTTP below, described in \`/openapi.json\`.
   60 shows a page, ranked by catalogue depth and longevity weighted by recency.
 
 - **Take the whole directory** — \`GET /opml\` (\`?category=<subject>\` for one subject)
-  Every show in one OPML file, with feed URLs. One request rather than tens of thousands.
+  Every show in one OPML file, with feed URLs. One request rather than hundreds of thousands.
 
 - **Add a show** — \`POST /api/submit\`
   JSON \`{"url": "<site or feed>"}\`, \`{"urls": [...]}\` (up to 50) or \`{"opml": "<opml>"}\`.
   A site URL works: the feed is found from the page. One URL is resolved in the call; a
   list is queued and \`statusUrl\` shows each land. A feed can be listed when its items
-  carry audio, its host is not a paid hosting platform (Anchor is allowed), and it
-  published inside the last 90 days; a refusal names the rule (\`rejected[].error\` and
+  carry audio and it published inside the last 90 days, on any host; a refusal names the rule (\`rejected[].error\` and
   \`message\`). A feed that passes is NOT listed by the call: a person reviews it first,
   usually the same day, and the reply carries it as \`queued\` with \`review: [{url,
   feedUrl, title}]\` and the \`statusUrl\` to watch. \`accepted\` holds only shows already

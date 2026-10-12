@@ -43,17 +43,20 @@ export default async function Home() {
     <>
       <div className="hero">
         <div className="wrap">
-          <h1>Podcasts that live on their own domain.</h1>
+          <h1>Every podcast with a feed — on any host.</h1>
           <p className="lede">
-            Every one of these <span className="count">{total.toLocaleString()}</span>{" "}
-            shows publishes from a domain it controls, or from Anchor, the free host where
-            independents start — not Buzzsprout, not Libsyn, not a network. This is
-            podcasting's open web. Missing one? <Link href="/submit">Add it</Link>.
+            <span className="count">{total.toLocaleString()}</span> live shows, read from
+            their RSS feeds: shows on their own domain, shows on Anchor, Buzzsprout, Libsyn
+            and every other host, and the big libraries — TWiT, NPR, the BBC and the rest of
+            the <Link href="/networks">networks</Link>. Free, no account, listen in the
+            browser. Only the shows on their own domain?{" "}
+            <Link href="/self-hosted">Self-hosted</Link>. Missing one?{" "}
+            <Link href="/submit">Add it</Link>.
           </p>
           <form className="searchbar" action="/search">
             <input
               name="q"
-              placeholder="Search independent shows…"
+              placeholder="Search podcasts…"
               aria-label="Search podcasts"
             />
             <button type="submit">Search</button>
@@ -63,10 +66,11 @@ export default async function Home() {
               <b>{total.toLocaleString()}</b> shows
             </div>
             <div>
-              <b>{hosts.toLocaleString()}</b> distinct domains
+              <b>{hosts.toLocaleString()}</b> distinct hosts
             </div>
             <div>
-              <b>0</b> on a paid platform
+              <Link href="/networks">Networks</Link> ·{" "}
+              <Link href="/self-hosted">Self-hosted</Link>
             </div>
           </div>
         </div>

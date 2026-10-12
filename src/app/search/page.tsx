@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search independent, self-hosted podcasts by title, description or domain.",
+  description: "Search every live podcast with an RSS feed, on any host, by title, description or domain.",
 };
 
 async function search(q: string): Promise<Podcast[]> {
@@ -62,9 +62,9 @@ export default async function Search({
         {!query && (
           <div className="blurb" style={{ marginTop: 22 }}>
             <p>
-              Searching titles, descriptions and domains across the directory — every one of
-              them a podcast that publishes from a domain its creator controls. Shows that
-              exist only on Spotify, Anchor or another large host are not in here to find.
+              Searching titles, descriptions and domains across the directory — every live
+              podcast with an RSS feed, on its own domain, on a hosting platform or in a
+              network&rsquo;s library. A show that has not published in 90 days is not here.
             </p>
             <ul>
               <li>
@@ -114,8 +114,9 @@ export default async function Search({
             </>
           ) : (
             <p className="empty">
-              No independent show matches that. The directory only covers self-hosted
-              podcasts, so anything exclusive to Spotify or Anchor won't be here.
+              No show matches that. The directory lists shows that publish an RSS feed and
+              have an episode inside the last 90 days, so a show exclusive to one app, or one
+              that has stopped publishing, won&rsquo;t be here.
             </p>
           )}
         </section>

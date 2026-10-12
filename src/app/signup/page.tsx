@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Create an account",
   description:
-    "Create a free p0dcasters account to follow independent, self-hosted podcasts.",
+    "Create a free p0dcasters account to follow podcasts on any host.",
 };
 
 // Same mechanism as /login — see AuthForm. This page exists because a visitor

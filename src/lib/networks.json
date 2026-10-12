@@ -1,0 +1,2106 @@
+{
+  "networks": [
+    {
+      "slug": "twit",
+      "name": "TWiT",
+      "site": "https://twit.tv",
+      "description": "Leo Laporte's technology podcast network (This Week in Tech, Security Now, MacBreak Weekly, Windows Weekly).",
+      "match": {
+        "hosts": [
+          "twit.tv"
+        ],
+        "urlPrefixes": [
+          "https://feeds.twit.tv/"
+        ],
+        "owners": [
+          "twit",
+          "leo laporte"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://twit.tv/subscribe",
+          "pattern": "https://feeds\\.twit\\.tv/[A-Za-z0-9_]+\\.xml"
+        },
+        {
+          "kind": "html",
+          "url": "https://twit.tv/shows",
+          "follow": "href=\"(/shows/[a-z0-9-]+)\"",
+          "followBase": "https://twit.tv",
+          "pattern": "https://feeds\\.twit\\.tv/[A-Za-z0-9_]+\\.xml"
+        }
+      ],
+      "feeds": [
+        "https://feeds.twit.tv/aaa.xml",
+        "https://feeds.twit.tv/abby.xml",
+        "https://feeds.twit.tv/ant.xml",
+        "https://feeds.twit.tv/arena.xml",
+        "https://feeds.twit.tv/atg.xml",
+        "https://feeds.twit.tv/bits.xml",
+        "https://feeds.twit.tv/brickhouse.xml",
+        "https://feeds.twit.tv/byb.xml",
+        "https://feeds.twit.tv/ces.xml",
+        "https://feeds.twit.tv/code.xml",
+        "https://feeds.twit.tv/events.xml",
+        "https://feeds.twit.tv/fc.xml",
+        "https://feeds.twit.tv/fib.xml",
+        "https://feeds.twit.tv/floss.xml",
+        "https://feeds.twit.tv/fop.xml",
+        "https://feeds.twit.tv/go.xml",
+        "https://feeds.twit.tv/gtt.xml",
+        "https://feeds.twit.tv/hoai.xml",
+        "https://feeds.twit.tv/hoa.xml",
+        "https://feeds.twit.tv/hoi.xml",
+        "https://feeds.twit.tv/hom.xml",
+        "https://feeds.twit.tv/hop.xml",
+        "https://feeds.twit.tv/hot.xml",
+        "https://feeds.twit.tv/howin.xml",
+        "https://feeds.twit.tv/how.xml",
+        "https://feeds.twit.tv/hra.xml",
+        "https://feeds.twit.tv/htg.xml",
+        "https://feeds.twit.tv/ifive.xml",
+        "https://feeds.twit.tv/ipad.xml",
+        "https://feeds.twit.tv/itn.xml",
+        "https://feeds.twit.tv/jason.xml",
+        "https://feeds.twit.tv/jm.xml",
+        "https://feeds.twit.tv/kh.xml",
+        "https://feeds.twit.tv/kiki.xml",
+        "https://feeds.twit.tv/leo.xml",
+        "https://feeds.twit.tv/macbreak.xml",
+        "https://feeds.twit.tv/mbw.xml",
+        "https://feeds.twit.tv/mc.xml",
+        "https://feeds.twit.tv/mh.xml",
+        "https://feeds.twit.tv/mikah.xml",
+        "https://feeds.twit.tv/mm.xml",
+        "https://feeds.twit.tv/omgcraft.xml",
+        "https://feeds.twit.tv/padre.xml",
+        "https://feeds.twit.tv/photo.xml",
+        "https://feeds.twit.tv/roz.xml",
+        "https://feeds.twit.tv/ru.xml",
+        "https://feeds.twit.tv/snw.xml",
+        "https://feeds.twit.tv/sn.xml",
+        "https://feeds.twit.tv/stt.xml",
+        "https://feeds.twit.tv/tlr.xml",
+        "https://feeds.twit.tv/tnss.xml",
+        "https://feeds.twit.tv/tnw.xml",
+        "https://feeds.twit.tv/tri.xml",
+        "https://feeds.twit.tv/tsh.xml",
+        "https://feeds.twit.tv/tvh.xml",
+        "https://feeds.twit.tv/twich.xml",
+        "https://feeds.twit.tv/twiet.xml",
+        "https://feeds.twit.tv/twif.xml",
+        "https://feeds.twit.tv/twig.xml",
+        "https://feeds.twit.tv/twil.xml",
+        "https://feeds.twit.tv/twirt.xml",
+        "https://feeds.twit.tv/twis.xml",
+        "https://feeds.twit.tv/twit.xml",
+        "https://feeds.twit.tv/uls.xml",
+        "https://feeds.twit.tv/vog.xml",
+        "https://feeds.twit.tv/ww.xml",
+        "https://feeds.twit.tv/yt.xml",
+        "https://feeds.twit.tv/throwback.xml"
+      ]
+    },
+    {
+      "slug": "npr",
+      "name": "NPR",
+      "site": "https://www.npr.org",
+      "description": "US public radio network; national shows such as Up First, Planet Money and Fresh Air.",
+      "match": {
+        "hosts": [
+          "npr.org"
+        ],
+        "urlPrefixes": [
+          "https://feeds.npr.org/"
+        ],
+        "owners": [
+          "npr"
+        ]
+      },
+      "feeds": [
+        "https://feeds.npr.org/510351/podcast.xml",
+        "https://feeds.npr.org/510338/podcast.xml",
+        "https://feeds.npr.org/510310/podcast.xml",
+        "https://feeds.npr.org/510317/podcast.xml",
+        "https://feeds.npr.org/510355/podcast.xml",
+        "https://feeds.npr.org/510309/podcast.xml",
+        "https://feeds.npr.org/510364/podcast.xml",
+        "https://feeds.npr.org/510366/podcast.xml",
+        "https://feeds.npr.org/510312/podcast.xml",
+        "https://feeds.npr.org/510374/podcast.xml",
+        "https://feeds.npr.org/510318/podcast.xml",
+        "https://feeds.npr.org/510333/podcast.xml",
+        "https://feeds.npr.org/510289/podcast.xml",
+        "https://feeds.npr.org/344098539/podcast.xml",
+        "https://feeds.npr.org/381444908/podcast.xml",
+        "https://feeds.npr.org/510019/podcast.xml",
+        "https://feeds.npr.org/510325/podcast.xml",
+        "https://feeds.npr.org/510282/podcast.xml",
+        "https://feeds.npr.org/510298/podcast.xml",
+        "https://feeds.npr.org/510316/podcast.xml",
+        "https://feeds.npr.org/510340/podcast.xml",
+        "https://feeds.npr.org/510200/podcast.xml",
+        "https://feeds.npr.org/510311/podcast.xml",
+        "https://feeds.npr.org/510341/podcast.xml",
+        "https://feeds.npr.org/510305/podcast.xml",
+        "https://feeds.npr.org/510379/podcast.xml",
+        "https://feeds.npr.org/510334/podcast.xml",
+        "https://feeds.npr.org/510307/podcast.xml",
+        "https://feeds.npr.org/510026/podcast.xml",
+        "https://feeds.npr.org/510051/podcast.xml",
+        "https://api.npr.org/query?id=2&date=currentwithaudio&sort=assigned&output=podcast&sc=17&numResults=50&apiKey=MDA0NjI1NjgyMDEyNjM1MDIyNjE5ZDBlMQ010",
+        "https://api.npr.org/query?id=7&date=currentwithaudio&sort=assigned&output=podcast&sc=17&numResults=50&apiKey=MDA0NjI1NjgyMDEyNjM1MDIyNjE5ZDBlMQ010",
+        "https://feeds.npr.org/510008/podcast.xml",
+        "https://feeds.npr.org/g-s1-111189/podcast.xml",
+        "https://feeds.npr.org/g-s1-114952/podcast.xml",
+        "https://feeds.npr.org/g-s1-84651/podcast.xml",
+        "https://feeds.npr.org/500005/podcast.xml",
+        "https://feeds.npr.org/510208/podcast.xml",
+        "https://feeds.npr.org/g-s1-143588/podcast.xml",
+        "https://feeds.npr.org/510320/podcast.xml"
+      ]
+    },
+    {
+      "slug": "bbc",
+      "name": "BBC",
+      "site": "https://www.bbc.co.uk/sounds",
+      "description": "UK public broadcaster; podcasts from Radio 4, World Service, 5 Live and other BBC stations.",
+      "match": {
+        "hosts": [
+          "files.bbci.co.uk",
+          "voice.api.bbci.co.uk"
+        ],
+        "urlPrefixes": [
+          "https://podcasts.files.bbci.co.uk/",
+          "http://podcasts.files.bbci.co.uk/"
+        ],
+        "owners": []
+      },
+      "seeds": [
+        {
+          "kind": "opml",
+          "url": "https://podcasts.files.bbci.co.uk/podcasts.opml"
+        }
+      ],
+      "feeds": [
+        "https://podcasts.files.bbci.co.uk/b007qlvb.rss",
+        "https://podcasts.files.bbci.co.uk/p00gbjvb.rss",
+        "https://podcasts.files.bbci.co.uk/p004t1hd.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrw8h.rss",
+        "https://podcasts.files.bbci.co.uk/b006qykl.rss",
+        "https://podcasts.files.bbci.co.uk/p002vsxs.rss",
+        "https://podcasts.files.bbci.co.uk/p02nq0lx.rss",
+        "https://podcasts.files.bbci.co.uk/b006qjlq.rss",
+        "https://podcasts.files.bbci.co.uk/b006qshd.rss",
+        "https://podcasts.files.bbci.co.uk/b006qsq5.rss",
+        "https://podcasts.files.bbci.co.uk/b0144txn.rss",
+        "https://podcasts.files.bbci.co.uk/p004t1s0.rss",
+        "https://podcasts.files.bbci.co.uk/b006qnmr.rss",
+        "https://podcasts.files.bbci.co.uk/p05299nl.rss",
+        "https://podcasts.files.bbci.co.uk/p076qqzl.rss",
+        "https://podcasts.files.bbci.co.uk/b007jdd3.rss",
+        "https://podcasts.files.bbci.co.uk/b007jdfx.rss",
+        "https://podcasts.files.bbci.co.uk/p09qw1cn.rss",
+        "https://podcasts.files.bbci.co.uk/p002w557.rss",
+        "https://podcasts.files.bbci.co.uk/b00dv9hq.rss",
+        "https://podcasts.files.bbci.co.uk/b006qnx3.rss",
+        "https://podcasts.files.bbci.co.uk/w13xtvrv.rss",
+        "https://podcasts.files.bbci.co.uk/p02pc9zn.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrtq1.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrtrf.rss",
+        "https://podcasts.files.bbci.co.uk/b006qjnv.rss",
+        "https://podcasts.files.bbci.co.uk/p02pc9wf.rss",
+        "https://podcasts.files.bbci.co.uk/b01s6xyk.rss",
+        "https://podcasts.files.bbci.co.uk/b007b5wg.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrtty.rss",
+        "https://podcasts.files.bbci.co.uk/p0h6d6nm.rss",
+        "https://podcasts.files.bbci.co.uk/b006qjz5.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrsl2.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrvd3.rss",
+        "https://podcasts.files.bbci.co.uk/p02nrv1v.rss",
+        "https://podcasts.files.bbci.co.uk/b036f7w2.rss",
+        "https://podcasts.files.bbci.co.uk/b007rkcw.rss",
+        "https://podcasts.files.bbci.co.uk/w13xtvsd.rss",
+        "https://podcasts.files.bbci.co.uk/p07h19zz.rss",
+        "https://podcasts.files.bbci.co.uk/p02r6yqw.rss"
+      ]
+    },
+    {
+      "slug": "cbc",
+      "name": "CBC",
+      "site": "https://www.cbc.ca/listen",
+      "description": "Canadian public broadcaster's English podcasts (Front Burner, The Current, Ideas).",
+      "match": {
+        "hosts": [
+          "cbc.ca"
+        ],
+        "urlPrefixes": [
+          "https://www.cbc.ca/podcasting/"
+        ],
+        "owners": []
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.cbc.ca/listen/cbc-podcasts",
+          "pattern": "https://www\\.cbc\\.ca/podcasting/includes/[A-Za-z0-9_-]+\\.xml"
+        }
+      ],
+      "feeds": [
+        "https://www.cbc.ca/podcasting/includes/frontburner.xml",
+        "https://www.cbc.ca/podcasting/includes/qpodcast.xml",
+        "https://www.cbc.ca/podcasting/includes/sickboy.xml",
+        "https://www.cbc.ca/podcasting/includes/current.xml",
+        "https://www.cbc.ca/podcasting/includes/commotion.xml",
+        "https://www.cbc.ca/podcasting/includes/w6.xml",
+        "https://www.cbc.ca/podcasting/includes/wr.xml",
+        "https://www.cbc.ca/podcasting/includes/whatonearth.xml",
+        "https://www.cbc.ca/podcasting/includes/thisisvancouver.xml",
+        "https://www.cbc.ca/podcasting/includes/uncover.xml",
+        "https://www.cbc.ca/podcasting/includes/thedose.xml",
+        "https://www.cbc.ca/podcasting/includes/justasking.xml",
+        "https://www.cbc.ca/podcasting/includes/asithappens.xml",
+        "https://www.cbc.ca/podcasting/includes/ideas.xml",
+        "https://www.cbc.ca/podcasting/includes/thisistoronto.xml",
+        "https://www.cbc.ca/podcasting/includes/writersandco.xml",
+        "https://www.cbc.ca/podcasting/includes/tivi.xml",
+        "https://www.cbc.ca/podcasting/includes/westofcentre.xml",
+        "https://www.cbc.ca/podcasting/includes/thisismanitoba.xml",
+        "https://www.cbc.ca/podcasting/includes/thisisns.xml",
+        "https://www.cbc.ca/podcasting/includes/checkup.xml",
+        "https://www.cbc.ca/podcasting/includes/tio.xml",
+        "https://www.cbc.ca/podcasting/includes/thehouse.xml",
+        "https://www.cbc.ca/podcasting/includes/crimestory.xml",
+        "https://www.cbc.ca/podcasting/includes/thisiscalgary.xml",
+        "https://www.cbc.ca/podcasting/includes/sundayedition.xml",
+        "https://www.cbc.ca/podcasting/includes/nextchapter.xml",
+        "https://www.cbc.ca/podcasting/includes/cbcpowerandpolitics.xml",
+        "https://www.cbc.ca/podcasting/includes/runhiderepeat.xml",
+        "https://www.cbc.ca/podcasting/includes/ontariotoday.xml",
+        "https://www.cbc.ca/podcasting/includes/whitecoat.xml",
+        "https://www.cbc.ca/podcasting/includes/costofliving.xml",
+        "https://www.cbc.ca/podcasting/includes/quirksaio.xml",
+        "https://www.cbc.ca/podcasting/includes/nakedemperor.xml",
+        "https://www.cbc.ca/podcasting/includes/nowornever.xml",
+        "https://www.cbc.ca/podcasting/includes/twoblocks.xml",
+        "https://www.cbc.ca/podcasting/includes/unreserved.xml",
+        "https://www.cbc.ca/podcasting/includes/debaters.xml",
+        "https://www.cbc.ca/podcasting/includes/becausenews.xml",
+        "https://www.cbc.ca/podcasting/includes/laughoutloud.xml"
+      ]
+    },
+    {
+      "slug": "abc-australia",
+      "name": "ABC Australia",
+      "site": "https://www.abc.net.au/listen",
+      "description": "Australian Broadcasting Corporation's radio and podcast programs (ABC Listen, triple j, Radio National).",
+      "match": {
+        "hosts": [
+          "abc.net.au"
+        ],
+        "urlPrefixes": [
+          "https://www.abc.net.au/feeds/"
+        ],
+        "owners": [
+          "abc australia"
+        ]
+      },
+      "feeds": [
+        "https://www.abc.net.au/feeds/2888650/podcast.xml",
+        "https://www.abc.net.au/feeds/2890646/podcast.xml",
+        "https://www.abc.net.au/feeds/7711104/podcast.xml",
+        "https://www.abc.net.au/feeds/2890982/podcast.xml",
+        "https://www.abc.net.au/feeds/6840588/podcast.xml",
+        "https://www.abc.net.au/feeds/2887252/podcast.xml",
+        "https://www.abc.net.au/feeds/2887248/podcast.xml",
+        "https://www.abc.net.au/feeds/8681126/podcast.xml",
+        "https://www.abc.net.au/feeds/102038464/podcast.xml",
+        "https://www.abc.net.au/feeds/12017248/podcast.xml",
+        "https://www.abc.net.au/feeds/3775502/podcast.xml",
+        "https://www.abc.net.au/feeds/10987644/podcast.xml",
+        "https://www.abc.net.au/feeds/9184114/podcast.xml",
+        "https://www.abc.net.au/feeds/9989710/podcast.xml",
+        "https://www.abc.net.au/feeds/8604510/podcast.xml",
+        "https://www.abc.net.au/feeds/103189114/podcast.xml",
+        "https://www.abc.net.au/feeds/9593214/podcast.xml",
+        "https://www.abc.net.au/feeds/10584512/podcast.xml",
+        "https://www.abc.net.au/feeds/8804158/podcast.xml",
+        "https://www.abc.net.au/feeds/7919014/podcast.xml",
+        "https://www.abc.net.au/feeds/2889506/podcast.xml",
+        "https://www.abc.net.au/feeds/2890652/podcast.xml",
+        "https://www.abc.net.au/feeds/2883560/podcast.xml",
+        "https://www.abc.net.au/feeds/9443166/podcast.xml",
+        "https://www.abc.net.au/feeds/8315172/podcast.xml",
+        "https://www.abc.net.au/feeds/2890360/podcast.xml",
+        "https://www.abc.net.au/feeds/13868682/podcast.xml",
+        "https://www.abc.net.au/feeds/8138982/podcast.xml",
+        "https://www.abc.net.au/feeds/7288214/podcast.xml",
+        "https://www.abc.net.au/feeds/6344904/podcast.xml",
+        "https://www.abc.net.au/feeds/2885486/podcast.xml",
+        "https://www.abc.net.au/feeds/13898534/podcast.xml",
+        "https://www.abc.net.au/feeds/101858056/podcast.xml",
+        "https://www.abc.net.au/feeds/10987964/podcast.xml",
+        "https://www.abc.net.au/feeds/9189186/podcast.xml",
+        "https://www.abc.net.au/feeds/7104462/podcast.xml",
+        "https://www.abc.net.au/feeds/8244154/podcast.xml",
+        "https://www.abc.net.au/feeds/2883098/podcast.xml",
+        "https://www.abc.net.au/feeds/2883396/podcast.xml",
+        "https://www.abc.net.au/feeds/8096918/podcast.xml"
+      ]
+    },
+    {
+      "slug": "prx",
+      "name": "PRX",
+      "site": "https://prx.org",
+      "description": "US public media distributor and podcast host (Dovetail); feeds for Radiotopia, The World, Snap Judgment and many public stations.",
+      "match": {
+        "hosts": [
+          "publicfeeds.net",
+          "prxu.org",
+          "prx.org"
+        ],
+        "urlPrefixes": [
+          "https://publicfeeds.net/f/",
+          "https://f.prxu.org/"
+        ],
+        "owners": [
+          "prx",
+          "snap judgment and prx"
+        ]
+      },
+      "feeds": [
+        "https://publicfeeds.net/f/14052/feed-rss.xml",
+        "https://f.prxu.org/4317/feed-rss.xml",
+        "https://publicfeeds.net/f/6891/louisiana-considered",
+        "https://feed.livewireradio.org/",
+        "https://publicfeeds.net/f/15207/feed-rss.xml",
+        "https://publicfeeds.net/f/6858/feed-rss.xml",
+        "https://publicfeeds.net/f/13497/uniquely-milwaukee",
+        "https://publicfeeds.net/f/11710/feed-rss.xml",
+        "https://publicfeeds.net/f/9135/feed-rss.xml",
+        "https://publicfeeds.net/f/14745/spin-cycle",
+        "https://snap.feed.snapjudgment.org",
+        "https://publicfeeds.net/f/8607/feed-rss.xml",
+        "https://publicfeeds.net/f/17847/feed-rss.xml",
+        "http://feeds.prx.org/HowSound",
+        "https://publicfeeds.net/f/8376/clickhere",
+        "https://publicfeeds.net/f/10818/feed-rss.xml",
+        "https://publicfeeds.net/f/17649/feed-rss.xml",
+        "https://publicfeeds.net/f/10686/feed-rss.xml",
+        "https://publicfeeds.net/f/15240/geek-warning",
+        "https://publicfeeds.net/f/12369/thepulse.xml",
+        "https://publicfeeds.net/f/5439/feed-rss.xml",
+        "https://publicfeeds.net/f/11380/feed-rss.xml",
+        "https://f.prxu.org/354/feed-rss.xml",
+        "https://publicfeeds.net/f/3360/feed-rss.xml",
+        "https://publicfeeds.net/f/16065/feed-rss.xml",
+        "https://publicfeeds.net/f/7749/feed-rss.xml",
+        "https://f-staging.prxu.org/815/feed-rss.xml",
+        "https://podcast.davedesteno.com/",
+        "https://publicfeeds.net/f/7716/feed-rss.xml",
+        "https://publicfeeds.net/f/3492/feed-rss.xml",
+        "https://publicfeeds.net/f/8838/feed-rss.xml",
+        "https://publicfeeds.net/f/7452/feed-rss.xml",
+        "https://publicfeeds.net/f/10394/feed-rss.xml",
+        "https://publicfeeds.net/f/3426/feed-rss.xml",
+        "https://publicfeeds.net/f/8970/one-by-willie",
+        "https://publicfeeds.net/f/9928/feed-rss.xml",
+        "https://publicfeeds.net/f/4715/feed-rss.xml",
+        "https://publicfeeds.net/f/9663/feed-rss.xml",
+        "https://publicfeeds.net/f/14811/feed-rss.xml",
+        "https://publicfeeds.net/f/414/feed-rss.xml"
+      ]
+    },
+    {
+      "slug": "relay-fm",
+      "name": "Relay FM",
+      "site": "https://www.relay.fm",
+      "description": "Independent technology and culture podcast network (Upgrade, Connected, Cortex, Mac Power Users).",
+      "match": {
+        "hosts": [
+          "relay.fm"
+        ],
+        "urlPrefixes": [
+          "https://relay.fm/",
+          "https://www.relay.fm/"
+        ],
+        "owners": []
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.relay.fm/shows",
+          "pattern": "href=\"/([a-z0-9-]+)\"",
+          "template": "https://relay.fm/{1}/feed"
+        }
+      ],
+      "feeds": [
+        "https://relay.fm/20macs/feed",
+        "https://relay.fm/adapt/feed",
+        "https://relay.fm/analogue/feed",
+        "https://relay.fm/automators/feed",
+        "https://relay.fm/backmarkers/feed",
+        "https://relay.fm/bionic/feed",
+        "https://relay.fm/bonanza/feed",
+        "https://relay.fm/b-sides/feed",
+        "https://relay.fm/canvas/feed",
+        "https://relay.fm/clockwise/feed",
+        "https://relay.fm/cmdspace/feed",
+        "https://relay.fm/conduit/feed",
+        "https://relay.fm/connected/feed",
+        "https://relay.fm/cortex/feed",
+        "https://relay.fm/debug/feed",
+        "https://relay.fm/departures/feed",
+        "https://relay.fm/designed/feed",
+        "https://relay.fm/disruption/feed",
+        "https://relay.fm/download/feed",
+        "https://relay.fm/downstream/feed",
+        "https://relay.fm/flashback/feed",
+        "https://relay.fm/focused/feed",
+        "https://relay.fm/inquisitive/feed",
+        "https://relay.fm/intentional/feed",
+        "https://relay.fm/isometric/feed",
+        "https://relay.fm/liftoff/feed",
+        "https://relay.fm/ltoe/feed",
+        "https://relay.fm/makedo/feed",
+        "https://relay.fm/material/feed",
+        "https://relay.fm/mixedfeelings/feed",
+        "https://relay.fm/mpu/feed",
+        "https://relay.fm/originality/feed",
+        "https://relay.fm/paperplaces/feed",
+        "https://relay.fm/parallel/feed",
+        "https://relay.fm/penaddict/feed",
+        "https://relay.fm/pictorial/feed",
+        "https://relay.fm/playingforfun/feed",
+        "https://relay.fm/presentable/feed",
+        "https://relay.fm/prompt/feed",
+        "https://relay.fm/query/feed",
+        "https://relay.fm/radar/feed",
+        "https://relay.fm/rd/feed",
+        "https://relay.fm/remaster/feed",
+        "https://relay.fm/roboism/feed",
+        "https://relay.fm/rocket/feed",
+        "https://relay.fm/simplebeep/feed",
+        "https://relay.fm/tc/feed",
+        "https://relay.fm/testdrivers/feed",
+        "https://relay.fm/topfour/feed",
+        "https://relay.fm/ungeniused/feed",
+        "https://relay.fm/upgrade/feed",
+        "https://relay.fm/virtual/feed"
+      ]
+    },
+    {
+      "slug": "wnyc-studios",
+      "name": "WNYC Studios",
+      "site": "https://www.wnycstudios.org",
+      "description": "New York Public Radio's podcast studio (Radiolab, On the Media, The New Yorker Radio Hour).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "wnyc studios",
+          "wnyc",
+          "wnyc studios and the new yorker",
+          "science friday and wnyc studios",
+          "wqxr/wnyc",
+          "wnyc, wqxr"
+        ]
+      },
+      "feeds": [
+        "https://feeds.feedburner.com/allofit_podcast",
+        "https://feeds.feedburner.com/wnyc_bl",
+        "https://feeds.feedburner.com/science-friday/",
+        "http://feeds.feedburner.com/onthemedia",
+        "https://feeds.feedburner.com/newyorkerradiohour",
+        "https://feeds.feedburner.com/bl-daily-politics-podcast",
+        "https://feeds.simplecast.com/ysE9ORt_",
+        "https://feeds.feedburner.com/radiolab",
+        "http://feeds.feedburner.com/wnyc_soundcheck",
+        "http://feeds.feedburner.com/radiolab-kids",
+        "https://feeds.simplecast.com/ErCmj16D"
+      ]
+    },
+    {
+      "slug": "wbur",
+      "name": "WBUR",
+      "site": "https://www.wbur.org/podcasts",
+      "description": "Boston NPR station; Here & Now, On Point, Endless Thread.",
+      "match": {
+        "hosts": [
+          "wbur.org"
+        ],
+        "urlPrefixes": [
+          "https://rss.wbur.org/"
+        ],
+        "owners": [
+          "wbur"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.wbur.org/podcasts",
+          "pattern": "https://rss\\.wbur\\.org/[a-z0-9_-]+/podcast"
+        }
+      ],
+      "feeds": [
+        "https://rss.wbur.org/endlessthread/podcast",
+        "https://rss.wbur.org/circleround/podcast",
+        "https://rss.wbur.org/dearsugar/podcast",
+        "https://rss.wbur.org/onpoint/podcast",
+        "https://feeds.npr.org/510051/podcast.xml",
+        "https://rss.wbur.org/violation/podcast",
+        "https://rss.wbur.org/all-things-considered/podcast",
+        "https://rss.wbur.org/anythingforselena/podcast",
+        "https://rss.wbur.org/hereandnow/podcast",
+        "https://rss.wbur.org/upnext/podcast",
+        "https://rss.wbur.org/the-wbur-festival/podcast",
+        "https://rss.wbur.org/news/podcast",
+        "https://rss.wbur.org/hereandnow/rss"
+      ]
+    },
+    {
+      "slug": "kcrw",
+      "name": "KCRW",
+      "site": "https://www.kcrw.com",
+      "description": "Santa Monica public radio station; Good Food, Left, Right & Center, The Treatment.",
+      "match": {
+        "hosts": [
+          "kcrw.com"
+        ],
+        "urlPrefixes": [],
+        "owners": [
+          "kcrw",
+          "kcrw & sam sanders"
+        ]
+      },
+      "feeds": [
+        "https://feed.cdnstream1.com/zjb/feed/download/1b/c6/58/1bc65871-3b5b-4b18-a05e-b5a2c1eec713.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/34/5c/36/345c36a7-a587-4220-8c3e-bba344564908.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/ac/28/59/ac28594c-e1d0-4231-8728-61865cdc80e8.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/4b/e5/cc/4be5cc7b-8528-4b9e-8981-08d89bcff381.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/0c/2f/a2/0c2fa2ea-2757-40eb-8135-99b3c9c78156.xml",
+        "https://leftrightandcenter-feed.kcrw.com",
+        "https://feed.cdnstream1.com/zjb/feed/download/0c/01/c0/0c01c01b-56b7-4df8-8efb-6a7162abcfb8.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/9e/0c/d4/9e0cd479-3546-4c31-9a47-b3cde162b512.xml",
+        "https://feed.cdnstream1.com/zjb/feed/download/41/05/05/41050524-2924-4132-bb75-8f0a8f997937.xml"
+      ]
+    },
+    {
+      "slug": "pbs",
+      "name": "PBS News",
+      "site": "https://www.pbs.org/newshour/podcasts",
+      "description": "PBS NewsHour and PBS News podcast feeds.",
+      "match": {
+        "hosts": [
+          "pbs.org"
+        ],
+        "urlPrefixes": [
+          "https://www.pbs.org/newshour/feeds/rss/podcasts/"
+        ],
+        "owners": [
+          "pbs newshour",
+          "pbs news"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.pbs.org/newshour/podcasts",
+          "pattern": "https://www\\.pbs\\.org/newshour/feeds/rss/podcasts/[a-z0-9-]+"
+        }
+      ],
+      "feeds": [
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/segments",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/politics",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/settle-in-with-pbs-news",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/horizons-with-pbs-news",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/show",
+        "http://feeds.feedburner.com/NewshourWorldPodcast",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/brooks-and-capehart",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/science",
+        "http://feeds.pbs.org/pbs/weta/washingtonweek-audio",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/in-pursuit-of-happiness-with-judy-woodruff",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/compass-points-with-pbs-news",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/politics-monday",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/supremecourt",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/artbeat",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/brief-but-spectacular",
+        "https://www.pbs.org/newshour/feeds/rss/podcasts/health"
+      ]
+    },
+    {
+      "slug": "american-public-media",
+      "name": "American Public Media",
+      "site": "https://www.americanpublicmedia.org",
+      "description": "Minnesota Public Radio's national arm: Marketplace, APM Reports, YourClassical, The Slowdown.",
+      "match": {
+        "hosts": [
+          "publicradio.org"
+        ],
+        "urlPrefixes": [
+          "https://feeds.publicradio.org/"
+        ],
+        "owners": [
+          "american public media"
+        ]
+      },
+      "feeds": [
+        "https://feeds.publicradio.org/public_feeds/the-splendid-table",
+        "https://feeds.publicradio.org/public_feeds/the-slowdown",
+        "https://feeds.publicradio.org/public_feeds/ask-a-bookseller",
+        "https://feeds.publicradio.org/public_feeds/marketplace-all-in-one",
+        "https://feeds.publicradio.org/public_feeds/this-is-uncomfortable",
+        "https://feeds.publicradio.org/public_feeds/mpr-news-with-angela-davis",
+        "https://feeds.publicradio.org/public_feeds/marketplace-tech",
+        "https://feeds.publicradio.org/public_feeds/mpr-news-with-kerri-miller",
+        "https://feeds.publicradio.org/public_feeds/million-bazillion",
+        "https://feeds.publicradio.org/public_feeds/mpr-news-update",
+        "https://feeds.publicradio.org/public_feeds/how-we-survive",
+        "https://feeds.publicradio.org/public_feeds/this-old-house-radio-hour",
+        "https://pdrl.fm/53c558/feeds.publicradio.org/public_feeds/this-old-house-radio-hour",
+        "https://feeds.publicradio.org/public_feeds/minnesota-now",
+        "https://feeds.publicradio.org/public_feeds/climate-cast",
+        "https://feeds.publicradio.org/public_feeds/marketplace",
+        "https://feeds.publicradio.org/public_feeds/marketplace-morning-report",
+        "http://feeds.feedburner.com/YourClassicalDailyDownload",
+        "https://feeds.publicradio.org/public_feeds/composers-datebook",
+        "https://feeds.publicradio.org/public_feeds/policast",
+        "https://feeds.publicradio.org/public_feeds/sold-a-story",
+        "https://feeds.publicradio.org/public_feeds/song-of-the-day",
+        "https://feeds.publicradio.org/public_feeds/art-hounds",
+        "https://feeds.publicradio.org/public_feeds/new-classical-tracks",
+        "https://feeds.publicradio.org/public_feeds/must-be-the-money",
+        "https://feeds.publicradio.org/public_feeds/north-star-journey",
+        "https://feeds.publicradio.org/public_feeds/rhapsody-in-black"
+      ]
+    },
+    {
+      "slug": "maximum-fun",
+      "name": "Maximum Fun",
+      "site": "https://maximumfun.org",
+      "description": "Listener-supported comedy and culture network (Judge John Hodgman, Bullseye, My Brother, My Brother and Me).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [
+          "https://feeds.feedburner.com/rocketjump/story-break",
+          "https://feeds.simplecast.com/2pvdZXa_",
+          "https://feeds.simplecast.com/3Kt9OjV_",
+          "https://feeds.simplecast.com/3vVrWdfk",
+          "https://feeds.simplecast.com/4NOSW3hj",
+          "https://feeds.simplecast.com/4jxztCzv",
+          "https://feeds.simplecast.com/5lbWOVqN",
+          "https://feeds.simplecast.com/6WD3bDj7",
+          "https://feeds.simplecast.com/CH5YuJdE",
+          "https://feeds.simplecast.com/ChOFdBbH",
+          "https://feeds.simplecast.com/EOAFriME",
+          "https://feeds.simplecast.com/ETbLHWeA",
+          "https://feeds.simplecast.com/FeofiXhA",
+          "https://feeds.simplecast.com/FxPyOlup",
+          "https://feeds.simplecast.com/G7kHI_fj",
+          "https://feeds.simplecast.com/GNWefIha",
+          "https://feeds.simplecast.com/GV_TcxDe",
+          "https://feeds.simplecast.com/Hq3igj9D",
+          "https://feeds.simplecast.com/Iy2WKI7A",
+          "https://feeds.simplecast.com/Jmnu9_eM",
+          "https://feeds.simplecast.com/NDAi3mtz",
+          "https://feeds.simplecast.com/OMMw82Om",
+          "https://feeds.simplecast.com/OVap9of7",
+          "https://feeds.simplecast.com/PPi8bxPB",
+          "https://feeds.simplecast.com/QaeG4hpc",
+          "https://feeds.simplecast.com/RRFDex5r",
+          "https://feeds.simplecast.com/SMcNunjG",
+          "https://feeds.simplecast.com/T8zp1C9J",
+          "https://feeds.simplecast.com/UOW1b2En",
+          "https://feeds.simplecast.com/VsZceb4U",
+          "https://feeds.simplecast.com/Vw9UNww4",
+          "https://feeds.simplecast.com/WT6cShIt",
+          "https://feeds.simplecast.com/XqNLT4El",
+          "https://feeds.simplecast.com/YwW7C_3h",
+          "https://feeds.simplecast.com/ZL7iUDiH",
+          "https://feeds.simplecast.com/ZWAVsnMi",
+          "https://feeds.simplecast.com/_WI4mhWl",
+          "https://feeds.simplecast.com/_qpJr5Pq",
+          "https://feeds.simplecast.com/bT0zvJuh",
+          "https://feeds.simplecast.com/cYQVc__c",
+          "https://feeds.simplecast.com/crlnnm_d",
+          "https://feeds.simplecast.com/d5_1O0_y",
+          "https://feeds.simplecast.com/dHAE55rq",
+          "https://feeds.simplecast.com/ddLKZiwV",
+          "https://feeds.simplecast.com/ebjiDp6h",
+          "https://feeds.simplecast.com/fOCFcskz",
+          "https://feeds.simplecast.com/izV_Bglh",
+          "https://feeds.simplecast.com/jXdLYCUo",
+          "https://feeds.simplecast.com/kBSmSDEr",
+          "https://feeds.simplecast.com/kKMR_wuB",
+          "https://feeds.simplecast.com/m3TgdnAm",
+          "https://feeds.simplecast.com/m8RFgwms",
+          "https://feeds.simplecast.com/n8ppsCKR",
+          "https://feeds.simplecast.com/q8x9cVws",
+          "https://feeds.simplecast.com/rRcaqFt4",
+          "https://feeds.simplecast.com/sUxwITUa",
+          "https://feeds.simplecast.com/sb0p3ceK",
+          "https://feeds.simplecast.com/tgRswPWC",
+          "https://feeds.simplecast.com/uAnNBY_X",
+          "https://feeds.simplecast.com/vPP28tg9",
+          "https://feeds.simplecast.com/w1teXNny",
+          "https://feeds.simplecast.com/wjQvYtdl",
+          "https://feeds.simplecast.com/xCmPO2Cw",
+          "https://feeds.simplecast.com/y1LF_sn2",
+          "https://feeds.simplecast.com/zgH8lbxw"
+        ],
+        "owners": [
+          "maximum fun"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://maximumfun.org/podcasts/",
+          "follow": "href=\"(https://maximumfun\\.org/podcasts/[a-z0-9-]+/)\"",
+          "pattern": "https://feeds\\.[a-z0-9.]+/[A-Za-z0-9_/-]+"
+        }
+      ],
+      "feeds": [
+        "https://feeds.feedburner.com/rocketjump/story-break",
+        "https://feeds.simplecast.com/2pvdZXa_",
+        "https://feeds.simplecast.com/3Kt9OjV_",
+        "https://feeds.simplecast.com/3vVrWdfk",
+        "https://feeds.simplecast.com/4jxztCzv",
+        "https://feeds.simplecast.com/4NOSW3hj",
+        "https://feeds.simplecast.com/5lbWOVqN",
+        "https://feeds.simplecast.com/6WD3bDj7",
+        "https://feeds.simplecast.com/bT0zvJuh",
+        "https://feeds.simplecast.com/CH5YuJdE",
+        "https://feeds.simplecast.com/ChOFdBbH",
+        "https://feeds.simplecast.com/crlnnm_d",
+        "https://feeds.simplecast.com/cYQVc__c",
+        "https://feeds.simplecast.com/d5_1O0_y",
+        "https://feeds.simplecast.com/ddLKZiwV",
+        "https://feeds.simplecast.com/dHAE55rq",
+        "https://feeds.simplecast.com/ebjiDp6h",
+        "https://feeds.simplecast.com/EOAFriME",
+        "https://feeds.simplecast.com/ETbLHWeA",
+        "https://feeds.simplecast.com/FeofiXhA",
+        "https://feeds.simplecast.com/fOCFcskz",
+        "https://feeds.simplecast.com/FxPyOlup",
+        "https://feeds.simplecast.com/G7kHI_fj",
+        "https://feeds.simplecast.com/GNWefIha",
+        "https://feeds.simplecast.com/GV_TcxDe",
+        "https://feeds.simplecast.com/Hq3igj9D",
+        "https://feeds.simplecast.com/Iy2WKI7A",
+        "https://feeds.simplecast.com/izV_Bglh",
+        "https://feeds.simplecast.com/Jmnu9_eM",
+        "https://feeds.simplecast.com/jXdLYCUo",
+        "https://feeds.simplecast.com/kBSmSDEr",
+        "https://feeds.simplecast.com/kKMR_wuB",
+        "https://feeds.simplecast.com/m3TgdnAm",
+        "https://feeds.simplecast.com/m8RFgwms",
+        "https://feeds.simplecast.com/n8ppsCKR",
+        "https://feeds.simplecast.com/NDAi3mtz",
+        "https://feeds.simplecast.com/OMMw82Om",
+        "https://feeds.simplecast.com/OVap9of7",
+        "https://feeds.simplecast.com/PPi8bxPB",
+        "https://feeds.simplecast.com/q8x9cVws",
+        "https://feeds.simplecast.com/QaeG4hpc",
+        "https://feeds.simplecast.com/_qpJr5Pq",
+        "https://feeds.simplecast.com/rRcaqFt4",
+        "https://feeds.simplecast.com/RRFDex5r",
+        "https://feeds.simplecast.com/sb0p3ceK",
+        "https://feeds.simplecast.com/SMcNunjG",
+        "https://feeds.simplecast.com/sUxwITUa",
+        "https://feeds.simplecast.com/T8zp1C9J",
+        "https://feeds.simplecast.com/tgRswPWC",
+        "https://feeds.simplecast.com/uAnNBY_X",
+        "https://feeds.simplecast.com/UOW1b2En",
+        "https://feeds.simplecast.com/vPP28tg9",
+        "https://feeds.simplecast.com/VsZceb4U",
+        "https://feeds.simplecast.com/Vw9UNww4",
+        "https://feeds.simplecast.com/w1teXNny",
+        "https://feeds.simplecast.com/_WI4mhWl",
+        "https://feeds.simplecast.com/wjQvYtdl",
+        "https://feeds.simplecast.com/WT6cShIt",
+        "https://feeds.simplecast.com/xCmPO2Cw",
+        "https://feeds.simplecast.com/XqNLT4El",
+        "https://feeds.simplecast.com/y1LF_sn2",
+        "https://feeds.simplecast.com/YwW7C_3h",
+        "https://feeds.simplecast.com/zgH8lbxw",
+        "https://feeds.simplecast.com/ZL7iUDiH",
+        "https://feeds.simplecast.com/ZWAVsnMi"
+      ]
+    },
+    {
+      "slug": "jupiter-broadcasting",
+      "name": "Jupiter Broadcasting",
+      "site": "https://www.jupiterbroadcasting.com",
+      "description": "Linux and open-source podcast network (LINUX Unplugged, This Week in Bitcoin, The Launch).",
+      "match": {
+        "hosts": [
+          "jupiterbroadcasting.com",
+          "jupiter.zone",
+          "linuxunplugged.com",
+          "extras.show",
+          "jupiterstation.live"
+        ],
+        "urlPrefixes": [
+          "https://extras.show/rss",
+          "https://feeds.jupiterbroadcasting.com/",
+          "https://feeds.jupiterbroadcasting.com/lup",
+          "https://jupiterstation.live/rss",
+          "https://linuxunplugged.com/rss",
+          "https://serve.podhome.fm/rss/04b078f9-b3e8-4363-a576-98e668231306",
+          "https://serve.podhome.fm/rss/55b53584-4219-4fb0-b916-075ce23f714e"
+        ],
+        "owners": [
+          "jupiter broadcasting"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.jupiterbroadcasting.com/",
+          "pattern": "https://(?:linuxunplugged\\.com|extras\\.show|jupiterstation\\.live|serve\\.podhome\\.fm)/rss(?:/[0-9a-f-]+)?"
+        }
+      ],
+      "feeds": [
+        "https://feeds.jupiterbroadcasting.com/lup",
+        "https://linuxunplugged.com/rss",
+        "https://extras.show/rss",
+        "https://jupiterstation.live/rss",
+        "https://serve.podhome.fm/rss/04b078f9-b3e8-4363-a576-98e668231306",
+        "https://serve.podhome.fm/rss/55b53584-4219-4fb0-b916-075ce23f714e"
+      ]
+    },
+    {
+      "slug": "frogpants",
+      "name": "FrogPants Studios",
+      "site": "https://frogpants.com",
+      "description": "Scott Johnson's network (The Morning Stream, Film Sack, The Instance).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [
+          "https://api.substack.com/feed/podcast/6422727.rss",
+          "https://feeds.acast.com/public/shows/6500eec59654d100127e79b4",
+          "https://feeds.acast.com/public/shows/6500f421d570420011d0e34b",
+          "https://feeds.acast.com/public/shows/6500f7e38c35840011fa822f",
+          "https://feeds.acast.com/public/shows/6500f93e9654d100128055d8",
+          "https://feeds.acast.com/public/shows/6500fd9b9654d10012811a62",
+          "https://feeds.acast.com/public/shows/6501051a5af62b0011318057",
+          "https://feeds.acast.com/public/shows/6501081209d52c001243343a",
+          "https://feeds.acast.com/public/shows/65c19a42b4dc51001797ffc2"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://feeds.acast.com/public/shows/6501051a5af62b0011318057",
+        "https://feeds.acast.com/public/shows/6500eec59654d100127e79b4",
+        "https://feeds.acast.com/public/shows/6500f421d570420011d0e34b",
+        "https://feeds.acast.com/public/shows/6500f93e9654d100128055d8",
+        "https://feeds.acast.com/public/shows/6501081209d52c001243343a",
+        "https://feeds.acast.com/public/shows/6500f7e38c35840011fa822f",
+        "https://feeds.acast.com/public/shows/6500fd9b9654d10012811a62",
+        "https://feeds.acast.com/public/shows/65c19a42b4dc51001797ffc2",
+        "https://api.substack.com/feed/podcast/6422727.rss"
+      ]
+    },
+    {
+      "slug": "changelog",
+      "name": "Changelog",
+      "site": "https://changelog.com/podcasts",
+      "description": "Software development podcast network (The Changelog, Practical AI, Go Time, JS Party).",
+      "match": {
+        "hosts": [
+          "changelog.com"
+        ],
+        "urlPrefixes": [
+          "https://changelog.com/"
+        ],
+        "owners": [
+          "changelog media"
+        ]
+      },
+      "feeds": [
+        "https://changelog.com/podcast/feed",
+        "https://changelog.com/gotime/feed",
+        "https://changelog.com/jsparty/feed",
+        "https://changelog.com/practicalai/feed",
+        "https://changelog.com/shipit/feed",
+        "https://changelog.com/founderstalk/feed",
+        "https://changelog.com/brainscience/feed",
+        "https://changelog.com/afk/feed",
+        "https://changelog.com/friends/feed",
+        "https://changelog.com/news/feed",
+        "https://changelog.com/rfc/feed",
+        "https://changelog.com/spotlight/feed",
+        "https://changelog.com/interviews/feed",
+        "https://changelog.com/master/feed"
+      ]
+    },
+    {
+      "slug": "wondery",
+      "name": "Wondery (Audible)",
+      "site": "https://wondery.com",
+      "description": "Narrative and true-crime network (Dr. Death, Business Wars, American Scandal); folded into Audible, feeds now owned 'Audible' on Art19.",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "wondery",
+          "audible",
+          "guy raz | wondery",
+          "real crime profile / wondery",
+          "threefourtwo productions | wondery",
+          "armchair expert | wondery",
+          "kate casey / wondery",
+          "uninterrupted | wondery",
+          "los angeles times | wondery"
+        ]
+      },
+      "feeds": [
+        "https://rss.art19.com/reality-life-with-kate-casey",
+        "https://rss.art19.com/armchair-expert",
+        "https://rss.art19.com/how-i-built-this",
+        "https://rss.art19.com/business-wars",
+        "https://rss.art19.com/real-crime-profile-wondery",
+        "https://rss.art19.com/the-vanished-podcast-wondery",
+        "https://rss.art19.com/american-history-tellers",
+        "https://rss.art19.com/the-old-man-and-the-three",
+        "https://rss.art19.com/this-is-actually-happening-podcast",
+        "https://rss.art19.com/even-the-rich",
+        "https://rss.art19.com/british-scandal",
+        "https://rss.art19.com/against-the-odds",
+        "https://rss.art19.com/new-heights",
+        "https://rss.art19.com/generation-why-podcast",
+        "https://rss.art19.com/baby-this-is-keke-palmer",
+        "https://rss.art19.com/american-scandal",
+        "https://rss.art19.com/scamfluencers",
+        "https://rss.art19.com/the-spy-who",
+        "https://rss.art19.com/the-big-flop",
+        "https://rss.art19.com/even-the-royals",
+        "https://rss.art19.com/business-movers",
+        "https://rss.art19.com/diss-and-tell",
+        "https://rss.art19.com/mind-the-game",
+        "https://rss.art19.com/lawless-planet",
+        "https://rss.art19.com/redacted-declassified-mysteries",
+        "https://rss.art19.com/think-twice-michael-jackson",
+        "https://rss.art19.com/kill-list",
+        "https://rss.art19.com/dr-death",
+        "https://rss.art19.com/flesh-and-code",
+        "https://rss.art19.com/this-is-not-nicholas",
+        "https://rss.art19.com/we-came-to-the-forest",
+        "https://rss.art19.com/liberty-lost",
+        "https://rss.art19.com/scam-factory",
+        "https://rss.art19.com/death-county-pa",
+        "https://rss.art19.com/last-one-laughing",
+        "https://feeds.simplecast.com/W_uw47_M",
+        "https://rss.art19.com/blood-will-tell",
+        "https://rss.art19.com/audible-true-crime",
+        "https://rss.art19.com/the-last-city",
+        "https://rss.art19.com/bunga-bunga"
+      ]
+    },
+    {
+      "slug": "iheart",
+      "name": "iHeartPodcasts",
+      "site": "https://www.iheart.com/podcast/",
+      "description": "iHeartMedia's podcast network (Stuff You Should Know, The Breakfast Club) plus iHeartRadio station shows.",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "iheartpodcasts",
+          "iheartradio",
+          "big money players network and iheartpodcasts",
+          "bloomberg and iheartpodcasts",
+          "cool zone media and iheartpodcasts",
+          "elvis duran podcast network and iheartpodcasts",
+          "exactly right and iheartpodcasts",
+          "fox sports radio and iheartpodcasts",
+          "iheartpodcasts and bloomberg",
+          "iheartpodcasts and bubbler",
+          "iheartpodcasts and crimeonline",
+          "iheartpodcasts and dan patrick podcast network",
+          "iheartpodcasts and glass podcasts",
+          "iheartpodcasts and grim & mild",
+          "iheartpodcasts and kaleidoscope",
+          "iheartpodcasts and nba",
+          "iheartpodcasts and nfl",
+          "iheartpodcasts and pray.com",
+          "iheartpodcasts and the volume",
+          "iheartpodcasts australia",
+          "iheartpodcasts | glass podcasts",
+          "my cultura and iheartpodcasts",
+          "playmaker and iheartpodcasts",
+          "the black effect and iheartpodcasts",
+          "the black effect podcast network and iheartpodcasts"
+        ]
+      },
+      "feeds": [
+        "https://www.omnycontent.com/d/playlist/98a2599f-cd9b-4f2a-9be4-b22c00e585f2/c0b905b9-14a5-48a1-a89f-b368015067ab/504dcc5e-2f48-4d9a-871e-b368015067b1/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/EDFCE6B3-C206-4832-8816-AE2C007CFC84/06EA0549-DBC2-4D82-A8E2-AE2C007CFC9B/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/2dbb83f5-53f6-4048-84fa-ae510011dbf6/d8d2d357-5feb-4992-8bb3-ae510011dc04/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/69F89044-CE7B-4A37-B8FE-AE2C007B3CF5/4331CC95-C2E7-4689-A79C-AE2C007B3CFF/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/DCA0D8AD-E0B8-4A52-A2A8-AE300188D1E2/FE9400D8-DD2A-489F-82D9-AE300188D1EB/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/E5F91208-CC7E-4726-A312-AE280140AD11/D64F756D-6D5E-4FAE-B24F-AE280140AD36/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/107ed938-47b6-4af4-9628-b2570120eba1/5a2fc7a0-a808-4b73-b8a9-b2570120ebdd/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/9CE5947C-5177-479C-B697-AE300188D2A7/D7D1F23D-0111-45FF-AEAF-AE300188D2B9/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/2bee9419-43de-46ce-8996-af2a01167517/84cf551f-a33b-41d8-b112-af2a01167541/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/91C26F87-AA4E-4E61-816B-AE320005BE01/5CA66D21-7139-45EE-8D4E-AE320005BE14/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/f20e7a97-8856-44c6-bb0f-ae2c007b3c14/627875dd-a5c9-4c71-84c4-ae2c007b3c1e/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/BCFA3131-B64D-4B05-BB44-AE2E014407F3/67D3AD0F-3A4F-444D-AB6F-AE2E0144082B/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/92931f23-37b2-498b-b6d9-ae33003467c0/b56da3b8-3b3d-433e-92b3-ae33003467ce/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/34373F93-08BA-4C30-96B3-AE320005BABA/0B88AD87-5E11-4F86-BD28-AE320005BADB/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/EC5A50B3-3EA1-4B6E-B91B-AE2E00387281/9FCE13F2-0092-4F32-888B-AE2E0038728F/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/29EE4014-65AB-4D60-812E-AE4C00549B7F/3889A49B-3697-48AF-9765-AE4C00549B97/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/2E824128-FBD5-4C9E-9A57-AE2F0056B0C4/66D98A23-900C-44B0-A40B-AE2F0056B0DB/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/29A55D79-8FDC-4BD2-B91F-AE390045E4D4/37D55DDC-192C-43D2-82C0-AE390045E4DE/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/e2c41c2a-3adf-48c1-8789-b4c0012f6562/43bd10ae-48bb-4fed-b78b-b4c0012f656f/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/da2531e9-7a27-4c06-9356-ae320081e071/f4572821-04cd-482a-94f5-ae320081e0a9/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/cfb428ef-eafc-44d0-9d09-ae2701747e6f/fb626e1f-112c-4246-a40d-ae2701747e7d/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/752ba8f1-0e9f-43cc-81d8-b45f00f9a408/6f1d99f7-4f58-4689-b4f7-b45f00f9a4e3/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/b3a0ce7b-2fe2-4963-a010-b15e0117d538/3d810e26-96da-41aa-886a-b15e0117d55e/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/723A5526-8C62-4255-8C8B-AE2C007CFCC1/F2551C6E-95ED-4D33-9CFB-AE2C007CFCF9/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/EE1B8801-430C-4BAD-9607-AE320005B71A/6C094109-492D-4CBC-BA9F-AE320005B723/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/39e934d7-2ddc-4b3e-bc73-ae2b00156363/ab6037f4-9a9a-449b-915d-ae2b00156375/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/79e9a3f8-e7fd-4b7b-ad5c-b4ba0139f9ae/756a2948-13e0-4c8b-ae8f-b4ba0139f9bf/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/390f52fb-437c-4290-bdaa-b3ec011d3fc8/2d9ae039-d4b2-4a37-8a77-b3ec011d3fce/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/515d2905-7975-4b85-a224-b43601500d1e/3ecdf081-be76-4016-acac-b43601500d26/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/98a2599f-cd9b-4f2a-9be4-b22c00e585f2/bce6d9b2-d722-420d-9b06-b295011caa9a/97a52528-167d-4110-8770-b295011caaac/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/32ad6995-949b-47b5-bfa5-b2ce01483175/785d2727-e393-40b7-8309-b2ce01483193/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/1508ddb2-0c9a-42f6-aafe-ae3300346aa9/bf391792-153e-41b3-9d3d-ae3300346ad8/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/0E61FE66-E985-446F-BC46-AE27003599DA/C1B3EAA8-DB6B-4865-AC29-AE27003599F6/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/61c1535a-56bb-431a-ad6b-ae2b00350f5c/b95f0c24-c199-4939-b52c-ae2b00350f65/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/6EA152C0-9E3A-45DE-8672-AE2F0056B113/D8936746-9E22-4DBA-B762-AE2F0056B126/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/FA4DA4B1-6500-4550-A0ED-AE2D0142AD16/2442B355-5AB7-45D4-92DB-AE2D0142AD24/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/a6620428-68fa-4b5d-a5af-ae33005f660f/0660e13d-8aa3-45f5-90ef-ae33005f6621/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/3dae0b07-aac0-4154-8c1e-ae2b00350f94/961e484b-1dff-48ef-8bdd-ae2b00350fab/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/4A0AA31F-D7EC-4EE3-915F-AE300188D2DA/554B2774-1072-4AFC-88B3-AE300188D2E8/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/58472ddd-be56-4002-8937-b2d70144b8d5/cddd4ab4-85f4-4769-9ca3-b2d70144b8ef/podcast.rss"
+      ]
+    },
+    {
+      "slug": "siriusxm",
+      "name": "SiriusXM Podcasts (Stitcher, Earwolf)",
+      "site": "https://www.siriusxm.com/podcasts",
+      "description": "SiriusXM's podcast group including Stitcher, Earwolf, Team Coco and Freakonomics Radio.",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "siriusxm",
+          "siriusxm podcasts",
+          "siriusxm media",
+          "siriusxm podcasts and roman mars",
+          "earwolf",
+          "team coco & earwolf",
+          "stitcher & team coco",
+          "freakonomics radio + stitcher",
+          "earwolf and scott aukerman",
+          "dirty mo media & siriusxm",
+          "dirty mo media, siriusxm",
+          "siriusxm, dirty mo media",
+          "siriusxm | smartless media"
+        ]
+      },
+      "feeds": [
+        "https://feeds.simplecast.com/xHwJAwNo",
+        "https://feeds.simplecast.com/m5n1Ookx",
+        "https://feeds.simplecast.com/85uBY5kw",
+        "https://feeds.simplecast.com/RV1USAfC",
+        "https://feeds.simplecast.com/3QFDvuKE",
+        "https://feeds.simplecast.com/Dv1m2CJC",
+        "https://feeds.simplecast.com/e9PEEGqn",
+        "https://feeds.simplecast.com/Y8lFbOT4",
+        "https://feeds.simplecast.com/BqbsxVfO",
+        "https://feeds.simplecast.com/FA7YE02c",
+        "https://feeds.simplecast.com/MEylaxWP",
+        "https://feeds.simplecast.com/dHoohVNH",
+        "https://feeds.simplecast.com/nytqLrhe",
+        "https://feeds.simplecast.com/Xjj1yH0V",
+        "https://feeds.simplecast.com/qaiDidW0",
+        "https://feeds.simplecast.com/MRdD7qze",
+        "https://feeds.simplecast.com/K0gTWLUN",
+        "https://feeds.simplecast.com/ianWG_Vy",
+        "https://feeds.simplecast.com/RMlFaH7b",
+        "https://feeds.simplecast.com/UCwaTX1J",
+        "https://feeds.simplecast.com/jxOmnKXW",
+        "https://feeds.simplecast.com/FJo1cu4f",
+        "https://feeds.simplecast.com/Ao0C24M8",
+        "https://rss.pdrl.fm/aad407/feeds.simplecast.com/WnxY0J_V",
+        "https://feeds.simplecast.com/_SOsoLHg",
+        "https://feeds.simplecast.com/6J0Ivoq9",
+        "https://feeds.simplecast.com/dfh_verV",
+        "https://feeds.simplecast.com/n91GPFY5",
+        "https://feeds.simplecast.com/tA_4bn2c",
+        "https://feeds.simplecast.com/GMfwicWj",
+        "https://feeds.simplecast.com/rP60Wf24",
+        "https://feeds.simplecast.com/VQImumnT",
+        "https://feeds.simplecast.com/NfXO2EfT",
+        "https://feeds.simplecast.com/PVIkIQNo",
+        "https://feeds.simplecast.com/A1EGvXFD",
+        "https://feeds.simplecast.com/otOrYnrn",
+        "https://feeds.simplecast.com/jC9NVTN3",
+        "https://feeds.simplecast.com/byb4nhvN",
+        "https://feeds.simplecast.com/2AVhXXL_",
+        "https://feeds.simplecast.com/WhTGFBFO"
+      ]
+    },
+    {
+      "slug": "the-ringer",
+      "name": "The Ringer",
+      "site": "https://www.theringer.com/podcasts",
+      "description": "Spotify-owned sports and pop-culture network (The Bill Simmons Podcast, The Rewatchables).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "the ringer"
+        ]
+      },
+      "feeds": [
+        "https://feeds.megaphone.fm/the-press-box",
+        "https://feeds.megaphone.fm/the-ringer-nba-show",
+        "https://feeds.megaphone.fm/the-ringer-nfl-show",
+        "https://feeds.megaphone.fm/the-watch",
+        "https://feeds.megaphone.fm/the-bill-simmons-podcast",
+        "https://feeds.megaphone.fm/the-masked-man-show",
+        "https://feeds.megaphone.fm/ringer-gambling-show",
+        "https://feeds.megaphone.fm/the-big-picture",
+        "https://feeds.megaphone.fm/ringer-dish",
+        "https://feeds.megaphone.fm/ringer-fantasy-football-show",
+        "https://feeds.megaphone.fm/the-ringer-verse",
+        "https://feeds.megaphone.fm/ringer-reality-tv",
+        "https://feeds.megaphone.fm/bachelor-party",
+        "https://feeds.megaphone.fm/the-dave-chang-show",
+        "https://feeds.megaphone.fm/the-town-with-matthew-belloni",
+        "https://feeds.megaphone.fm/tvconcierge",
+        "https://feeds.megaphone.fm/higherlearning",
+        "https://feeds.megaphone.fm/philly-sports-podcast",
+        "https://feeds.megaphone.fm/the-jj-redick-podcast",
+        "https://feeds.megaphone.fm/GLT5753174395",
+        "https://feeds.megaphone.fm/ringer-the-rugby-pod",
+        "https://feeds.megaphone.fm/the-rewatchables",
+        "https://feeds.megaphone.fm/GLT6069920566",
+        "https://feeds.megaphone.fm/house-of-r",
+        "https://feeds.megaphone.fm/fairway-rollin",
+        "https://feeds.megaphone.fm/plain-english",
+        "https://feeds.megaphone.fm/house-of-carbs",
+        "https://feeds.megaphone.fm/dissectwide",
+        "https://feeds.megaphone.fm/counter-pressed",
+        "https://feeds.megaphone.fm/ripple-effect",
+        "https://feeds.megaphone.fm/todd-mcshay",
+        "https://feeds.megaphone.fm/GLT3365274141",
+        "https://feeds.megaphone.fm/paddock-pass",
+        "https://feeds.megaphone.fm/every-single-album",
+        "https://feeds.megaphone.fm/60-songs",
+        "https://feeds.megaphone.fm/zach-lowe",
+        "https://feeds.megaphone.fm/ringer-wnba-show",
+        "https://feeds.megaphone.fm/dave-chang-recipe-club",
+        "https://feeds.megaphone.fm/GLT6765190022",
+        "https://feeds.megaphone.fm/GLT6377681720"
+      ]
+    },
+    {
+      "slug": "pushkin",
+      "name": "Pushkin Industries",
+      "site": "https://www.pushkin.fm",
+      "description": "Malcolm Gladwell's audio company (Revisionist History, Cautionary Tales), distributed by iHeart.",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "pushkin industries",
+          "pushkin industries and iheartpodcasts",
+          "iheartpodcasts and pushkin industries",
+          "pushkin industries and bbc studios",
+          "pushkin industries and ruby"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "json",
+          "url": "https://api.omny.fm/orgs/e73c998e-6e60-432f-8610-ae210140c5b1/programs",
+          "pattern": "\"RssFeedUrl\":\\s*\"([^\"]+)\"",
+          "where": {
+            "list": "Programs",
+            "field": "Network",
+            "equals": "Pushkin Industries"
+          }
+        }
+      ],
+      "feeds": [
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/ff0ba2f2-f33c-4193-aba2-ae32006cd633/11c188a1-cb86-4869-9c57-ae32006cd63c/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/96c5c41e-0bc8-4661-b184-ae32006cd726/d623ef0b-3fee-4c26-b815-ae32006cd739/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/9a7ab5ee-ce11-48ff-a544-b3ec00ea9b1e/7f82f371-6316-4ea6-a108-b3ec00ea9b2d/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/c0ae8c6e-22f0-4e9b-ac1c-ae390037ac53/7f5a4714-6b10-4ccf-a424-ae390037ac70/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/0e563f45-9d14-4ce8-8ef0-ae32006cd7e7/0d4cc74d-fff7-4b89-8818-ae32006cd7f0/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/32c25e85-1667-4acb-99fd-ae3c0021f33e/beacef48-19d2-4f52-b9e8-ae3c0021f347/podcast.rss",
+        "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/0F1283E2-80FE-460B-B157-AE3900375D38/D548F2C1-D522-4AA8-9FF3-AE3900375D41/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/afbd76b8-eff2-442a-b938-b28e0126edad/d08826cd-f888-4cd3-b700-b28e0126edbb/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/f4e26994-3ddb-4ec7-b855-ae32006cd5de/ea4fae0c-3282-4cfd-b315-ae32006cd5ec/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/909992ef-65aa-487b-ab34-ae32006cd6c4/9ba7a5cf-2d80-4ab2-84c4-ae32006cd6e0/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/31bb1c28-0fb5-4627-b8a7-ae32006cd7c1/093755db-b947-43f4-a067-ae32006cd7cf/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/85547dfc-49bd-4e63-a6cc-ae32006cd832/6d9e2ef8-e4e9-45e9-9e13-ae32006cd844/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/7f3d9150-a284-4eb5-afdd-b36b012c131c/d0eda9ea-f1f7-4dbc-aeac-b36b012c1726/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/abdcbe1c-35f0-49ff-8a2a-ae39003761a2/8aa81b52-dc76-4e7c-80d6-ae39003761ab/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/fef8f1ac-0039-4a2a-8d60-b0a8010abfc0/cfb3d549-95c7-45f6-81a8-b0a8010b7a92/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/824a6bd6-185a-4697-bb57-aea9011fee2f/b90f60e3-e46c-42a4-8675-aea9012011fe/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/ae2faf08-9a91-4ec2-a43b-b3f001078f91/3006fbbd-79a1-47b7-87eb-b3f0010793c1/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/380766c2-8ad7-4864-8184-b43200ebf321/a7cc47bd-df77-4fc9-9c77-b43200ebf76f/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/dfc57dfa-7eb4-4384-93a6-b336013ae711/ac433391-ed4f-49c2-b148-b336013aed5f/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/495d050c-84ae-4684-9b03-b3a7011c66ff/cac3070d-a8e7-49bb-98f7-b3a7011c6b18/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/1adbf607-7b83-469d-aec5-b448013a0d8e/ae69b98a-a19f-4414-9936-b448013a1192/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/ed1c4822-458e-4490-ad84-b3590112525b/e71ffac4-c816-45c9-97dd-b3590112561b/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/9a37d445-478c-4a5e-9f49-aed90170d29b/7a214e36-5585-4a7b-a6b9-aed9017123f2/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/06043a99-5a6d-4b31-9b3e-b25a010f03fa/92dd1912-061d-4c66-87fe-b25a010f04e8/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/17a09e44-9235-45fa-b1b6-b449012b58d1/c19df155-4b09-4287-960e-b449012b58f1/podcast.rss",
+        "https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/21bd98b3-8cc6-4565-a21e-b4c9014d00dd/04897743-92ff-422f-9fed-b4c9014d05a3/podcast.rss"
+      ]
+    },
+    {
+      "slug": "slate",
+      "name": "Slate",
+      "site": "https://slate.com/podcasts",
+      "description": "Slate magazine's podcasts (Political Gabfest, Slow Burn, Amicus, What Next).",
+      "match": {
+        "hosts": [
+          "slate.com"
+        ],
+        "urlPrefixes": [],
+        "owners": [
+          "slate podcasts",
+          "slate audio"
+        ]
+      },
+      "feeds": [
+        "https://feeds.acast.com/public/shows/6960406eea3a5db99ef40043",
+        "https://feeds.acast.com/public/shows/696fee067668cfdea3a2870a",
+        "https://feeds.acast.com/public/shows/696568de9ab39048a63ed7f7",
+        "https://feeds.acast.com/public/shows/696925135f7f66b0e44666db",
+        "https://feeds.acast.com/public/shows/6969638b5f7f66b0e4468dad",
+        "https://feeds.acast.com/public/shows/69612bcd1f21449d6dec2ccb",
+        "https://feeds.acast.com/public/shows/695ead68a32e86d775858194",
+        "https://feeds.acast.com/public/shows/69612d9223ce58f14619a8f6",
+        "https://feeds.acast.com/public/shows/695ff52ed8ac698e7e1291b4",
+        "https://my.slate.com/podcasts/feeds/death-sex-money/",
+        "https://feeds.acast.com/public/shows/695ea2381c1db1c5bdf7c59b",
+        "https://feeds.acast.com/public/shows/695d4ed8d1ba84fb8f043f94",
+        "https://feeds.acast.com/public/shows/6965759d79fe7d554545528a",
+        "https://feeds.acast.com/public/shows/695ea6f6a32e86d77583c599",
+        "https://feeds.acast.com/public/shows/696572d375c092ac4e159c27",
+        "https://feeds.audiomeans.fr/feed/72b32869-cf10-43d5-b2f5-7f738a5f9134.xml",
+        "https://feeds.acast.com/public/shows/695c1c03b1ddb8392c5b30ac"
+      ]
+    },
+    {
+      "slug": "new-york-times",
+      "name": "The New York Times",
+      "site": "https://www.nytimes.com/spotlight/podcasts",
+      "description": "New York Times audio (The Daily, The Ezra Klein Show, Hard Fork, Modern Love).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "the new york times",
+          "new york times opinion",
+          "the new york times opinion"
+        ]
+      },
+      "feeds": [
+        "https://feeds.simplecast.com/54nAGcIl",
+        "https://feeds.simplecast.com/MssIhx9y",
+        "https://feeds.simplecast.com/W1rB_kgL",
+        "https://feeds.simplecast.com/ydACIPHO",
+        "https://feeds.simplecast.com/82FI35Px",
+        "https://feeds.simplecast.com/0N8Hs1MH",
+        "https://feeds.simplecast.com/kphrlDnb",
+        "https://feeds.simplecast.com/l2i9YnTd",
+        "https://feeds.simplecast.com/tI57z_LN",
+        "https://feeds.simplecast.com/ksGYZ_Z3",
+        "https://www.spreaker.com/show/6898863/episodes/feed",
+        "https://feeds.simplecast.com/2xzUiHxw",
+        "https://feeds.simplecast.com/JJrAJ_VY"
+      ]
+    },
+    {
+      "slug": "the-guardian",
+      "name": "The Guardian",
+      "site": "https://www.theguardian.com/podcasts",
+      "description": "Guardian News & Media podcasts (Today in Focus, Football Weekly, Politics Weekly).",
+      "match": {
+        "hosts": [
+          "theguardian.com"
+        ],
+        "urlPrefixes": [
+          "https://www.theguardian.com/"
+        ],
+        "owners": [
+          "the guardian"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.theguardian.com/podcasts",
+          "pattern": "\"(/[a-z]+(?:/[a-z-]+)?/series/[a-z0-9-]+)\"",
+          "template": "https://www.theguardian.com{1}/podcast.xml"
+        }
+      ],
+      "feeds": [
+        "https://www.theguardian.com/news/series/the-audio-long-read/podcast.xml",
+        "https://www.theguardian.com/australia-news/series/full-story/podcast.xml",
+        "https://www.theguardian.com/australia-news/series/australian-politics-live/podcast.xml",
+        "https://www.theguardian.com/news/series/todayinfocus/podcast.xml",
+        "https://www.theguardian.com/science/series/science/podcast.xml",
+        "https://www.theguardian.com/politics/series/politicsweekly/podcast.xml",
+        "https://www.theguardian.com/politics/series/politics-weekly-america/podcast.xml",
+        "https://www.theguardian.com/football/series/theguardianswomensfootballweekly/podcast.xml",
+        "https://www.theguardian.com/lifeandstyle/series/weekend/podcast.xml",
+        "https://www.theguardian.com/football/series/footballweekly/podcast.xml",
+        "https://www.theguardian.com/australia-news/series/back-to-back-barries/podcast.xml",
+        "https://feeds.acast.com/public/shows/69f1f631d7e73f5a692d1d3c",
+        "https://www.theguardian.com/technology/series/blackbox/podcast.xml",
+        "https://www.theguardian.com/news/series/guardian-australia-podcast-series/podcast.xml",
+        "https://www.theguardian.com/australia-news/series/alan-jones-on-trial/podcast.xml"
+      ]
+    },
+    {
+      "slug": "the-economist",
+      "name": "The Economist",
+      "site": "https://www.economist.com/podcasts",
+      "description": "The Economist's podcasts (The Intelligence, Money Talks, Babbage).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [],
+        "owners": [
+          "the economist"
+        ]
+      },
+      "feeds": [
+        "https://access.acast.com/rss/d556eb54-6160-4c85-95f4-47d9f5216c49",
+        "https://access.acast.com/rss/ec380acc-fe13-46a0-991f-a1e508d126f8",
+        "https://feeds.acast.com/public/shows/63beed437ae74e001002382f",
+        "https://access.acast.com/rss/64ee35bafc643000110d1607",
+        "https://feeds.acast.com/public/shows/62cff2d9d455860013698a7f",
+        "https://access.acast.com/rss/672ceccb61e4ef810ff282c0/default",
+        "https://access.acast.com/rss/theeconomistmorningbriefing/default",
+        "https://feeds.acast.com/public/shows/672ceccb61e4ef810ff282c0",
+        "https://feeds.acast.com/public/shows/6909b7a46204e248db2b1b29"
+      ]
+    },
+    {
+      "slug": "deutsche-welle",
+      "name": "Deutsche Welle",
+      "site": "https://www.dw.com",
+      "description": "Germany's international broadcaster; podcasts in some 30 languages.",
+      "match": {
+        "hosts": [
+          "dw.com"
+        ],
+        "urlPrefixes": [
+          "https://rss.dw.com/"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://rss.dw.com/xml/podcast_living-planet",
+        "https://rss.dw.com/xml/podcast_africalink",
+        "https://rss.dw.com/xml/DKpodcast_alltagsdeutsch_de",
+        "https://rss.dw.com/xml/podcast_inside-europe",
+        "https://rss.dw.com/xml/podcast_wirtschaft",
+        "https://rss.dw.com/xml/podcast_spectrum",
+        "https://rss.dw.com/xml/podcast_chi_klassischemusik",
+        "https://rss.dw.com/xml/podcast_sante",
+        "https://rss.dw.com/xml/podcast_bra_noticias",
+        "https://rss.dw.com/xml/podcast_ru_novosti-show",
+        "https://rss.dw.com/xml/podcast_Berlin_Briefing",
+        "https://rss.dw.com/xml/podcast_actualidad_en_analisis",
+        "https://rss.dw.com/xml/DKpodcast_lgn_de",
+        "https://rss.dw.com/xml/DKpodcast_wortderwoche_de",
+        "https://rss.dw.com/xml/DKpodcast_videothema_de",
+        "https://rss.dw.com/xml/DKpodcast_profisgesucht_video",
+        "https://rss.dw.com/xml/podcast_the_dip",
+        "https://rss.dw.com/xml/podcast_Syria_Laween",
+        "https://rss.dw.com/xml/DKpodcast_dassagtmanso_de",
+        "https://rss.dw.com/xml/podcast_Sudan_NOW",
+        "https://rss.dw.com/xml/DKpodcast_topthemamitvokabeln_de",
+        "https://rss.dw.com/xml/podcast_cannabis_cowboys",
+        "https://rss.dw.com/syndication/feeds/podcast_es_noticias.33193-mrss.xml",
+        "https://rss.dw.com/syndication/feeds/podcast_en_newsbrief.33191-mrss.xml",
+        "https://rss.dw.com/xml/podcast_jornal-pt",
+        "https://rss.dw.com/xml/podcast_amh_nachrichten",
+        "https://rss.dw.com/xml/gk-volltext-newsstand-iran-per",
+        "https://rss.dw.com/xml/podcast_science_unscripted",
+        "https://rss.dw.com/xml/podcast_amh_feature_der_woche",
+        "https://rss.dw.com/xml/podcast_ru_geofaktor",
+        "https://rss.dw.com/xml/podcast_amh_wissenschaft",
+        "https://rss.dw.com/xml/podcast_amh_diskussionsforum",
+        "https://rss.dw.com/xml/podcast_gri_kultur",
+        "https://rss.dw.com/xml/podcast_journal",
+        "https://rss.dw.com/xml/rss-per-all_volltext",
+        "https://rss.dw.com/xml/podcast_hau_kultur",
+        "https://rss.dw.com/xml/podcast_amh_zeitfunk",
+        "https://rss.dw.com/xml/podcast_amh_Diskussionssendung",
+        "https://rss.dw.com/xml/podcast_amh_aus_dem_wirtschaftsleben",
+        "https://rss.dw.com/xml/podcast_larbre-a-palabres"
+      ]
+    },
+    {
+      "slug": "rfi",
+      "name": "RFI",
+      "site": "https://www.rfi.fr",
+      "description": "Radio France Internationale, the French international radio (France Médias Monde), in 15+ languages.",
+      "match": {
+        "hosts": [
+          "rfi.fr",
+          "fle.rfi.fr"
+        ],
+        "urlPrefixes": [
+          "https://apis.rfi.fr/",
+          "https://www.rfi.fr/"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://www.rfi.fr/sw/makala/habari-rafiki/podcast",
+        "https://www.rfi.fr/sw/makala/jua-haki-zako/podcast",
+        "https://www.rfi.fr/sw/makala/jukwaa-la-michezo/podcast",
+        "https://www.rfi.fr/sw/makala/mazingira-leo-dunia-yako-kesho/podcast",
+        "https://www.rfi.fr/sw/makala/mtazamo-kwa-yaliyojiri-wiki-hii/podcast",
+        "https://www.rfi.fr/sw/makala/muziki-ijumaa/podcast",
+        "https://www.rfi.fr/sw/makala/nyumba-ya-sanaa/podcast",
+        "https://www.rfi.fr/sw/makala/siha-njema/podcast",
+        "https://www.rfi.fr/sw/makala/changu-chako-chako-changu/podcast",
+        "https://www.rfi.fr/sw/makala/wimbi-la-siasa/podcast",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB1892566-RFI-FR-20200703",
+        "https://www.rfi.fr/pt/programas/ciencia/podcast",
+        "https://www.rfi.fr/ro/podcasturi/podcast",
+        "https://www.rfi.fr/es/programas/14h00-14h03-gmt/podcast",
+        "https://www.rfi.fr/ru/%D0%B0%D1%83%D0%B4%D0%B8%D0%BE%D0%B0%D1%80%D1%85%D0%B8%D0%B2/podcast",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ1265-RFI-MA-20201208",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ303-RFI-FF-20201207",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ299-RFI-FF-20201207",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ304-RFI-FF-20201207",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WBMZ1253-RFI-MA-20201207",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB912692-RFI-FR-20130121",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB288427-RFI-FR-20101025",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB9160-RFI-FR-20091009",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79466-RFI-SW-20110421",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB15365-RFI-VI-20100225",
+        "https://apis.fle.rfi.fr/products/get_product/fle_getpodcast_by_nid_author_rfi?token_application=applepodcast_fle&program.entrepriseId=WBMZ39-FLE-FR-20220627",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB114-RFI-FR-20090830",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB161909-RFI-CN-20150122",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB1443-RFI-FR-20090930",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB19389-RFI-KM-20100408",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB86273-RFI-KM-20130812",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB19404-RFI-KM-20100409",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB10192-RFI-FR-20091012",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB2894-RFI-FR-20090915",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79415-RFI-SW-20110421",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79266-RFI-SW-20110404",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79302-RFI-SW-20110409",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79460-RFI-SW-20110421",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB79451-RFI-SW-20110421",
+        "https://apis.rfi.fr/products/get_product/rfi_getpodcast_by_nid?token_application=975d23b8-7a07-11e8-9f62-005056a90194&program.entrepriseId=WB1740749-RFI-FR-20190401"
+      ]
+    },
+    {
+      "slug": "radio-france",
+      "name": "Radio France",
+      "site": "https://www.radiofrance.fr/podcasts",
+      "description": "French public radio group: France Inter, franceinfo, France Culture, France Musique, ICI.",
+      "match": {
+        "hosts": [
+          "radiofrance-podcast.net",
+          "radiofrance.fr"
+        ],
+        "urlPrefixes": [
+          "https://radiofrance-podcast.net/"
+        ],
+        "owners": [
+          "radio france"
+        ]
+      },
+      "feeds": [
+        "https://radiofrance-podcast.net/podcast09/podcast_21964aef-608c-48a2-84f1-d3c6039f279a.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_c415e197-8562-44ce-9a53-4e5846e0d855.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_4ff3693f-6e66-11e5-8e9e-005056a87c89.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_614dcf4f-4039-494d-bc11-b95ceda4ea08.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_aa87513b-cba9-4a00-ad88-8cba8c77143d.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_91be84c1-a82c-48fe-a9a3-38d1af202d8f.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_3e7d0862-f738-4bbb-a3c2-4556d5b51fd8.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_76ceff81-1d32-4f0a-b01a-627a7148412b.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_268e46fa-2500-4892-b424-9c79aed89b4e.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_9c7ba162-d528-46e6-be4e-9140d60fc2c1.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_d555ed4e-dbe5-4908-912e-b3169f9ceede.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_423b51d8-3f44-4b9a-b906-e0d14bdf0516.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_a80ecbd5-df3d-4c9d-bee7-4e3d9efc1974.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_3636fb5e-f433-4baf-a7da-4c2854482dab.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_8d53f49d-6a21-45fa-9f4b-8ce40df83913.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_50033bdb-df4d-40f1-8dac-2a4e544ee339.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_9381f6a5-7774-44a1-86a5-fd3b5c2c14d8.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_843d0386-dab0-42b2-90ac-ce6bf6c9e21f.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_0b91efaf-26e6-11e4-907f-782bcb6744eb.xml",
+        "https://radiofrance-podcast.net/podcast09/35099478-7c72-4f9e-a6de-1b928400e9e5/rss_14312.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_3957c833-0b28-4314-8427-2a1d1e103381.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_311d3bad-4287-11e5-9fe0-005056a87c89.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_72410411-a76f-4c36-99f5-3918fbc24bb8.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_ccda2c90-41a8-11e5-9fe0-005056a87c89.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_fb95d7ee-4349-4489-8ab4-184962d098ca.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_c951e8a9-6121-4400-a3ef-5f9c958d36c3.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_355586fd-7eaa-433e-979c-98ca082b5fb1.xml",
+        "https://radiofrance-podcast.net/podcast09/d4463877-caa3-4507-9399-f5eb00fde027/podcast_355586fd-7eaa-433e-979c-98ca082b5fb1.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_14303c46-3c2f-486f-a063-fadf9719bff3.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_bd43a733-4811-11e5-9fe0-005056a87c89.xml",
+        "https://radiofrance-podcast.net/podcast09/35099478-7c72-4f9e-a6de-1b928400e9e5/rss_10078.xml",
+        "https://radiofrance-podcast.net/podcast09/rss_23118.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_481f078d-4810-11e5-9fe0-005056a87c89.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_4a343ac1-9c42-448a-b1be-301794c7b2ba.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_8f2d1e07-aaf1-4935-96d2-4307f470baec.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_bf2a39c4-d259-11e0-b8ee-842b2b72cd1d.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_c07ed278-d257-11e0-b8ee-842b2b72cd1d.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_eb76878a-d2e7-4930-a6e1-192c7ba60448.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_95722d43-323a-41a9-9821-48539b48dffd.xml",
+        "https://radiofrance-podcast.net/podcast09/podcast_2980a1db-3393-4b68-ba22-07523b7e87e0.xml"
+      ]
+    },
+    {
+      "slug": "nrk",
+      "name": "NRK",
+      "site": "https://radio.nrk.no",
+      "description": "Norwegian public broadcaster's podcasts.",
+      "match": {
+        "hosts": [
+          "nrk.no"
+        ],
+        "urlPrefixes": [
+          "https://podkast.nrk.no/"
+        ],
+        "owners": [
+          "nrk"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "json",
+          "url": "https://psapi.nrk.no/radio/search/categories/podcast?take=1000&skip=0",
+          "pattern": "\"seriesId\":\"([a-z0-9_]+)\"",
+          "template": "https://podkast.nrk.no/program/{1}.rss"
+        }
+      ],
+      "feeds": [
+        "https://podkast.nrk.no/program/hele_historien.rss",
+        "https://podkast.nrk.no/program/radiodokumentaren.rss",
+        "https://podkast.nrk.no/program/tyrann.rss",
+        "https://podkast.nrk.no/program/andakten.rss",
+        "https://podkast.nrk.no/program/abels_taarn.rss",
+        "https://podkast.nrk.no/program/radioresepsjonens_arkivpodkast.rss",
+        "https://podkast.nrk.no/program/politisk_kvarter.rss",
+        "https://podkast.nrk.no/program/verden_paa_loerdag.rss",
+        "https://podkast.nrk.no/program/loerdagsraadet.rss",
+        "https://podkast.nrk.no/program/drivkraft.rss",
+        "https://podkast.nrk.no/program/med_all_respekt.rss",
+        "https://podkast.nrk.no/program/oppdatert.rss",
+        "https://podkast.nrk.no/program/ekko_-_et_aktuelt_samfunnsprogram.rss",
+        "https://podkast.nrk.no/program/norsken_svensken_og_dansken.rss",
+        "https://podkast.nrk.no/program/trygdekontoret.rss",
+        "https://podkast.nrk.no/program/radio_moerch.rss",
+        "https://podkast.nrk.no/program/skiklubben.rss",
+        "https://podkast.nrk.no/program/baade_erlend_og_steinar_.rss",
+        "https://podkast.nrk.no/program/baksnakk.rss",
+        "https://podkast.nrk.no/program/kjapt_oppdatert.rss",
+        "https://podkast.nrk.no/program/lev_vel.rss",
+        "https://podkast.nrk.no/program/krimrommet.rss",
+        "https://podkast.nrk.no/program/utro_haap_og_kjaerlighet.rss",
+        "https://podkast.nrk.no/program/blaatur.rss",
+        "https://podkast.nrk.no/program/spor.rss",
+        "https://podkast.nrk.no/program/sentralbordet.rss",
+        "https://podkast.nrk.no/program/sportsdesken_brenner.rss"
+      ]
+    },
+    {
+      "slug": "dr",
+      "name": "DR",
+      "site": "https://www.dr.dk/lyd",
+      "description": "Danish public broadcaster's podcasts.",
+      "match": {
+        "hosts": [
+          "dr.dk"
+        ],
+        "urlPrefixes": [
+          "https://api.dr.dk/podcasts/"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://api.dr.dk/podcasts/v1/feeds/genstart.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/kulturen-pa-p1.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/mads-monopolet-podcast.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/brinkmanns-briks.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/p1-debat.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/djaevlen-i-detaljen.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/kampen-om-historien-3.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/p1-orientering.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/galt-nok.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/radioavisen.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/akkurat-med-clement.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/tiden.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/p1-morgen.xml?format=podcast&limit=100",
+        "https://api.dr.dk/podcasts/v1/feeds/morgenandagten.xml?format=podcast&limit=100",
+        "https://api.dr.dk/podcasts/v1/feeds/ubegribeligt.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/du-kender-typen.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/det-en-klassiker.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/jagten-paa-det-evige-liv.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/ibens-harem-18-aar-efter.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/tyvstart.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/genstart-dox.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/foelg-pengene.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/under-radaren.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/orientering.xml?format=podcast&limit=100",
+        "https://api.dr.dk/podcasts/v1/feeds/tyran.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/slotsholmen.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/stjerner-og-striber-podcast.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/svingdoeren.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/hemmeligheder-2.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/elskovspony.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/prompt.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/bibelen-leth-fortalt.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/kup.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/verdens-navle.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/lyssky.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/4-division.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/det-der-med-anders-breinholt.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/vildt-naturligt",
+        "https://api.dr.dk/podcasts/v1/feeds/supertanker.xml?format=podcast",
+        "https://api.dr.dk/podcasts/v1/feeds/norsken-svensken-og-dansken.xml?format=podcast"
+      ]
+    },
+    {
+      "slug": "sbs",
+      "name": "SBS Australia",
+      "site": "https://www.sbs.com.au/audio",
+      "description": "Australia's multicultural broadcaster; podcasts in 60+ languages.",
+      "match": {
+        "hosts": [
+          "sbs.com.au"
+        ],
+        "urlPrefixes": [
+          "https://feeds.sbs.com.au/"
+        ],
+        "owners": [
+          "sbs audio"
+        ]
+      },
+      "feeds": [
+        "https://sbs-ondemand.streamguys1.com/sbs-hindi/",
+        "https://sbs-ondemand.streamguys1.com/sbs-indonesian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-persian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-punjabi/",
+        "https://feeds.sbs.com.au/sbs-urdu",
+        "https://sbs-ondemand.streamguys1.com/sbs-hmong/",
+        "https://sbs-ondemand.streamguys1.com/sbs-french/",
+        "https://sbs-ondemand.streamguys1.com/sbs-dutch/",
+        "https://sbs-ondemand.streamguys1.com/sbs-german/",
+        "https://sbs-ondemand.streamguys1.com/sbs-mandarin/",
+        "https://sbs-ondemand.streamguys1.com/sbs-portuguese/",
+        "https://sbs-ondemand.streamguys1.com/sbs-greek/",
+        "https://sbs-ondemand.streamguys1.com/sbs-cantonese/",
+        "https://sbs-ondemand.streamguys1.com/sbs-italian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-japanese/",
+        "https://sbs-ondemand.streamguys1.com/sbs-pashto/",
+        "https://sbs-ondemand.streamguys1.com/sbs-russian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-spanish/",
+        "https://sbs-ondemand.streamguys1.com/sbs-turkish/",
+        "https://sbs-ondemand.streamguys1.com/sbs-croatian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-nepali/",
+        "https://sbs-ondemand.streamguys1.com/sbs-dari/",
+        "https://sbs-ondemand.streamguys1.com/sbs-Vietnamese/",
+        "https://sbs-ondemand.streamguys1.com/sbs-thai/",
+        "https://sbs-ondemand.streamguys1.com/reportages-par-sbs-french/",
+        "https://sbs-ondemand.streamguys1.com/sbs-gujarati/",
+        "https://sbs-ondemand.streamguys1.com/sbs-tigrinya/",
+        "https://sbs-ondemand.streamguys1.com/sbs-arabic24/",
+        "https://sbs-ondemand.streamguys1.com/sbs-bangla/",
+        "https://sbs-ondemand.streamguys1.com/sbs-world-news-radio/",
+        "https://sbs-ondemand.streamguys1.com/sbs-korean/",
+        "https://sbs-ondemand.streamguys1.com/sbs-swahili/",
+        "https://sbs-ondemand.streamguys1.com/sbs-news-update/",
+        "https://sbs-ondemand.streamguys1.com/sbs-telugu/",
+        "https://sbs-ondemand.streamguys1.com/arabic-newsflash/",
+        "https://sbs-ondemand.streamguys1.com/sbs-kurdish/",
+        "https://sbs-ondemand.streamguys1.com/sbs-burmese/",
+        "https://sbs-ondemand.streamguys1.com/sbs-bosnian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-Ukrainian/",
+        "https://sbs-ondemand.streamguys1.com/sbs-news-easy-english/"
+      ]
+    },
+    {
+      "slug": "rnz",
+      "name": "RNZ",
+      "site": "https://www.rnz.co.nz/podcasts",
+      "description": "Radio New Zealand, NZ's public broadcaster.",
+      "match": {
+        "hosts": [
+          "rnz.co.nz"
+        ],
+        "urlPrefixes": [
+          "https://www.rnz.co.nz/podcasts/"
+        ],
+        "owners": [
+          "rnz"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://www.rnz.co.nz/podcasts",
+          "pattern": "https://www\\.rnz\\.co\\.nz/podcasts/[a-z0-9/_-]+\\.rss"
+        }
+      ],
+      "feeds": [
+        "https://www.rnz.co.nz/acast/checkpoint.rss",
+        "https://www.rnz.co.nz/acast/middayreport.rss",
+        "https://www.rnz.co.nz/acast/culture-101.rss",
+        "https://www.rnz.co.nz/podcasts/first-up-podcast.rss",
+        "https://www.rnz.co.nz/acast/morningreport.rss",
+        "https://www.rnz.co.nz/podcasts/acast/the-detail.rss",
+        "https://www.rnz.co.nz/podcasts/acast/datelinepacific.rss",
+        "https://www.rnz.co.nz/podcasts/acast/countrylife.rss",
+        "https://www.rnz.co.nz/podcasts/acast/ourchangingworld.rss",
+        "https://www.rnz.co.nz/podcasts/acast/it-takes-a-village.rss",
+        "https://www.rnz.co.nz/podcasts/acast/the-house.rss",
+        "https://www.rnz.co.nz/podcasts/acast/mediawatch.rss",
+        "https://www.rnz.co.nz/podcasts/acast/monday-politics.rss",
+        "https://www.rnz.co.nz/acast/ninetonoon.rss",
+        "https://www.rnz.co.nz/podcasts/acast/focusonpolitics.rss",
+        "https://www.rnz.co.nz/acast/afternoons.rss",
+        "https://www.rnz.co.nz/podcasts/acast/politics-nz.rss",
+        "https://www.rnz.co.nz/acast/nights.rss",
+        "https://www.rnz.co.nz/podcasts/acast/wild-sounds.rss",
+        "https://www.rnz.co.nz/acast/thepanel.rss",
+        "https://www.rnz.co.nz/acast/sunday.rss",
+        "https://www.rnz.co.nz/podcasts/acast/motive.rss",
+        "https://www.rnz.co.nz/podcasts/acast/kakapo-files.rss",
+        "https://www.rnz.co.nz/acast/saturday.rss",
+        "https://www.rnz.co.nz/acast/parliament.rss",
+        "https://www.rnz.co.nz/podcasts/acast/kim-hill-wants-to-know.rss",
+        "https://www.rnz.co.nz/podcasts/acast/the-sound-of-my-father.rss",
+        "https://www.rnz.co.nz/acast/news-bulletin-podcast.rss",
+        "https://www.rnz.co.nz/podcasts/acast/zombie-towns-everything-i-missed.rss",
+        "https://www.rnz.co.nz/podcasts/acast/thrift.rss",
+        "https://www.rnz.co.nz/podcasts/acast/erotica-by-the-fire.rss",
+        "https://www.rnz.co.nz/podcasts/acast/your-money.rss",
+        "https://www.rnz.co.nz/podcasts/acast/suzy-and-friends.rss",
+        "https://www.rnz.co.nz/acast/ruralnews.rss",
+        "https://www.rnz.co.nz/acast/businessnews.rss",
+        "https://www.rnz.co.nz/podcasts/acast/context.rss",
+        "https://www.rnz.co.nz/podcasts/acast/all-in-her-head.rss",
+        "https://www.rnz.co.nz/podcasts/acast/crumps-classical-conversation.rss",
+        "https://www.rnz.co.nz/podcasts/acast/no-stupid-questions.rss",
+        "https://www.rnz.co.nz/podcasts/acast/nz-wars-collection.rss"
+      ]
+    },
+    {
+      "slug": "ard",
+      "name": "ARD",
+      "site": "https://www.ardaudiothek.de",
+      "description": "German public broadcasting consortium: WDR, NDR, BR, SWR, MDR, HR, RBB, Radio Bremen, tagesschau.",
+      "match": {
+        "hosts": [
+          "wdr.de",
+          "ndr.de",
+          "br.de",
+          "swr.de",
+          "swr3.de",
+          "mdr.de",
+          "hr.de",
+          "rbb-online.de",
+          "rbb888.de",
+          "inforadio.de",
+          "radiobremen.de",
+          "bremenzwei.de",
+          "bremeneins.de",
+          "butenunbinnen.de",
+          "tagesschau.de",
+          "ard.de"
+        ],
+        "urlPrefixes": [],
+        "owners": []
+      },
+      "feeds": [
+        "https://feeds.br.de/br24-thema-des-tages/feed.xml",
+        "https://feeds.br.de/klassik-aktuell/feed.xml",
+        "https://feeds.br.de/das-kalenderblatt/feed.xml",
+        "https://feeds.br.de/blaue-couch/feed.xml",
+        "https://feeds.br.de/radiowissen/feed.xml",
+        "https://www.swr.de/~podcast/swrkultur/programm/podcast-swr-das-wissen-102.xml",
+        "https://www1.wdr.de/mediathek/audio/daily-quarks/daily-quarks-podcast-104.podcast",
+        "https://feeds.br.de/iq-wissenschaft-und-forschung/feed.xml",
+        "https://feeds.br.de/betthupferl/feed.xml",
+        "https://www.swr.de/~podcast/swrkultur/programm/podcast-lesenswert-100.xml",
+        "https://www.swr.de/~podcast/wissen/1000-antworten/1000-antworten-podcast-102.xml",
+        "https://www.swr3.de/~podcast/podcasts/promi-talk-mit-thees-102.xml",
+        "https://feeds.br.de/zoom-musikgeschichte-und-was-sonst-geschah/feed.xml",
+        "https://www1.wdr.de/mediathek/audio/zeitzeichen/zeitzeichen-podcast-100.podcast",
+        "https://feeds.br.de/nachtstudio/feed.xml",
+        "https://www.ndr.de/podcast/podcast2998.xml",
+        "https://feeds.br.de/alles-geschichte-history-von-radiowissen/feed.xml",
+        "https://feeds.br.de/das-starke-stueck-musiker-erklaeren-meisterwerke/feed.xml",
+        "https://www.tagesschau.de/multimedia/podcast/15-minuten/index~podcast.xml",
+        "https://www.tagesschau.de/multimedia/podcasts/11km/index~podcast.xml",
+        "https://www.mdr.de/tweens/podcast/figarino/fahrradladen-mdr-100.xml",
+        "https://www.ndr.de/ndr2/programm/podcast4250.xml",
+        "https://www.mdr.de/nachrichten/podcast/general/russland-angriff-krieg-ukraine-mdr-100.xml",
+        "https://www1.wdr.de/mediathek/audio/wdr/0630bywdraktuell/0630bywdraktuell-100.podcast",
+        "https://feeds.br.de/im-namen-der-hose-der-sexpodcast-von-puls/feed.xml",
+        "https://www1.wdr.de/mediathek/audio/wdr3/meisterstuecke/meisterstuecke-podcast-100.podcast",
+        "https://feeds.br.de/eins-zu-eins-der-talk/feed.xml",
+        "https://www.swr3.de/~podcast/musik/die-groessten-hits-und-ihre-geschichte/index.xml",
+        "https://www.ndr.de/ndr2/fruehstueck_bei_stefanie/podcast2956.xml",
+        "https://www.mdr.de/mdr-klassik-radio/podcast/bach-kantate/podcast-die-bach-kantate-102.xml",
+        "https://feeds.br.de/bergfreundinnen/feed.xml",
+        "https://www.ndr.de/nachrichten/info/podcast4700.xml",
+        "https://www1.wdr.de/mediathek/video/podcast/channel-sendung-mit-der-maus-100.podcast",
+        "https://feeds.br.de/do-re-mikro-die-musiksendung-fuer-kinder/feed.xml",
+        "https://feeds.br.de/eltern-ohne-filter/feed.xml",
+        "https://feeds.br.de/lachlabor/feed.xml",
+        "https://www.swr3.de/~podcast/podcasts/1-plus-1/podcast-1-plus-1-100.xml",
+        "https://feeds.br.de/true-crime/feed.xml",
+        "https://feeds.ard.de/api/v4/audiorss/quarks/feed/urn:ard:show:09f1d0268d45a7d2",
+        "https://www1.wdr.de/mediathek/audio/wdr5/wdr5-leonardo/wissenschaft-und-mehr-100.podcast"
+      ]
+    },
+    {
+      "slug": "ted",
+      "name": "TED Audio Collective",
+      "site": "https://www.ted.com/podcasts",
+      "description": "TED's podcasts (TED Talks Daily, WorkLife, ReThinking, Fixable).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [
+          "https://feeds.acast.com/public/shows/64f74dde9a04ce0011863833",
+          "https://feeds.acast.com/public/shows/6737ba65efa89af0b58e854e",
+          "https://feeds.acast.com/public/shows/6a85fe2bbaab9cd55fc0be36",
+          "https://feeds.feedburner.com/AmINormal_TED",
+          "https://feeds.feedburner.com/HowToBeABetterHuman",
+          "https://feeds.feedburner.com/TEDTalks_audio",
+          "https://feeds.feedburner.com/TED_TakenForGranted",
+          "https://feeds.feedburner.com/WorklifeWithAdamGrant",
+          "https://feeds.feedburner.com/iTunesPodcastTTBusiness",
+          "https://feeds.feedburner.com/iTunesPodcastTTHealth",
+          "https://feeds.feedburner.com/ted_fixable",
+          "https://feeds.feedburner.com/tedinchinese"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://feeds.feedburner.com/TEDTalks_audio",
+        "https://feeds.feedburner.com/iTunesPodcastTTBusiness",
+        "https://feeds.feedburner.com/iTunesPodcastTTHealth",
+        "https://feeds.feedburner.com/WorklifeWithAdamGrant",
+        "https://feeds.feedburner.com/HowToBeABetterHuman",
+        "https://feeds.feedburner.com/TED_TakenForGranted",
+        "https://feeds.feedburner.com/ted_fixable",
+        "https://feeds.feedburner.com/tedinchinese",
+        "https://feeds.acast.com/public/shows/6737ba65efa89af0b58e854e",
+        "https://feeds.feedburner.com/AmINormal_TED",
+        "https://feeds.acast.com/public/shows/6a85fe2bbaab9cd55fc0be36",
+        "https://feeds.acast.com/public/shows/64f74dde9a04ce0011863833"
+      ]
+    },
+    {
+      "slug": "crooked-media",
+      "name": "Crooked Media",
+      "site": "https://crooked.com/podcasts/",
+      "description": "Progressive politics and culture network (Pod Save America, Lovett or Leave It, Strict Scrutiny).",
+      "match": {
+        "hosts": [],
+        "urlPrefixes": [
+          "https://audioboom.com/channels/5174627.rss",
+          "https://feeds.megaphone.fm/mother-country-radicals",
+          "https://feeds.megaphone.fm/wind-of-change-wide",
+          "https://feeds.simplecast.com/1yRH6k2Y",
+          "https://feeds.simplecast.com/5TybV5Uc",
+          "https://feeds.simplecast.com/6ep8m_Sv",
+          "https://feeds.simplecast.com/7lcuMRbK",
+          "https://feeds.simplecast.com/AeLYwXNc",
+          "https://feeds.simplecast.com/CbCOMZ03",
+          "https://feeds.simplecast.com/EyrYWMW2",
+          "https://feeds.simplecast.com/FcDgGm6U",
+          "https://feeds.simplecast.com/HfcT5ZOx",
+          "https://feeds.simplecast.com/IGgVpPK7",
+          "https://feeds.simplecast.com/JPrhAgky",
+          "https://feeds.simplecast.com/LnIztGF0",
+          "https://feeds.simplecast.com/M7qXQ5Pd",
+          "https://feeds.simplecast.com/Mq2oqDQY",
+          "https://feeds.simplecast.com/Nk8SQk80",
+          "https://feeds.simplecast.com/XTkxyXke",
+          "https://feeds.simplecast.com/Z1vWFICO",
+          "https://feeds.simplecast.com/bmGLFguw",
+          "https://feeds.simplecast.com/bsWzhM0J",
+          "https://feeds.simplecast.com/dxZsm5kX",
+          "https://feeds.simplecast.com/fQ3mywpV",
+          "https://feeds.simplecast.com/f_MGLISm",
+          "https://feeds.simplecast.com/n_gL1Piz",
+          "https://feeds.simplecast.com/pdSmCK46"
+        ],
+        "owners": [
+          "crooked media",
+          "audible | crooked media"
+        ]
+      },
+      "seeds": [
+        {
+          "kind": "html",
+          "url": "https://crooked.com/podcasts/",
+          "follow": "href=\"(https://crooked\\.com/podcast-series/[a-z0-9-]+/)\"",
+          "pattern": "https://(?:feeds\\.[a-z0-9.]+|audioboom\\.com/channels)/[A-Za-z0-9_./-]+"
+        }
+      ],
+      "feeds": [
+        "https://audioboom.com/channels/5174627.rss",
+        "https://feeds.megaphone.fm/mother-country-radicals",
+        "https://feeds.megaphone.fm/wind-of-change-wide",
+        "https://feeds.simplecast.com/1yRH6k2Y",
+        "https://feeds.simplecast.com/5TybV5Uc",
+        "https://feeds.simplecast.com/6ep8m_Sv",
+        "https://feeds.simplecast.com/7lcuMRbK",
+        "https://feeds.simplecast.com/AeLYwXNc",
+        "https://feeds.simplecast.com/bmGLFguw",
+        "https://feeds.simplecast.com/bsWzhM0J",
+        "https://feeds.simplecast.com/CbCOMZ03",
+        "https://feeds.simplecast.com/dxZsm5kX",
+        "https://feeds.simplecast.com/EyrYWMW2",
+        "https://feeds.simplecast.com/FcDgGm6U",
+        "https://feeds.simplecast.com/f_MGLISm",
+        "https://feeds.simplecast.com/fQ3mywpV",
+        "https://feeds.simplecast.com/HfcT5ZOx",
+        "https://feeds.simplecast.com/IGgVpPK7",
+        "https://feeds.simplecast.com/JPrhAgky",
+        "https://feeds.simplecast.com/LnIztGF0",
+        "https://feeds.simplecast.com/M7qXQ5Pd",
+        "https://feeds.simplecast.com/Mq2oqDQY",
+        "https://feeds.simplecast.com/n_gL1Piz",
+        "https://feeds.simplecast.com/Nk8SQk80",
+        "https://feeds.simplecast.com/pdSmCK46",
+        "https://feeds.simplecast.com/XTkxyXke",
+        "https://feeds.simplecast.com/Z1vWFICO"
+      ]
+    },
+    {
+      "slug": "deutschlandradio",
+      "name": "Deutschlandradio",
+      "site": "https://www.deutschlandfunk.de/podcasts",
+      "description": "German national public radio: Deutschlandfunk, Deutschlandfunk Kultur, Deutschlandfunk Nova.",
+      "match": {
+        "hosts": [
+          "deutschlandfunk.de",
+          "deutschlandfunkkultur.de",
+          "deutschlandfunknova.de"
+        ],
+        "urlPrefixes": [],
+        "owners": []
+      },
+      "feeds": [
+        "https://www.deutschlandfunk.de/deutschlandfunk-der-rest-ist-geschichte-100.xml",
+        "https://www.deutschlandfunkkultur.de/podcast-breitband-medien-und-digitale-kultur-100.xml",
+        "https://www.deutschlandfunk.de/1001-nacht-100.xml",
+        "https://www.deutschlandfunk.de/podcast-104.xml",
+        "https://www.deutschlandfunk.de/podcast-kirchensendungen-100.xml",
+        "https://www.deutschlandfunk.de/buecher-fuer-junge-leser-podcast-100.xml",
+        "https://www.deutschlandfunk.de/podcast-nachrichtenleicht-der-wochenrueckblick-in-einfacher-sprache-100.xml",
+        "http://www.deutschlandfunknova.de/podcast/update",
+        "http://www.deutschlandfunknova.de/podcast/eine-stunde-history",
+        "http://www.deutschlandfunknova.de/podcast/wissensnachrichten",
+        "http://www.deutschlandfunknova.de/podcast/eine-stunde-liebe",
+        "http://www.deutschlandfunknova.de/podcast/hoersaal-der-podcast",
+        "https://www.deutschlandfunknova.de/podcast/achtsam-mit-main-huong-und-diane",
+        "https://www.deutschlandfunknova.de/podcast/update-erde",
+        "https://www.deutschlandfunk.de/hintergrund-102.xml",
+        "https://www.deutschlandfunk.de/sport-aktuell-podcast-100.xml",
+        "https://www.deutschlandfunk.de/sternzeit-102.xml",
+        "https://www.deutschlandfunk.de/forschung-aktuell-102.xml",
+        "https://www.deutschlandfunk.de/forschung-aktuell-104.xml",
+        "https://www.deutschlandfunk.de/interviews-108.xml",
+        "https://www.deutschlandfunk.de/essay-und-diskurs-102.xml",
+        "https://www.deutschlandfunk.de/doku-serie-100.xml",
+        "https://www.deutschlandfunk.de/ki-verstehen-102.xml",
+        "https://www.deutschlandfunkkultur.de/zeitfragen-feature-130.xml",
+        "https://www.deutschlandfunkkultur.de/der-theaterpodcast-108.xml",
+        "https://www.deutschlandfunk.de/dlf-kalenderblatt-100.xml",
+        "https://www.deutschlandfunk.de/professor-van-dusen-104.xml",
+        "https://www.deutschlandfunkkultur.de/podcast-interview-100.xml",
+        "https://www.deutschlandfunk.de/wissenschaft-im-brennpunkt-102.xml",
+        "https://www.deutschlandfunk.de/mediasres-110.xml",
+        "https://www.deutschlandfunk.de/informationen-am-morgen-102.xml",
+        "https://www.deutschlandfunkkultur.de/studio-9-der-tag-mit-102.xml",
+        "https://www.deutschlandfunk.de/amerika-verstehen-mit-volker-depkat-100.xml",
+        "https://www.deutschlandfunkkultur.de/das-literarische-quartett-102.xml",
+        "https://www.deutschlandfunkkultur.de/lange-nacht-106.xml",
+        "https://www.deutschlandfunk.de/podcast-106.xml",
+        "https://www.deutschlandfunkkultur.de/die-reportage-104.xml",
+        "https://www.deutschlandfunk.de/crashkurs-100.xml",
+        "https://www.deutschlandfunk.de/tatort-kunst-102.xml",
+        "https://www.deutschlandfunkkultur.de/podcast-kompressor-magazin-fuer-popkultur-100.xml"
+      ]
+    },
+    {
+      "slug": "sveriges-radio",
+      "name": "Sveriges Radio",
+      "site": "https://sverigesradio.se",
+      "description": "Swedish public radio's podcasts.",
+      "match": {
+        "hosts": [
+          "sr.se"
+        ],
+        "urlPrefixes": [
+          "https://api.sr.se/"
+        ],
+        "owners": []
+      },
+      "feeds": [
+        "https://public-api.sr.se/rss/p1-dokumentar",
+        "https://public-api.sr.se/rss/spanarna",
+        "https://public-api.sr.se/rss/gasten-morgonpasset-i-p3",
+        "https://public-api.sr.se/rss/p3-nyheter-pa-en-minut",
+        "https://public-api.sr.se/rss/obs-radioessan",
+        "https://public-api.sr.se/rss/meanraatio",
+        "https://public-api.sr.se/rss/radio-sweden",
+        "https://public-api.sr.se/rss/radiokorrespondenterna-ryssland",
+        "https://public-api.sr.se/rss/vetenskapsradion",
+        "https://public-api.sr.se/rss/gasten-p4-extra",
+        "https://public-api.sr.se/rss/planboken",
+        "https://public-api.sr.se/rss/morgonpasset-i-p3",
+        "https://public-api.sr.se/rss/studio-ett",
+        "https://public-api.sr.se/rss/vetenskap",
+        "https://public-api.sr.se/rss/ring-p1",
+        "https://public-api.sr.se/rss/verkligheten",
+        "https://public-api.sr.se/rss/klartext",
+        "https://public-api.sr.se/rss/p3-nyheter-med",
+        "https://public-api.sr.se/rss/eftermiddag-i-p3",
+        "https://public-api.sr.se/rss/karlavagnen",
+        "https://public-api.sr.se/rss/ekot-nyhetssandning",
+        "https://public-api.sr.se/rss/tankar-for-dagen",
+        "https://public-api.sr.se/rss/godmorgon-varlden",
+        "https://public-api.sr.se/rss/radio-sweden-pa-latt-svenska",
+        "https://public-api.sr.se/rss/p1-kultur",
+        "https://public-api.sr.se/rss/kultur",
+        "https://public-api.sr.se/rss/ekonomiekot-extra",
+        "https://public-api.sr.se/rss/medierna",
+        "https://public-api.sr.se/rss/p1-kultur-reportage",
+        "https://public-api.sr.se/rss/vetenskapsradion-nyheter",
+        "https://public-api.sr.se/rss/radiofynd",
+        "https://public-api.sr.se/rss/meny",
+        "https://public-api.sr.se/rss/spraket",
+        "https://public-api.sr.se/rss/dagens-eko",
+        "https://public-api.sr.se/rss/kropp-sjal",
+        "https://public-api.sr.se/rss/ekot-senaste-nytt",
+        "https://public-api.sr.se/rss/det-politiska-spelet",
+        "https://public-api.sr.se/rss/usapodden",
+        "https://public-api.sr.se/rss/pa-minuten",
+        "https://public-api.sr.se/rss/europapodden"
+      ]
+    }
+  ]
+}

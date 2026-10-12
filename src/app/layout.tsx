@@ -11,19 +11,19 @@ import ServiceWorker from "@/components/ServiceWorker";
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
   title: {
-    default: "p0dcasters — the independent podcast directory",
+    default: "p0dcasters — the open podcast directory",
     template: "%s · p0dcasters",
   },
-  // 149 characters. The previous wording ran to 176 and lost its last clause to
+  // 146 characters. Kept short: a wording of 176 once lost its last clause to
   // truncation in exactly the snippet it was written for.
   description:
-    "A free directory of podcasts that live on their own domains — no Spotify, no Anchor, no Buzzsprout. Every show is self-hosted. Listen in the browser.",
+    "A free directory of every live podcast with an RSS feed — on any host, plus networks like TWiT, NPR and the BBC. Listen in the browser.",
   openGraph: {
     type: "website",
     siteName: "p0dcasters",
-    title: "p0dcasters — the independent podcast directory",
+    title: "p0dcasters — the open podcast directory",
     description:
-      "Podcasts that live on their own domains. Every show here is self-hosted, off the big platforms.",
+      "Every podcast with a feed — on any host. Self-hosted shows, every hosting platform, and the big network libraries.",
   },
   twitter: { card: "summary_large_image" },
   // /favicon.ico and /icons/* are real files under public/; the manifest is
@@ -86,7 +86,7 @@ const siteJsonLd = {
       url: "https://p0dcasters.com/",
       logo: "https://p0dcasters.com/icons/icon-512x512.png",
       description:
-        "An independent podcast directory: every show listed publishes from a domain its creator controls.",
+        "An open podcast directory: every live podcast with an RSS feed, on any host, read from the feed itself.",
       email: "hello@p0dcasters.com",
       // Only profiles that actually belong to this directory. A sameAs list
       // padded with a Wikipedia or Crunchbase URL that resolves to nothing is
@@ -109,7 +109,7 @@ const siteJsonLd = {
       "@type": "WebSite",
       "@id": "https://p0dcasters.com/#website",
       name: "p0dcasters",
-      alternateName: "the independent podcast directory",
+      alternateName: "the open podcast directory",
       url: "https://p0dcasters.com/",
       inLanguage: "en",
       publisher: { "@id": "https://p0dcasters.com/#organization" },
@@ -143,7 +143,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PlayerProvider>
             {/* First focusable thing on every page, so a keyboard or screen
                 reader user can jump the header and the nav instead of tabbing
-                through them on all 22k pages. Visible only while focused. */}
+                through them on every page. Visible only while focused. */}
             <a className="skip-link" href="#main">
               Skip to main content
             </a>
@@ -165,6 +165,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <nav>
                   <Link href="/browse">Browse</Link>
                   <Link href="/search">Search</Link>
+                  <Link href="/networks">Networks</Link>
+                  <Link href="/self-hosted">Self-hosted</Link>
                   <Link href="/hosts">Hosts</Link>
                   <Link href="/submit">Add a show</Link>
                   <Link href="/about">About</Link>
@@ -176,10 +178,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <footer className="site">
               <div className="wrap">
                 <p>
-                  <strong>p0dcasters</strong> — independent podcasts only. Feed metadata
-                  from the <a href="https://podcastindex.org">Podcast Index</a> and from
-                  publishers who <Link href="/submit">add their own show</Link>, filtered to
-                  shows that publish from their own domain or from Anchor.
+                  <strong>p0dcasters</strong> — every podcast with a feed, on any host. Feed
+                  metadata from the <a href="https://podcastindex.org">Podcast Index</a>, the
+                  networks&rsquo; own feed lists, and publishers who{" "}
+                  <Link href="/submit">add their own show</Link>, filtered to shows still
+                  publishing.
                 </p>
                 <p>
                   <Link href="/opml">Full directory as OPML</Link> ·{" "}

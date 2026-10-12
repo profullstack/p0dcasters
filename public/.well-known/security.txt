@@ -5,6 +5,6 @@ Canonical: https://p0dcasters.com/.well-known/security.txt
 Policy: https://p0dcasters.com/contact
 
 # p0dcasters hosts no audio and no publisher content: every show links out to
-# the creator's own domain. Reports about a listed show's own site belong with
-# that publisher, not here. Reports about this site — the directory, the
+# the publisher's feed, wherever it is hosted. Reports about a listed show's
+# own site or host belong with that publisher or host, not here. Reports about this site — the directory, the
 # accounts, the sign-in flow — are welcome at the address above.

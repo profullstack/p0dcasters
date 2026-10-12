@@ -13,7 +13,7 @@ const { all, languageBuckets } = cachedDb(300);
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Browse",
-  description: "Browse independent, self-hosted podcasts by subject and language.",
+  description: "Browse every live podcast with an RSS feed, on any host, by subject and language.",
   alternates: { canonical: "/browse" },
 };
 

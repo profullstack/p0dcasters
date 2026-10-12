@@ -2,7 +2,7 @@
   "openmcp": "0.1",
   "mcp": "https://p0dcasters.com/api/mcp",
   "name": "p0dcasters",
-  "description": "A directory of podcasts that publish from their own domain: search, read a show, list its episodes, add one, and read or edit the podcaster's OpenProfile.md.",
+  "description": "A directory of every live podcast with an RSS feed, on any host: search, read a show, list its episodes, add one, and read or edit the podcaster's OpenProfile.md.",
   "url": "https://p0dcasters.com",
   "auth": {
     "kind": "none"
@@ -11,7 +11,8 @@
     "podcasts",
     "rss",
     "directory",
-    "self-hosted"
+    "self-hosted",
+    "podcast-networks"
   ],
   "operator": "https://logicsrc.com/.well-known/openprofile.md",
   "tools": [

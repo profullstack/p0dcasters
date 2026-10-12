@@ -52,7 +52,7 @@ export async function GET() {
       title: "p0dcasters",
       version: "1.0.0",
       description:
-        "A directory of podcasts that publish from their creator's own domain. Free, no key. Also an MCP server at /api/mcp and a CLI at /cli.",
+        "A directory of every live podcast with an RSS feed, on any host, including the big network libraries. Free, no key. Also an MCP server at /api/mcp and a CLI at /cli.",
       contact: { email: "hello@p0dcasters.com" },
     },
     servers: [{ url: SITE }],

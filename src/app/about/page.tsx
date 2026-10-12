@@ -12,7 +12,7 @@ const { all, count } = cachedDb(86400);
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "About",
-  description: "How p0dcasters decides what counts as an independent podcast.",
+  description: "How p0dcasters decides which podcasts are listed, how hosts and networks are labelled, and how shows are ordered.",
   alternates: { canonical: "/about" },
 };
 
@@ -35,7 +35,16 @@ export default async function About() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Starting from the Podcast Index public database, a feed is listed when it returned HTTP 200 on the last fetch and published within the last 90 days; is not on a hosting platform or broadcaster, defined as any domain carrying 25 or more live feeds, which removes 308 domains including every major host; has at least three episodes plus a title, description and artwork; and is not a bulk-dump content farm, meaning feeds averaging ten or more episodes a day over their lifetime are excluded.",
+            "Any host is fine: a show on its own domain, on Anchor, Buzzsprout, Libsyn or any other hosting platform, or in a network library such as TWiT, NPR or the BBC. Starting from the Podcast Index public database and the networks' own feed lists, a feed is listed when it returned HTTP 200 on the last fetch and published within the last 90 days; has at least three episodes plus a title, description and artwork; and is not a bulk-dump content farm, meaning feeds averaging ten or more episodes a day over their lifetime are left out. Near-identical copies of the same feed are collapsed into one.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How does p0dcasters tell a hosting platform from a show's own domain?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text:
+            "By measurement: a domain carrying 25 or more live feeds in the Podcast Index is a hosting platform, and its shows are labelled as hosted there. The label decides nothing about whether a show is listed. Shows on a domain below that line are the self-hosted ones, listed together at https://p0dcasters.com/self-hosted.",
         },
       },
       {
@@ -44,7 +53,7 @@ export default async function About() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "It does not work: 93% of live feeds already sit on a domain in the global top million, because they are all on the same twenty platforms. That measures Spotify's traffic, never the show. Worse, the domains absent from those rankings are precisely the independent ones, so ranking that way buries exactly what is worth finding. Popularity is used here inverted, as one signal for identifying platforms to exclude.",
+            "Domain popularity does not measure a show: 93% of live feeds sit on a domain in the global top million because they are on the same twenty platforms, so the ranking measures the platform's traffic. It would also bury every show on its own small domain. Shows are ordered by their own catalogue instead.",
         },
       },
       {
@@ -62,7 +71,7 @@ export default async function About() {
         acceptedAnswer: {
           "@type": "Answer",
           text:
-            "Metadata comes from the Podcast Index. The full directory is available as OPML at https://p0dcasters.com/opml, which any podcast app can import. Nothing is hosted by p0dcasters: every link points at the publisher.",
+            "Metadata comes from the Podcast Index, from the networks' own published feed lists, and from publishers who add their show. The full directory is available as OPML at https://p0dcasters.com/opml, which any podcast app can import. Nothing is hosted by p0dcasters: every link points at the publisher.",
         },
       },
       {
@@ -97,35 +106,46 @@ export default async function About() {
           About p0dcasters
         </h1>
         <p>
-          Podcasting was designed as an open format: an RSS feed at a URL you control. Most
-          of it no longer works that way. Of the 4.7 million feeds in the Podcast Index,
-          roughly 40% sit on a single host — Spotify's Anchor — and the ten largest hosts
-          account for about three quarters of everything.
+          Podcasting is an open format: an RSS feed at a URL. That holds wherever the feed
+          lives — on the creator&rsquo;s own domain, on a hosting platform, or in a
+          broadcaster&rsquo;s library. Of the 4.7 million feeds in the Podcast Index, most
+          are dead; this directory is the part that is still publishing.
         </p>
         <p>
-          This directory is the remainder: <strong>{total.toLocaleString()} shows</strong> on{" "}
-          <strong>{hosts.toLocaleString()} distinct domains</strong>, together{" "}
-          {Number(eps).toLocaleString()} episodes. Every one publishes from a domain its
-          creator controls, or from Anchor, the free host most independent shows start on.
+          That is <strong>{total.toLocaleString()} shows</strong> on{" "}
+          <strong>{hosts.toLocaleString()} distinct hosts</strong>, together{" "}
+          {Number(eps).toLocaleString()} episodes: shows on their own domain, shows on
+          Anchor, Buzzsprout, Libsyn and every other host, and the big libraries with RSS
+          — TWiT, NPR, the BBC, CBC, ABC Australia and the rest of the{" "}
+          <Link href="/networks">networks</Link>.
         </p>
 
         <h2 id="what-gets-in">What gets in?</h2>
-        <p>Starting from the Podcast Index public database, a feed is listed when it:</p>
+        <p>
+          Any host is fine. Starting from the Podcast Index public database and the
+          networks&rsquo; own feed lists, a feed is listed when it:
+        </p>
         <ul>
           <li>returned HTTP 200 on the last fetch, and published within the last 90 days;</li>
-          <li>
-            is <em>not</em> on a hosting platform or broadcaster — defined as any domain
-            carrying 25 or more live feeds, which removes about 300 domains including every
-            paid host. One exception: Anchor, Spotify&rsquo;s free host, is let through,
-            because it is where most one-person shows start and excluding it threw out
-            exactly the long tail this directory exists for;
-          </li>
           <li>has at least three episodes, plus a title, description and artwork;</li>
           <li>
             isn't a bulk-dump content farm — feeds averaging ten or more episodes a day over
-            their lifetime are excluded.
+            their lifetime are left out.
           </li>
         </ul>
+        <p>Near-identical copies of the same feed on one host are collapsed into one.</p>
+
+        <h2 id="hosts">Platforms, networks and self-hosted shows</h2>
+        <p>
+          Where a show is hosted is a label, not a rule. A domain carrying 25 or more live
+          feeds in the Podcast Index is counted as a hosting platform, and its shows say so
+          (&ldquo;Hosted on Buzzsprout&rdquo;). The threshold is measured on every rebuild,
+          not declared. A show on a domain below it publishes from its own site; those are
+          all listed together under <Link href="/self-hosted">self-hosted</Link>, which is
+          what this directory started as. The <Link href="/networks">networks</Link> page
+          groups the broadcasters and podcast networks that publish their whole library as
+          RSS. <Link href="/hosts">Hosts</Link> lists the domains carrying the most shows.
+        </p>
 
         {/* One rectangle, at a section break well into the piece — someone
             still reading here has settled in. */}
@@ -134,11 +154,10 @@ export default async function About() {
         <h2 id="why-not-popularity">Why not just rank by popularity?</h2>
         <p>
           The obvious move is to rank feeds by how popular their domain is. It doesn't work:
-          93% of live feeds already sit on a domain in the global top million, because
-          they're all on the same twenty platforms. That measures Spotify's traffic, never
-          the show. Worse, the domains <em>absent</em> from those rankings are precisely the
-          independent ones — so ranking that way buries exactly what's worth finding. It is
-          used here inverted, as one signal for identifying platforms to exclude.
+          93% of live feeds sit on a domain in the global top million, because they're on
+          the same twenty platforms. That measures the platform's traffic, never the show.
+          And the domains <em>absent</em> from those rankings are the shows on their own
+          small sites — so ranking that way would bury them under everything else.
         </p>
 
         <h2 id="ordering">How are shows ordered?</h2>
@@ -150,7 +169,9 @@ export default async function About() {
 
         <h2 id="data">Where does the data come from?</h2>
         <p>
-          Metadata comes from the <a href="https://podcastindex.org">Podcast Index</a>. The
+          Metadata comes from the <a href="https://podcastindex.org">Podcast Index</a>, from
+          the networks&rsquo; own published feed lists, and from publishers who{" "}
+          <Link href="/submit">add their show</Link>. The
           full directory is available as <a href="/opml">OPML</a>, which any podcast app can
           import. Nothing here is hosted by us: every link points at the publisher.
         </p>
