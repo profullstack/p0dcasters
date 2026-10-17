@@ -148,10 +148,19 @@ export function languageName(code: string | null): string {
  * <Art> already draws a lettered placeholder for. Returns "" for the genuinely
  * malformed entries in the index (a filename where the host should be).
  */
+// Artwork URLs confirmed 404 by the Link Watch crawl (2026-10-17). The rows are
+// imported feed data, so they are dropped here and <Art> draws its placeholder.
+const DEAD_IMAGES = new Set([
+  "https://tilos.hu/upload/episode-new/roadmovie.jpg",
+  "https://tilos.hu/upload/episode-new/szappanopera-helyett.jpg",
+  "https://upload.wikimedia.org/wikipedia/hu/f/f0/Tilos_R%C3%A1di%C3%B3_log%C3%B3.jpg",
+]);
+
 export function safeImage(url: string | null | undefined): string {
   if (!url) return "";
   const s = url.trim();
   if (!s) return "";
+  if (DEAD_IMAGES.has(s.replace(/^http:/i, "https:"))) return "";
   try {
     const u = new URL(s);
     if (u.protocol !== "http:" && u.protocol !== "https:") return "";
