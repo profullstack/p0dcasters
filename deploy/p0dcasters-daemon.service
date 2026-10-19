@@ -13,6 +13,9 @@ Type=simple
 WorkingDirectory=/home/anthony/www/p0dcasters.com/app
 ExecStart=/home/anthony/.local/share/mise/shims/bun scripts/daemon.mjs
 Environment=HOME=/home/anthony
+# The daemon's BullMQ queue: this site's own Redis (deploy/redis.sh).
+Environment=REDIS_URL=redis://127.0.0.1:6393
+Environment=REDIS_URL=redis://127.0.0.1:6393
 Environment=PATH=/home/anthony/.local/share/mise/shims:/home/anthony/.local/bin:/usr/local/bin:/usr/bin:/bin
 Restart=always
 RestartSec=30

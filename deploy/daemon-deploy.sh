@@ -17,6 +17,8 @@ export PATH=/home/anthony/.local/share/mise/shims:/home/anthony/.local/bin:/usr/
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 
 cd "$APP"
+# The daemon's Redis first: it connects to it on start.
+sh deploy/redis.sh
 bun install --frozen-lockfile
 install -D -m 644 deploy/$UNIT "$HOME/.config/systemd/user/$UNIT"
 systemctl --user daemon-reload

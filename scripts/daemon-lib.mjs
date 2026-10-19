@@ -80,6 +80,7 @@ export function buildDaemon(deps) {
   const {
     createDaemon,
     store,
+    redis = null,
     fetch: fetchImpl,
     sh,
     files,
@@ -340,6 +341,9 @@ export function buildDaemon(deps) {
 
   const daemon = createDaemon({
     name: "p0dcasters.com",
+    // BullMQ on this site's own Redis (deploy/redis.sh). Run records and status stay in Postgres
+    // (`store`), where the web container's /api/v1/daemon reads them.
+    redis,
     store,
     concurrency: 1,
     onRun,
