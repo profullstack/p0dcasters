@@ -7,8 +7,8 @@
 set -eu
 NAME=p0dcasters-redis
 PORT=6394
-if docker inspect "$NAME" >/dev/null 2>&1; then
-  [ "$(docker inspect -f '{{.State.Running}}' "$NAME")" = true ] || docker start "$NAME" >/dev/null
+if docker inspect --type container "$NAME" >/dev/null 2>&1; then
+  [ "$(docker inspect --type container -f '{{.State.Running}}' "$NAME")" = true ] || docker start "$NAME" >/dev/null
 else
   docker run -d --name "$NAME" --restart unless-stopped \
     --memory 256m --memory-swap 256m \
