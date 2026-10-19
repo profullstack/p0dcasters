@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import Script from "next/script";
+import { Footer } from "@profullstack/footer/react";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
@@ -177,19 +178,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main id="main">{children}</main>
             <footer className="site">
               <div className="wrap">
-                <p>
-                  <Link href="/about">About</Link> · <Link href="/contact">Contact</Link> ·{" "}
-                  <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> ·{" "}
-                  <Link href="/opml">OPML</Link> · <Link href="/openapi.json">API</Link> ·{" "}
-                  <Link href="/mcp">MCP</Link> · <Link href="/cli">CLI</Link> ·{" "}
-                  <a href="https://github.com/profullstack/p0dcasters">Code</a>
-                </p>
                 <p className="small">
-                  &copy; {new Date().getFullYear()} p0dcasters · Feed metadata from the{" "}
-                  <a href="https://podcastindex.org">Podcast Index</a>
+                  Feed metadata from the <a href="https://podcastindex.org">Podcast Index</a>, the
+                  networks&rsquo; own feed lists, and publishers who add their own show.
                 </p>
               </div>
             </footer>
+            {/* The links, copyright and webring row; the pit.world footer is last in <body>. */}
+            <Footer
+              site="https://p0dcasters.com/"
+              links={[
+                { label: "About", href: "/about" },
+                { label: "Contact", href: "/contact" },
+                { label: "Privacy", href: "/privacy" },
+                { label: "Terms", href: "/terms" },
+                { label: "OPML", href: "/opml" },
+                { label: "API", href: "/openapi.json" },
+                { label: "MCP", href: "/mcp" },
+                { label: "CLI", href: "/cli" },
+                { label: "Code", href: "https://github.com/profullstack/p0dcasters" },
+              ]}
+            />
           </PlayerProvider>
         </SessionProvider>
 
