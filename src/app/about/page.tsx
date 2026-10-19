@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cachedDb } from "@/lib/cached-db";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_MREC } from "@/lib/ads";
 import Link from "next/link";
 
@@ -196,7 +195,6 @@ export default async function About() {
           from your feed, so fixing the feed fixes it everywhere.
         </p>
       </section>
-      <AdBanner />
     </div>
   );
 }

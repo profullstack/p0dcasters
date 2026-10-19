@@ -4,7 +4,6 @@ import { all, count, one, languageVariants } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { languageName, normalizeLang, safeDecode } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
@@ -166,7 +165,6 @@ export default async function Language({
             )}
           </div>
         )}
-        <AdBanner />
       </section>
     </div>
   );

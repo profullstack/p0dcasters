@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cachedDb } from "@/lib/cached-db";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { adPlan, AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
@@ -56,7 +55,6 @@ export default async function Hosts() {
             return format ? [row, <Ad key={`ad-${i}`} format={format} />] : [row];
           })}
         </div>
-        <AdBanner />
       </section>
     </div>
   );

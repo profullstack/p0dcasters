@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cachedDb } from "@/lib/cached-db";
 import { NETWORKS, networkWhere } from "@/lib/networks";
-import AdBanner from "@/components/AdBanner";
+import Ad from "@/components/Ad";
+import { AD_TEXT } from "@/lib/ads";
 
 const { count } = cachedDb(3600);
 
@@ -33,6 +34,7 @@ export default async function Networks() {
           toward a network when its feed is on the network&rsquo;s own domain or declares the
           network as its owner. Only shows with an episode in the last 90 days are listed.
         </p>
+        <Ad format={AD_TEXT} />
         <div className="rows">
           {listed.map(({ n, shows }) => (
             <Link className="row" key={n.slug} href={`/networks/${n.slug}`}>
@@ -45,7 +47,6 @@ export default async function Networks() {
             </Link>
           ))}
         </div>
-        <AdBanner />
       </section>
     </div>
   );

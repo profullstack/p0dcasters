@@ -6,7 +6,6 @@ import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
@@ -135,10 +134,6 @@ export default async function Home() {
           ))}
         </div>
       </section>
-
-      <div className="wrap">
-        <AdBanner />
-      </div>
     </>
   );
 }

@@ -4,7 +4,6 @@ import { all, count, one } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { safeDecode, titleCase } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
@@ -149,7 +148,6 @@ export default async function Category({
             )}
           </div>
         )}
-        <AdBanner />
       </section>
     </div>
   );

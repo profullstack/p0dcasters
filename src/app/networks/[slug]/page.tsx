@@ -6,7 +6,6 @@ import type { Podcast } from "@/lib/db";
 import { networkBySlug, networkWhere } from "@/lib/networks";
 import Card from "@/components/Card";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 
@@ -105,7 +104,6 @@ export default async function NetworkPage({
             )}
           </div>
         )}
-        <AdBanner />
       </section>
     </div>
   );

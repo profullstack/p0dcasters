@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import AdBanner from "@/components/AdBanner";
+import Ad from "@/components/Ad";
+import { AD_TEXT } from "@/lib/ads";
 
 export const revalidate = 86400;
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default async function Cli() {
           episodes, take it as OPML, and <Link href="/submit">add a show</Link>. One Node
           script with no dependencies, installed by copying it onto your PATH.
         </p>
+        <Ad format={AD_TEXT} />
         <pre>
           <code>curl -fsSL https://p0dcasters.com/install.sh | sh</code>
         </pre>
@@ -75,7 +77,6 @@ export default async function Cli() {
           Everything it calls is in <a href="/openapi.json">openapi.json</a>.
         </p>
       </section>
-      <AdBanner />
     </div>
   );
 }

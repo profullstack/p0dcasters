@@ -3,7 +3,6 @@ import { all } from "@/lib/db";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_GRID_SPLIT, AD_TEXT } from "@/lib/ads";
 import { tokenise, ftsQuery, SEARCH_WHERE, SEARCH_ORDER } from "@/lib/search";
 import Link from "next/link";
@@ -84,6 +83,7 @@ export default async function Search({
             </ul>
           </div>
         )}
+        <Ad format={AD_TEXT} />
       </section>
 
       {query && (
@@ -121,7 +121,6 @@ export default async function Search({
           )}
         </section>
       )}
-      <AdBanner />
     </div>
   );
 }

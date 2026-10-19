@@ -8,7 +8,6 @@ import { safeImage } from "@/lib/format";
 import Card from "@/components/Card";
 import FollowingFeed from "@/components/FollowingFeed";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +40,6 @@ export default async function Following() {
             Browse the directory
           </Link>
         </p>
-        <AdBanner />
       </div>
     );
   }
@@ -75,8 +73,6 @@ export default async function Following() {
           ))}
         </div>
       </section>
-
-      <AdBanner />
     </div>
   );
 }
