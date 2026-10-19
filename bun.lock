@@ -12,8 +12,8 @@
         "@profullstack/player": "^0.2.0",
         "@profullstack/scraper-daemon": "0.2.1",
         "@profullstack/submit-feed": "^0.1.3",
-        "@profullstack/throttle": "^0.3.0",
-        "@profullstack/x402-gateway": "^0.8.0",
+        "@profullstack/throttle": "^0.3.2",
+        "@profullstack/x402-gateway": "^0.10.1",
         "@simplewebauthn/browser": "^13.3.0",
         "@simplewebauthn/server": "^13.3.3",
         "bullmq": "6.3.17",
@@ -200,9 +200,9 @@
 
     "@profullstack/submit-feed": ["@profullstack/submit-feed@0.1.3", "", { "dependencies": { "fast-xml-parser": "5.11.1" } }, "sha512-RMH294Q1qFJ6L01pU5q/yowshx1Xpu4gfGC2OuNaxyZ5jySqM9FvgqvVuWH+G18711SqzNq+DL8dvbAaBgBIvA=="],
 
-    "@profullstack/throttle": ["@profullstack/throttle@0.3.0", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0" } }, "sha512-qoR3MdB/kf6TmkTe5pZdW/y10wH5uC5EfxrrUmS5hL0V4BN17ZzyfHZm99Fge80ZsBVz4jDlLvAP5dkYksDOvQ=="],
+    "@profullstack/throttle": ["@profullstack/throttle@0.3.2", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0" } }, "sha512-53bE30J/vjuuahKiBveB3oKL+L03ufNGwmmSk9yfQwInfmC3xr9I7DvDkPti/wwAuk6V6bcfUqeazgNGLfe8rQ=="],
 
-    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.8.0", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-C5/47u32EufLKjy9ttuGOETBDXRaOgRv4e149pOwOsQMZmpqq6lbtlQmXeuwuD+rrtbc35Rgj3ynXYfnfNRGKg=="],
+    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.10.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-YF/P3GRbb/8dAHIhDT2R7yHSAK+olrT4/zAWLzf5aF9Na8o1/rJCdP+k6UnGepyQ9RQ2qL9p5diRVwb18Zt4VA=="],
 
     "@simplewebauthn/browser": ["@simplewebauthn/browser@13.3.0", "", {}, "sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ=="],
 
