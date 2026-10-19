@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import SubmitForm from "@/components/SubmitForm";
-import AdBanner from "@/components/AdBanner";
 
 export const revalidate = 86400;
 
@@ -29,7 +28,6 @@ export default async function Submit({
   return (
     <div className="wrap narrow">
       <SubmitForm initial={shared} error={str(p.error)} errorUrl={str(p.url) && str(p.error) ? str(p.url) : ""} />
-      <AdBanner />
     </div>
   );
 }

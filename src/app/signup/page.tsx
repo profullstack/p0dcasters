@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
-import AdBanner from "@/components/AdBanner";
 import { currentUser } from "@/lib/auth/session";
 import { safeNext } from "@/lib/auth/next";
 
@@ -26,8 +25,6 @@ export default async function Signup({
   return (
     <div className="wrap narrow">
       <AuthForm mode="signup" next={next} expired={false} />
-      {/* As on /login: under the form, and only the one unit. */}
-      <AdBanner />
     </div>
   );
 }

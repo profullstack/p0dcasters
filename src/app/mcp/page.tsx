@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TOOLS } from "@/lib/mcp/tools";
 import { SITE } from "@/lib/queries";
-import AdBanner from "@/components/AdBanner";
+import Ad from "@/components/Ad";
+import { AD_TEXT } from "@/lib/ads";
 
 export const revalidate = 86400;
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function Mcp() {
           <a href="/.well-known/openmcp.json">/.well-known/openmcp.json</a>; the same calls
           over plain HTTP are in <a href="/openapi.json">openapi.json</a>.
         </p>
+        <Ad format={AD_TEXT} />
         <pre>
           <code>{ENDPOINT}</code>
         </pre>
@@ -67,7 +69,6 @@ export default function Mcp() {
           headers. Nothing is remembered between requests.
         </p>
       </section>
-      <AdBanner />
     </div>
   );
 }

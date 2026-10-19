@@ -218,11 +218,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/*
           The ad loader, once for the site. It only ever acts on the
-          [data-cp-ad] positions the pages themselves place (<Ad> and
-          <AdBanner>) — there are deliberately none in here. The generated
-          install dropped all four sizes at the bottom of <body>, which is a
-          unit on the sign-in form and four stacked boxes under every footer;
-          they are placed per page instead.
+          [data-cp-ad] positions the pages themselves place (<Ad>) — there
+          are deliberately none in here. The generated install dropped all
+          four sizes at the bottom of <body>, which is a unit on the sign-in
+          form and four stacked boxes under every footer; they are placed per
+          page instead, inside the content and never as the last thing above
+          the footer.
 
           <AdRescan> is what makes those positions work at all on a site whose
           navigation is client side; see the component.

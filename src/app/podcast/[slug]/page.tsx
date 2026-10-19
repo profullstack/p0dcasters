@@ -7,7 +7,6 @@ import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_MREC } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
@@ -261,8 +260,6 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
           </div>
         </section>
       )}
-
-      <AdBanner />
     </div>
   );
 }

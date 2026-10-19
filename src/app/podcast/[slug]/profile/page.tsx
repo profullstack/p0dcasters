@@ -6,7 +6,8 @@ import { showBySlug } from "@/lib/queries";
 import { renderShowProfile } from "@/lib/openprofile/store";
 import { profileUrl } from "@/lib/openprofile/generate";
 import ProfileEditor from "@/components/ProfileEditor";
-import AdBanner from "@/components/AdBanner";
+import Ad from "@/components/Ad";
+import { AD_TEXT } from "@/lib/ads";
 import { clamp } from "@/lib/format";
 
 export const revalidate = 3600;
@@ -54,6 +55,7 @@ export default async function Profile({ params }: { params: Promise<{ slug: stri
           {kind ? `${kind[0].toUpperCase()}${kind.slice(1)}` : "Unstated kind"}
           {r.claimed ? " · claimed and verified" : " · generated from the feed, not yet claimed"}
         </p>
+        <Ad format={AD_TEXT} />
 
         {doc.identity.length > 0 && (
           <dl className="profile-identity">
@@ -130,7 +132,6 @@ export default async function Profile({ params }: { params: Promise<{ slug: stri
       </section>
 
       <ProfileEditor slug={p.slug} claimed={r.claimed} markdown={r.markdown} isPublic={r.public} />
-      <AdBanner />
     </div>
   );
 }

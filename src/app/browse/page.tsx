@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { cachedDb } from "@/lib/cached-db";
 import { titleCase, languageName } from "@/lib/format";
 import Ad from "@/components/Ad";
-import AdBanner from "@/components/AdBanner";
 import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
@@ -53,7 +52,6 @@ export default async function Browse() {
           ))}
         </div>
       </section>
-      <AdBanner />
     </div>
   );
 }

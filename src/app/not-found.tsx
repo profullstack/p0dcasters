@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AdBanner from "@/components/AdBanner";
 
 export default function NotFound() {
   return (
@@ -13,9 +12,6 @@ export default function NotFound() {
           </Link>
         </p>
       </section>
-      {/* Below the way out, so it is never the thing a reader who took a wrong
-          turn is offered first. */}
-      <AdBanner />
     </div>
   );
 }
