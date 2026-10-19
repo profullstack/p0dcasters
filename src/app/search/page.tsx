@@ -54,6 +54,9 @@ export default async function Search({
           />
           <button type="submit">Search</button>
         </form>
+        {/* A query's results carry their own units; the empty page gets one,
+            under the input rather than as the last thing above the footer. */}
+        {!query && <Ad format={AD_TEXT} />}
         {/* With no query this page was a heading and an input — 62 words, the
             thinnest page on the site. It is disallowed in robots.txt and so
             never indexed, but a person who lands on it with nothing typed
@@ -83,7 +86,6 @@ export default async function Search({
             </ul>
           </div>
         )}
-        <Ad format={AD_TEXT} />
       </section>
 
       {query && (
