@@ -228,7 +228,7 @@ if (process.argv.includes("--status")) {
   process.exit(0);
 }
 
-const daemon = buildDaemon({ createDaemon, store, fetch, sh, files, record, credential, lock, alert, repo: REPO });
+const daemon = buildDaemon({ createDaemon, store, redis: process.env.REDIS_URL || null, fetch, sh, files, record, credential, lock, alert, repo: REPO });
 
 async function writeStatus() {
   try {
