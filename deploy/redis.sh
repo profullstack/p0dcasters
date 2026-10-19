@@ -3,10 +3,10 @@
 # (@profullstack/scraper-daemon). One Redis per site, as the fleet does:
 # redis:8-alpine, loopback only, AOF on, noeviction (BullMQ requires it), its own
 # volume. Idempotent: creates the container once, leaves a running one alone.
-# The daemon unit sets REDIS_URL=redis://127.0.0.1:6393.
+# The daemon unit sets REDIS_URL=redis://127.0.0.1:6394.
 set -eu
 NAME=p0dcasters-redis
-PORT=6393
+PORT=6394
 if docker inspect "$NAME" >/dev/null 2>&1; then
   [ "$(docker inspect -f '{{.State.Running}}' "$NAME")" = true ] || docker start "$NAME" >/dev/null
 else
