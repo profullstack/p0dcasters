@@ -1,6 +1,6 @@
 {
   "name": "p0dcasters",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@logicsrc/openaccess": "0.3.0",
-    "@profullstack/footer": "latest",
     "@profullstack/libsql-pg": "^0.1.2",
     "@profullstack/openprofile": "^0.1.2",
     "@profullstack/player": "^0.2.0",
