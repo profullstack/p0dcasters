@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import { Footer } from "@profullstack/footer/react";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
 import { AccountNav, SessionProvider } from "@/components/Session";
 import AdRescan from "@/components/AdRescan";
 import ServiceWorker from "@/components/ServiceWorker";
+import PitFooter from "@/components/PitFooter";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://p0dcasters.com"),
@@ -178,35 +178,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <footer className="site">
               <div className="wrap">
                 <p>
-                  <strong>p0dcasters</strong> — every podcast with a feed, on any host. Feed
-                  metadata from the <a href="https://podcastindex.org">Podcast Index</a>, the
-                  networks&rsquo; own feed lists, and publishers who{" "}
-                  <Link href="/submit">add their own show</Link>, filtered to shows still
-                  publishing.
-                </p>
-                <p>
-                  <Link href="/opml">Full directory as OPML</Link> ·{" "}
-                  <Link href="/sitemap.xml">Sitemap</Link> ·{" "}
-                  <Link href="/about">How this is built</Link> ·{" "}
-                  <Link href="/crawlstats">Crawl status</Link> ·{" "}
-                  <Link href="/submit">Add a show</Link> ·{" "}
-                  <Link href="/signup">Create a free account</Link> to follow shows
+                  <Link href="/about">About</Link> · <Link href="/contact">Contact</Link> ·{" "}
+                  <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> ·{" "}
+                  <Link href="/opml">OPML</Link> · <Link href="/openapi.json">API</Link> ·{" "}
+                  <Link href="/mcp">MCP</Link> · <Link href="/cli">CLI</Link> ·{" "}
+                  <a href="https://github.com/profullstack/p0dcasters">Code</a>
                 </p>
                 <p className="small">
-                  Machine-readable: <Link href="/llms.txt">llms.txt</Link> ·{" "}
-                  <Link href="/skill.md">skill.md</Link> · <Link href="/mcp">MCP</Link> ·{" "}
-                  <Link href="/cli">CLI</Link> · <Link href="/openapi.json">OpenAPI</Link>
+                  &copy; {new Date().getFullYear()} p0dcasters · Feed metadata from the{" "}
+                  <a href="https://podcastindex.org">Podcast Index</a>
                 </p>
               </div>
             </footer>
-            <Footer
-              site="https://p0dcasters.com/"
-              links={[
-                { label: "Contact", href: "/contact" },
-                { label: "Privacy", href: "/privacy" },
-                { label: "Terms", href: "/terms" },
-              ]}
-            />
           </PlayerProvider>
         </SessionProvider>
 
@@ -231,6 +214,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script src="https://crawlproof.com/ad.js" strategy="afterInteractive" />
         <AdRescan />
         <ServiceWorker />
+        <PitFooter />
       </body>
     </html>
   );
