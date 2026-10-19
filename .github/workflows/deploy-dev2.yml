@@ -50,6 +50,17 @@ jobs:
           ssh -o BatchMode=yes "$DEV2_USER@$DEV2_HOST" \
             /home/anthony/www/p0dcasters.com/deploy-app.sh "$SHA"
 
+      # The directory refresh runs on the host as a systemd user unit from the
+      # same checkout deploy-app.sh just moved: install its dependencies, the
+      # unit file, and restart it on the new code.
+      - name: Restart the directory daemon
+        env:
+          DEV2_USER: ${{ secrets.DEV2_USER }}
+          DEV2_HOST: ${{ secrets.DEV2_HOST }}
+        run: |
+          ssh -o BatchMode=yes "$DEV2_USER@$DEV2_HOST" \
+            sh /home/anthony/www/p0dcasters.com/app/deploy/daemon-deploy.sh
+
       - name: Verify the site answers
         run: |
           for i in $(seq 1 10); do

@@ -1,0 +1,26 @@
+# systemd USER unit for the p0dcasters.com directory daemon (scripts/daemon.mjs).
+# Installed and restarted by deploy/daemon-deploy.sh, which the deploy workflow
+# runs after deploy-app.sh has checked the merged commit out in this directory.
+# Replaces the crontab's refresh-if-new-dump.sh and crawlstats-watchdog.sh.
+[Unit]
+Description=p0dcasters.com directory refresh daemon (@profullstack/scraper-daemon)
+Documentation=https://github.com/profullstack/p0dcasters
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/anthony/www/p0dcasters.com/app
+ExecStart=/home/anthony/.local/share/mise/shims/bun scripts/daemon.mjs
+Environment=HOME=/home/anthony
+Environment=PATH=/home/anthony/.local/share/mise/shims:/home/anthony/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=always
+RestartSec=30
+# SIGTERM to the daemon first: it aborts the running step (which kills its child)
+# and records the run; whatever is left after the timeout is killed.
+KillMode=mixed
+TimeoutStopSec=60
+Nice=10
+
+[Install]
+WantedBy=default.target

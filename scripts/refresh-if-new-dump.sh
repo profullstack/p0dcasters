@@ -1,6 +1,12 @@
 #!/bin/sh
 # Rebuild the directory, but only when Podcast Index actually publishes a new dump.
 #
+# Since 2026-10-19 production runs this pipeline from scripts/daemon.mjs (the
+# p0dcasters-daemon systemd user unit, @profullstack/scraper-daemon), which
+# calls the same scripts and keeps the same stamp files, lock and refresh_runs
+# rows; the crontab lines are commented out. This script stays for manual runs
+# (FORCE=1, DRY_RUN=1) and shares the daemon's lock.
+#
 # Run from cron. A check costs one HEAD request; the full pipeline only runs when
 # the dump has moved. This matters because rebuilding against an unchanged dump
 # can only ever SHRINK the directory -- inclusion is "published within 90 days",
