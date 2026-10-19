@@ -219,14 +219,8 @@ if (!c) {
   process.exit(1);
 }
 const sql = new SQL(c.url, { max: 2 });
-// pgStore with Bun's SQL: Bun JSON-encodes a string bound to a jsonb parameter
-// (so `$2::jsonb`, already JSON text, would store a JSON string of the JSON), and
-// it hands jsonb back parsed (so pgStore's JSON.parse of a string value breaks on
-// a stored string like the done-token). Bind as text and read as text: pgStore
-// then sees exactly the JSON text it wrote, and the column holds real objects.
-const store = pgStore((text, params) =>
-  sql.unsafe(text.replace(/::jsonb/g, "::text::jsonb").replace(/SELECT value FROM/g, "SELECT value::text AS value FROM"), params),
-);
+// scraper-daemon 0.1.1+ passes state as text both ways, so Bun's SQL needs no help here.
+const store = pgStore((text, params) => sql.unsafe(text, params));
 
 if (process.argv.includes("--status")) {
   console.log(JSON.stringify(await store.get("status"), null, 2));

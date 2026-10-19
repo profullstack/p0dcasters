@@ -10,7 +10,7 @@
         "@profullstack/libsql-pg": "^0.1.2",
         "@profullstack/openprofile": "^0.1.2",
         "@profullstack/player": "^0.2.0",
-        "@profullstack/scraper-daemon": "0.1.0",
+        "@profullstack/scraper-daemon": "0.1.1",
         "@profullstack/submit-feed": "^0.1.3",
         "@profullstack/throttle": "^0.2.2",
         "@profullstack/x402-gateway": "^0.7.0",
@@ -180,7 +180,7 @@
 
     "@profullstack/player": ["@profullstack/player@0.2.0", "", { "dependencies": { "hls.js": "1.7.1", "mpegts.js": "1.8.2" }, "peerDependencies": { "react": ">=18" }, "optionalPeers": ["react"] }, "sha512-v9bo5tq7VExG1xWNB0c60P+AXuSWgOBSMTkKC1CUJ0ur7uKC4Cd4HaitKfp9S8D3OFFdChV6OUENZ1YBvS//1A=="],
 
-    "@profullstack/scraper-daemon": ["@profullstack/scraper-daemon@0.1.0", "", { "bin": { "scraper-daemon": "bin/scraper-daemon.js" } }, "sha512-ynBaS4poq34c2fA3V1yLAFuSSS4FLks50jZaUFxrhzHxMHjjnRNO9iQdWO2HwV5fzQo5V/6VW0fI4OAJY2P8Bg=="],
+    "@profullstack/scraper-daemon": ["@profullstack/scraper-daemon@0.1.1", "", { "bin": { "scraper-daemon": "bin/scraper-daemon.js" } }, "sha512-kfVC8eBcnN+oCsE1iAK1fJKJ8ihiA93cREJ2ljlh3gSRW0yDINg74c5VXj+I4tVqz5BL9mvqSiJw+rXFw6M+3w=="],
 
     "@profullstack/submit-feed": ["@profullstack/submit-feed@0.1.3", "", { "dependencies": { "fast-xml-parser": "5.11.1" } }, "sha512-RMH294Q1qFJ6L01pU5q/yowshx1Xpu4gfGC2OuNaxyZ5jySqM9FvgqvVuWH+G18711SqzNq+DL8dvbAaBgBIvA=="],
 
