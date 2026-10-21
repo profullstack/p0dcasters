@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cachedDb } from "@/lib/cached-db";
 import Ad from "@/components/Ad";
-import { AD_MREC } from "@/lib/ads";
+import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
 const { all, count } = cachedDb(86400);
@@ -148,7 +148,7 @@ export default async function About() {
 
         {/* One rectangle, at a section break well into the piece — someone
             still reading here has settled in. */}
-        <Ad format={AD_MREC} />
+        <Ad format={AD_TEXT} />
 
         <h2 id="why-not-popularity">Why not just rank by popularity?</h2>
         <p>

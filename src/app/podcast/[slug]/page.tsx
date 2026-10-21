@@ -7,7 +7,7 @@ import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
 import Ad from "@/components/Ad";
-import { AD_MREC } from "@/lib/ads";
+import { AD_TEXT } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
 import PlaylistButtons from "@/components/PlaylistButtons";
@@ -235,7 +235,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
           to look at something, which is the only condition under which a
           rectangle is worth its space. Nothing above it — the play button, the
           follow button and the feed URL are what this page is for. */}
-      <Ad format={AD_MREC} />
+      <Ad format={AD_TEXT} />
 
       {sameHost.length > 0 && (
         <section>

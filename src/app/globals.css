@@ -445,13 +445,13 @@ body:has(.player) { padding-bottom: 122px; }
    prepends. No label of our own: the banners get that caption and the text
    link carries its own "Sponsored" inside the frame. */
 .ad { display: block; width: 100%; margin: 0 auto; }
-.ad[data-cp-filled] { margin: 34px auto; }
+.ad[data-cp-filled] { margin: 10px auto; }
 
 /* ad.js gives the frame display:block inline but no margin, so this is what
    centres a 300px creative in a wider column. */
 .ad > iframe { margin-left: auto; margin-right: auto; }
 
-.ad-text_link[data-cp-filled] { min-height: 40px; margin: 26px auto; }
+.ad-text_link[data-cp-filled] { min-height: 40px; margin: 10px auto; }
 
 .ad-banner_300x250[data-cp-filled] { min-height: 266px; max-width: 300px; }
 
@@ -471,7 +471,7 @@ body:has(.player) { padding-bottom: 122px; }
 
 /* A unit sitting in a stack of .row links belongs to the stack, not to the
    page around it. */
-.rows > .ad[data-cp-filled] { margin: 14px auto; }
+.rows > .ad[data-cp-filled] { margin: 10px auto; }
 
 /* Off-screen until it takes focus, then the first thing on the page. Kept out
    of the flow with a negative offset rather than display:none, which would
