@@ -140,7 +140,6 @@ export default async function Language({
         </div>
         {split > 0 && (
           <>
-            <Ad format={AD_TEXT} />
             <div className="grid">
               {rows.slice(split).map((p) => (
                 <Card key={p.id} p={p} />

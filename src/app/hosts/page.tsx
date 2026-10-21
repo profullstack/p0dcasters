@@ -24,7 +24,7 @@ export default async function Hosts() {
 
   // A stack of 300 compact rows. text_link is the only format that belongs in
   // it — a rectangle here would break the column in half.
-  const ads = adPlan(rows.length, { first: 13, every: 40, max: 3, formats: [AD_TEXT] });
+  const ads = adPlan(rows.length, { first: 13, every: 40, max: 1, formats: [AD_TEXT] });
 
   return (
     <div className="wrap">

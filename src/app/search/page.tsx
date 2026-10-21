@@ -105,7 +105,6 @@ export default async function Search({
               </div>
               {split > 0 && (
                 <>
-                  <Ad format={AD_TEXT} />
                   <div className="grid">
                     {results.slice(split).map((p) => (
                       <Card key={p.id} p={p} />

@@ -5,8 +5,6 @@ import TimeAgo from "@/components/TimeAgo";
 import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
-import Ad from "@/components/Ad";
-import { AD_TEXT } from "@/lib/ads";
 import Link from "next/link";
 
 const { all, count, languageBuckets } = cachedDb(300);
@@ -75,11 +73,7 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* A text link, not a banner: it is the only format that can sit between
-          the hero and the first row of shows without pushing them down. */}
-      <div className="wrap">
-        <Ad format={AD_TEXT} />
-      </div>
+      {/* The homepage carries no ad unit. */}
 
       <section className="wrap">
         <h2 className="sec">Deep catalogues, still publishing</h2>
