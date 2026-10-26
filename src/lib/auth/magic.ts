@@ -26,6 +26,7 @@ export async function requestLink(
   origin: string,
   next: string,
   ip: string | null,
+  profile: string | null = null,
 ): Promise<void> {
   const since = now() - TTL;
   const byEmail = await one<{ n: number }>(
@@ -43,8 +44,8 @@ export async function requestLink(
 
   const raw = token();
   await db().execute({
-    sql: "INSERT INTO login_tokens(token_hash, email, created_at, expires_at, ip) VALUES(?,?,?,?,?)",
-    args: args([sha256(raw), email, now(), now() + TTL, ip]),
+    sql: "INSERT INTO login_tokens(token_hash, email, created_at, expires_at, ip, profile) VALUES(?,?,?,?,?,?)",
+    args: args([sha256(raw), email, now(), now() + TTL, ip, profile]),
   });
 
   const known = await one<{ id: number }>("SELECT id FROM users WHERE email = ?", [email]);
@@ -53,11 +54,21 @@ export async function requestLink(
   await sendMail(email, mail.subject, mail.html, mail.text);
 }
 
-/** Burns the token and returns the address it proved, or null. */
-export async function consumeLink(raw: string): Promise<string | null> {
+/**
+ * Burns the token and returns the address it proved, with the signup profile
+ * it carried (JSON, or null for a sign-in link), or null.
+ */
+export async function consumeLink(
+  raw: string,
+): Promise<{ email: string; profile: string | null } | null> {
   const hash = sha256(raw);
-  const row = await one<{ email: string; expires_at: number; used_at: number | null }>(
-    "SELECT email, expires_at, used_at FROM login_tokens WHERE token_hash = ?",
+  const row = await one<{
+    email: string;
+    profile: string | null;
+    expires_at: number;
+    used_at: number | null;
+  }>(
+    "SELECT email, profile, expires_at, used_at FROM login_tokens WHERE token_hash = ?",
     [hash],
   );
   if (!row || row.used_at !== null || row.expires_at < now()) return null;
@@ -68,7 +79,7 @@ export async function consumeLink(raw: string): Promise<string | null> {
     args: args([now(), hash]),
   });
   if (Number(res.rowsAffected ?? 0) < 1) return null;
-  return row.email;
+  return { email: row.email, profile: row.profile ?? null };
 }
 
 /** Housekeeping so the table does not grow without bound. */

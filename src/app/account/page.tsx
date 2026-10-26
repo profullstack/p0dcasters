@@ -5,6 +5,9 @@ import { count } from "@/lib/db";
 import { currentUser } from "@/lib/auth/session";
 import { credentialsFor } from "@/lib/auth/passkey";
 import PasskeyManager from "@/components/PasskeyManager";
+import ProfileForm from "@/components/ProfileForm";
+import { COLUMNS } from "@profullstack/profile";
+import { profileStore } from "@/lib/profile";
 import Ad from "@/components/Ad";
 import { AD_TEXT } from "@/lib/ads";
 
@@ -19,10 +22,17 @@ export default async function Account() {
   const user = await currentUser();
   if (!user) redirect("/login?next=/account");
 
-  const [passkeys, follows] = await Promise.all([
+  const [passkeys, follows, mine] = await Promise.all([
     credentialsFor(user.id),
     count("SELECT COUNT(*) n FROM follows WHERE user_id = ?", [user.id]),
+    // A missing table must not take the account page down with it.
+    profileStore().get(user.id).catch(() => null),
   ]);
+  // Only the six fields cross to the client form, as plain strings.
+  const profileValues: Record<string, string | null> = Object.fromEntries(
+    COLUMNS.map((c) => [c, mine?.[c] == null ? null : String(mine[c])]),
+  );
+  if (!profileValues.email) profileValues.email = user.email;
 
   return (
     <div className="wrap narrow">
@@ -41,6 +51,15 @@ export default async function Account() {
           heading and clear of the panels — every control on this page is one
           the reader came here to press. */}
       <Ad format={AD_TEXT} />
+
+      <section className="panel">
+        <h2>Your details</h2>
+        <p className="muted">
+          Your name and, if you like, where you work. Only the email and your name are
+          required.
+        </p>
+        <ProfileForm initial={profileValues} />
+      </section>
 
       <section className="panel">
         <h2>Following</h2>

@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { normaliseEmail, pruneLinks, requestLink } from "@/lib/auth/magic";
 import { origin } from "@/lib/auth/session";
 import { safeNext } from "@/lib/auth/next";
+import { signupProfileFrom } from "@/lib/auth/signupProfile";
 
 export const dynamic = "force-dynamic";
 
@@ -20,11 +21,22 @@ export async function POST(req: Request) {
   } catch {
     return Response.json(SAME_ANSWER);
   }
-  const { email: rawEmail, next: rawNext } = (body ?? {}) as Record<string, unknown>;
+  const fields = (body ?? {}) as Record<string, unknown>;
+  const { email: rawEmail, next: rawNext } = fields;
   const email = normaliseEmail(rawEmail);
   if (!email) {
     return Response.json(
       { ok: false, message: "That does not look like an email address." },
+      { status: 400 },
+    );
+  }
+  // /signup sends its profile fields with `signup: true`; they are checked
+  // before any link is minted, so a refused form never mails anybody. Saying
+  // a name is missing reveals nothing about who has an account.
+  const signup = signupProfileFrom(fields, email);
+  if (!signup.ok) {
+    return Response.json(
+      { ok: false, message: "A few of those fields need another look.", errors: signup.errors },
       { status: 400 },
     );
   }
@@ -34,7 +46,7 @@ export async function POST(req: Request) {
     h.get("x-forwarded-for")?.split(",")[0].trim() || h.get("x-real-ip") || null;
 
   try {
-    await requestLink(email, await origin(), safeNext(rawNext), ip);
+    await requestLink(email, await origin(), safeNext(rawNext), ip, signup.pending);
     await pruneLinks();
   } catch (err) {
     // A Resend outage must not become an account oracle either.
