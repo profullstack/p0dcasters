@@ -17,7 +17,7 @@
 # 3000 inside the container, answers / for the deploy health check, reads its
 # secrets from app.env at run time.
 
-FROM oven/bun:1.4.0-slim AS base
+FROM oven/bun:1.4.4-slim AS base
 WORKDIR /app
 RUN chown bun:bun /app
 USER bun
