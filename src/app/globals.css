@@ -270,6 +270,23 @@ button.btn:disabled { opacity: .55; cursor: default; }
 .auth-swap { margin-top: 28px; font-size: 14.5px; color: var(--muted); }
 .auth-swap a { color: var(--accent); text-decoration: underline; }
 .auth-done { padding: 60px 0; }
+
+/* The signup profile from @profullstack/profile (/signup, /account): labelled
+   rows that match the email box above them. */
+.pfs-profile { border: 0; padding: 0; margin: 0 0 4px; min-width: 0; }
+.pfs-profile__row label {
+  display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.pfs-profile__optional { opacity: .8; }
+.pfs-profile input[type="text"], .pfs-profile input[type="url"], .pfs-profile input[type="email"] {
+  width: 100%; padding: 12px 14px; font-size: 16px; font-family: inherit;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); margin-bottom: 12px;
+}
+.pfs-profile input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.pfs-profile input[aria-invalid="true"] { border-color: var(--accent); }
+.pfs-profile__error { color: var(--accent); font-size: 13.5px; margin: -6px 0 12px; }
 .auth-done h2 { font-size: 26px; margin: 0 0 12px; letter-spacing: -0.02em; }
 
 .panel {

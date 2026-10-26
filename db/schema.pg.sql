@@ -40,6 +40,10 @@ create table if not exists login_tokens (
 );
 create index if not exists i_login_email on login_tokens(email, created_at desc);
 create index if not exists i_login_ip on login_tokens(ip, created_at desc);
+-- The /signup form's fields (JSON, already through @profullstack/profile's
+-- validateProfile). They ride on the link because the account is only made
+-- when it is opened; saved to user_profiles then.
+alter table login_tokens add column if not exists profile text;
 
 create table if not exists credentials (
   id text primary key,
@@ -61,6 +65,22 @@ create table if not exists follows (
   primary key (user_id, slug)
 );
 create index if not exists i_follows_slug on follows(slug);
+
+-- The signup profile (@profullstack/profile 0.1.3, `profile schema --key-type
+-- bigint`), keyed by users.id. Server-only: no public page or API reads it.
+create table if not exists "user_profiles" (
+  "user_id" bigint primary key,
+  "email" text,
+  "first_name" text,
+  "last_name" text,
+  "company_domain" text,
+  "job_title" text,
+  "linkedin_url" text,
+  "created_at" timestamptz not null default now(),
+  "updated_at" timestamptz not null default now()
+);
+create index if not exists "user_profiles_email" on "user_profiles" (lower("email"));
+create index if not exists "user_profiles_company_domain" on "user_profiles" ("company_domain");
 
 -- One row per refresh-pipeline run; what /crawlstats reads.
 create table if not exists refresh_runs (

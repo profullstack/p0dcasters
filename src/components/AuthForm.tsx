@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { startAuthentication } from "@simplewebauthn/browser";
+import { ProfileFields } from "@profullstack/profile/react";
 import { suggestEmail } from "@/lib/auth/typo";
 
 /**
@@ -28,6 +29,8 @@ export default function AuthForm({
   );
   const [error, setError] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
 
   /**
    * A near-miss like `.con` is checked here because it cannot be checked
@@ -51,16 +54,24 @@ export default function AuthForm({
   async function send(address: string) {
     setBusy(true);
     setError(null);
+    // /signup also sends the profile fields; /login only ever sends the address.
+    const profile: Record<string, unknown> = {};
+    if (mode === "signup" && formRef.current) {
+      for (const [k, v] of new FormData(formRef.current)) if (k !== "email") profile[k] = v;
+      profile.signup = true;
+    }
     try {
       const res = await fetch("/api/auth/magic", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: address, next }),
+        body: JSON.stringify({ ...profile, email: address, next }),
       });
       const body = await res.json();
       if (!res.ok) {
+        setFieldErrors(body.errors || {});
         setError(body.message || "That did not work. Try again.");
       } else {
+        setFieldErrors({});
         setSent(true);
         setSentTo(address);
         setNote(body.message);
@@ -146,7 +157,7 @@ export default function AuthForm({
 
       {note && !sent && <p className="auth-note">{note}</p>}
 
-      <form onSubmit={submit}>
+      <form ref={formRef} onSubmit={submit}>
         <label htmlFor="email">Email address</label>
         <input
           id="email"
@@ -179,6 +190,16 @@ export default function AuthForm({
             </button>{" "}
             — or send it again to use the address as you typed it.
           </p>
+        )}
+
+        {/* /signup only: the profile a new account starts with. Kept mounted
+            (uncontrolled) so a refused submit keeps what was typed. */}
+        {mode === "signup" && (
+          <ProfileFields
+            fields={["first_name", "last_name", "company_domain", "job_title", "linkedin_url"]}
+            errors={fieldErrors}
+            idPrefix="signup-"
+          />
         )}
 
         <button className="btn primary wide" type="submit" disabled={busy || !email}>
