@@ -13,7 +13,7 @@
         "@profullstack/profile": "0.1.6",
         "@profullstack/scraper-daemon": "0.2.1",
         "@profullstack/submit-feed": "^0.1.3",
-        "@profullstack/throttle": "^0.3.4",
+        "@profullstack/throttle": "^0.3.5",
         "@profullstack/x402-gateway": "^0.15.1",
         "@simplewebauthn/browser": "^14.0.0",
         "@simplewebauthn/server": "^14.0.3",
@@ -207,7 +207,7 @@
 
     "@profullstack/submit-feed": ["@profullstack/submit-feed@0.1.3", "", { "dependencies": { "fast-xml-parser": "^5.2.5" } }, "sha512-RMH294Q1qFJ6L01pU5q/yowshx1Xpu4gfGC2OuNaxyZ5jySqM9FvgqvVuWH+G18711SqzNq+DL8dvbAaBgBIvA=="],
 
-    "@profullstack/throttle": ["@profullstack/throttle@0.3.4", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0" } }, "sha512-OshhN6Uy/8BJeelhhb9ltiPbMMMIodtMlWLgkb5K+9nu5enLMY6k1m5J8UlKc2Z1ltQgA7HKe0E0HuWaBjPjLg=="],
+    "@profullstack/throttle": ["@profullstack/throttle@0.3.5", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0" } }, "sha512-tZ04du+CyjN6ECiRekw46XVDbmD4pxxg7tUPrhgHGP6Bt4YVn+1yIgUVbzr+AcKVBIwGqCiNkH8FKcLGV9ByUw=="],
 
     "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.15.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-yw4q8XAtop9p6jHV3z5tRnCF7af8O7pn7ZlbuWeeN87XXtynFNZnoJFd1xZTTHEj994Bvnxg9yIjwkv7coI4rQ=="],
 
@@ -414,8 +414,6 @@
     "xtend": ["xtend@4.0.2", "", {}, "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ=="],
 
     "@logicsrc/openaccess/@profullstack/footer": ["@profullstack/footer@0.2.6", "", { "peerDependencies": { "react": ">=18" }, "optionalPeers": ["react"], "bin": { "profullstack-footer": "bin/profullstack-footer.js" } }, "sha512-BKwbDszAc7e0mYIBiPjgr/5WS8WyDt8IW718s/zW/8pCWOIB1BGwSNs6fmImRSo5kqIjQKUVbXp22jZQ5GEipA=="],
-
-    "@profullstack/throttle/@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.13.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-V7liSO0tShZRlp8dancuDuUSF/rqrr5YF3bzLoZy9wn6ixf1RIRPYTepe72s36JOdSVzi3wfuhaZFm9y0RpV4w=="],
 
     "libsql/detect-libc": ["detect-libc@2.0.2", "", {}, "sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw=="],
 
