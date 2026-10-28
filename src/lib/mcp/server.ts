@@ -39,6 +39,9 @@ export const INSTRUCTIONS = [
   "checked against the rules (audio episodes, an episode inside 90 days; any host) and",
   "queued for a person to list; a refusal names the rule. Listed shows are also passed",
   "along to rssamplifier.com.",
+  "",
+  "`get_newsletter` says when the weekly digest goes out and what the last issue was;",
+  "`newsletter_preview` is this week's issue as it would be built now.",
 ].join("\n");
 
 function resources() {

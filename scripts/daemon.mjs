@@ -10,6 +10,10 @@
 //   bun scripts/daemon.mjs            run forever
 //   bun scripts/daemon.mjs --status   print the last status it stored
 //   bun scripts/daemon.mjs --once     run the pipeline once now and exit
+//   bun scripts/daemon.mjs --newsletter-dry-run   print this week's digest and
+//                                     how many accounts it would go to; sends
+//                                     and writes nothing (not even the DDL)
+//   bun scripts/daemon.mjs --newsletter-once      one real pass of the digest now
 //
 // State is in the site's Postgres (scraper_daemon_runs / scraper_daemon_state);
 // the status it writes there every minute is what /api/v1/daemon serves.
@@ -22,6 +26,9 @@ import { SQL } from "bun";
 import { createDaemon, pgStore } from "@profullstack/scraper-daemon";
 
 import { buildDaemon, pathsFor } from "./daemon-lib.mjs";
+// Bun runs the TypeScript directly: the same sender the web app's admin route uses.
+import { runWeeklyNewsletter, slotFor, slotFrom, sqlStore } from "../src/lib/newsletter.ts";
+import { sendMail } from "../src/lib/auth/mail.ts";
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..");
 const P = pathsFor();
@@ -222,13 +229,83 @@ const sql = new SQL(c.url, { max: 2 });
 // scraper-daemon 0.1.1+ passes state as text both ways, so Bun's SQL needs no help here.
 const store = pgStore((text, params) => sql.unsafe(text, params));
 
+/* ---------- the weekly digest (src/lib/newsletter.ts) ---------- */
+
+// The sender writes `?` placeholders (libsql-pg's dialect in the web app);
+// Bun's SQL wants $n. None of its statements has a literal `?` in it.
+const toPg = (text) => {
+  let i = 0;
+  return text.replace(/\?/g, () => `$${++i}`);
+};
+const newsletterDb = {
+  all: async (text, params = []) => [...(await sql.unsafe(toPg(text), params))],
+  run: async (text, params = []) => Number((await sql.unsafe(toPg(text), params)).count ?? 0),
+};
+
+// AUTH_SECRET has to be the web container's own (the unsubscribe links are
+// checked there), so its env file comes before the vault. Kept in memory only.
+const secrets = {};
+async function secretEnv(name) {
+  if (secrets[name]) return secrets[name];
+  let v = process.env[name];
+  if (!v) {
+    const line = (files.read(join(REPO, "..", "app.env")) ?? "").split("\n").find((l) => l.startsWith(`${name}=`));
+    v = line ? line.slice(name.length + 1).replace(/^["']|["'\s\r]+$/g, "") : null;
+  }
+  if (!v && name === "RESEND_API_KEY") v = files.read(`${P.data}/.resend-key`)?.trim() || null;
+  if (!v) v = await vaultEnv(name);
+  if (v) secrets[name] = v;
+  return v || null;
+}
+
+async function newsletterPass({ dryRun = false } = {}) {
+  const store = sqlStore(newsletterDb);
+  const deps = { store, key: "", send: async () => { throw new Error("not sending"); }, env: process.env, log };
+  const now = new Date();
+  // Outside the window (or switched off) the pass returns before it would need a
+  // key, so the vault is only asked once there is something to send.
+  if (dryRun || process.env.NEWSLETTER_SEND === "0" || now < slotFor(now, slotFrom(process.env))) {
+    return runWeeklyNewsletter(deps, { dryRun, now });
+  }
+  const key = await secretEnv("AUTH_SECRET");
+  if (!key || key.length < 16) throw new Error("no AUTH_SECRET (environment, ../app.env, vault): cannot sign unsubscribe links");
+  const resend = await secretEnv("RESEND_API_KEY");
+  // mail.ts prints instead of sending when it has no key; here that would mark everyone sent.
+  if (!resend) throw new Error("no RESEND_API_KEY (environment, ../app.env, cache, vault)");
+  process.env.RESEND_API_KEY = resend;
+  return runWeeklyNewsletter({ ...deps, key, send: (m) => sendMail(m.to, m.subject, m.html, m.text, m.headers) }, { now });
+}
+
+if (process.argv.includes("--newsletter-dry-run") || process.argv.includes("--newsletter-once")) {
+  const dryRun = process.argv.includes("--newsletter-dry-run");
+  const r = await newsletterPass({ dryRun });
+  const { issue, ...counts } = r;
+  console.log(JSON.stringify(counts, null, 2));
+  if (issue && dryRun) console.log(`\nSubject: ${issue.subject}\n\n${issue.text}`);
+  await sql.close();
+  process.exit(0);
+}
+
 if (process.argv.includes("--status")) {
   console.log(JSON.stringify(await store.get("status"), null, 2));
   await sql.close();
   process.exit(0);
 }
 
-const daemon = buildDaemon({ createDaemon, store, redis: process.env.REDIS_URL || null, fetch, sh, files, record, credential, lock, alert, repo: REPO });
+const daemon = buildDaemon({
+  createDaemon,
+  store,
+  redis: process.env.REDIS_URL || null,
+  fetch,
+  sh,
+  files,
+  record,
+  credential,
+  lock,
+  alert,
+  newsletter: () => newsletterPass(),
+  repo: REPO,
+});
 
 async function writeStatus() {
   try {

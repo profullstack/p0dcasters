@@ -83,12 +83,25 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
   scope podcasts:submit) records its principal as the submitter; scope
   submissions:review opens GET /api/review and POST /api/review/{id}.
 - [MCP](https://p0dcasters.com/mcp): search, get_podcast, list_episodes, list_shows,
-  browse, directory_stats, submit_feed, get_openprofile, update_openprofile and
-  claim_openprofile at https://p0dcasters.com/api/mcp, no key (the two writes take an
-  OpenAccess bearer with scope openprofile:edit).
+  browse, directory_stats, submit_feed, get_openprofile, update_openprofile,
+  claim_openprofile, get_newsletter and newsletter_preview at
+  https://p0dcasters.com/api/mcp, no key (the two profile writes take an OpenAccess
+  bearer with scope openprofile:edit).
 - [CLI](https://p0dcasters.com/cli): \`curl -fsSL https://p0dcasters.com/install.sh | sh\`
-  installs \`p0d\`: search, show, episodes, submit, opml, profile.
+  installs \`p0d\`: search, show, episodes, submit, opml, profile, newsletter.
 - [OpenAPI](https://p0dcasters.com/openapi.json): Every JSON endpoint, described.
+
+## The weekly digest
+
+- [Newsletter](https://p0dcasters.com/newsletter): One email a week to every account,
+  Fridays at 15:00 UTC: the shows that joined the directory, the most followed that week,
+  long-running shows that published, the busiest networks. On by default, off from
+  /account or the one-click link (RFC 8058 List-Unsubscribe) in every issue. No ads.
+- [GET /api/v1/newsletter](https://p0dcasters.com/api/v1/newsletter): The schedule, the
+  next send time and the latest issue.
+- [GET /api/v1/newsletter/preview](https://p0dcasters.com/api/v1/newsletter/preview): This
+  week's issue as it would be built now (subject, HTML, text). Signed in,
+  GET/PUT /api/v1/me/newsletter reads or sets {"subscribed": true|false}.
 
 ## Taking the data
 

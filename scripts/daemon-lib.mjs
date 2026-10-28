@@ -13,6 +13,9 @@
 //   * onStall after 13h without a success, which replaces the watchdog's email,
 //   * status() for /api/v1/daemon.
 //
+// Beside it, the weekly digest as a plain job (NEWSLETTER_JOB, every 15 min):
+// src/lib/newsletter.ts does the work, this only schedules it.
+//
 // Nothing here is site-generic and nothing here touches the network or disk
 // directly: buildDaemon() takes every side effect as a dependency, so the test
 // can build it with fakes. scripts/daemon.mjs wires the real ones.
@@ -20,6 +23,7 @@
 export const DUMP_URL = "https://public.podcastindex.org/podcastindex_feeds.db.tgz";
 export const UA = "p0dcasters/1.0 (+https://p0dcasters.com)";
 export const DATA = "/home/anthony/p0dcasters-data";
+export const NEWSLETTER_JOB = "newsletter";
 export const STEP_NAMES = ["download", "build_live", "export_indie", "row_floor", "load_directory", "seed_networks"];
 
 /** The paths refresh-if-new-dump.sh uses, under one data dir. */
@@ -73,6 +77,7 @@ export async function headStamp(fetchImpl, url = DUMP_URL, { signal, timeoutMs =
  * @param {() => Promise<{url: string, source: string}|null>} deps.credential
  * @param {{acquire(): Promise<boolean>, release(): void}} deps.lock   the shell's flock
  * @param {(s: {job: string, lastOk: number|null, lastError: string|null}) => Promise<void>} [deps.alert]
+ * @param {() => Promise<object>} [deps.newsletter]  one pass of the weekly digest (src/lib/newsletter.ts)
  * @param {object} [deps.bin]   { node, bun, python }
  * @param {string} [deps.repo]  the checkout the scripts live in
  */
@@ -88,6 +93,7 @@ export function buildDaemon(deps) {
     credential,
     lock,
     alert,
+    newsletter,
     console: out = console,
     now = Date.now,
     minRows = 10_000,
@@ -345,7 +351,9 @@ export function buildDaemon(deps) {
     // (`store`), where the web container's /api/v1/daemon reads them.
     redis,
     store,
-    concurrency: 1,
+    // Two: the directory pipeline runs for hours and must not hold the weekly
+    // digest back. Each task still runs one at a time on its own.
+    concurrency: 2,
     onRun,
     onStall: async (s) => {
       out.error(`[directory] stalled: no success since ${s.lastOk ? new Date(s.lastOk).toISOString() : "start"}${s.lastError ? `: ${s.lastError}` : ""}`);
@@ -354,5 +362,23 @@ export function buildDaemon(deps) {
   });
 
   daemon.pipeline({ name: "directory", every: "6h", timeout: "3h", staleAfter: "13h", gate, steps });
+
+  // The weekly digest. Every 15 minutes, because a pass is a no-op before the
+  // week's slot (Friday 15:00 UTC) and once everybody has the issue; after the
+  // slot each pass sends the next batch. No staleAfter: "nothing to send" is
+  // the usual outcome, not a stall. The issue itself stays out of the run
+  // record, which is only the counts.
+  if (newsletter) {
+    daemon.job({
+      name: NEWSLETTER_JOB,
+      every: "15m",
+      timeout: "30m",
+      async run() {
+        const r = await newsletter();
+        const { issue: _issue, ...counts } = r ?? {};
+        return counts;
+      },
+    });
+  }
   return daemon;
 }

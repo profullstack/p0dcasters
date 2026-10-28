@@ -7,6 +7,7 @@ import { bearerPrincipal, EDIT_SCOPE } from "@/lib/openaccess";
 import { findOrCreateUser } from "@/lib/auth/session";
 import { claimProfile, editorOf, rememberPrincipal, renderShowProfile, saveOverrides } from "@/lib/openprofile/store";
 import { profilePage, profileUrl } from "@/lib/openprofile/generate";
+import { newsletterInfo, previewIssue } from "@/lib/newsletter-store";
 
 /**
  * What an agent can do with the directory.
@@ -328,6 +329,41 @@ TOOLS.push(
       if (!out.ok) throw toolError(`${out.error}${out.checked.length ? ` (checked: ${out.checked.join(", ")})` : ""}`);
       const r = await renderShowProfile(p, { readFeed: false });
       return { ...profileResult(slug, r, true), method: out.method, owner: user.email };
+    },
+  },
+);
+
+TOOLS.push(
+  {
+    name: "get_newsletter",
+    title: "The weekly digest",
+    description:
+      "The p0dcasters weekly email: when it goes out (Fridays 15:00 UTC unless reconfigured), the next send time, and the latest issue sent (week, subject, how many it went to). Read-only; subscribing is a setting on a signed-in account, not something this server does.",
+    inputSchema: { type: "object", properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+    async run() {
+      return newsletterInfo();
+    },
+  },
+  {
+    name: "newsletter_preview",
+    title: "This week's digest so far",
+    description:
+      "This week's issue of the weekly digest as it would be built now from the live directory: subject, plain text and, with html: true, the HTML. Shows new to the directory, the most followed this week, long-running shows that published, the busiest networks. Read-only, no recipients; the per-reader unsubscribe link is a placeholder. Rebuilt at most every 15 minutes.",
+    inputSchema: {
+      type: "object",
+      properties: { html: { type: "boolean", description: "Include the HTML body too. Default false." } },
+    },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+    async run(args) {
+      const issue = await previewIssue();
+      return {
+        week: issue.week,
+        subject: issue.subject,
+        sections: issue.sections,
+        text: issue.text,
+        ...(args?.html === true ? { html: issue.html } : {}),
+      };
     },
   },
 );

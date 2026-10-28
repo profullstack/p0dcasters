@@ -6,6 +6,9 @@ import { currentUser } from "@/lib/auth/session";
 import { credentialsFor } from "@/lib/auth/passkey";
 import PasskeyManager from "@/components/PasskeyManager";
 import ProfileForm from "@/components/ProfileForm";
+import NewsletterToggle from "@/components/NewsletterToggle";
+import { isSubscribed } from "@/lib/newsletter-store";
+import { describeSlot, slotFrom } from "@/lib/newsletter";
 import { COLUMNS } from "@profullstack/profile";
 import { profileStore } from "@/lib/profile";
 import Ad from "@/components/Ad";
@@ -22,11 +25,12 @@ export default async function Account() {
   const user = await currentUser();
   if (!user) redirect("/login?next=/account");
 
-  const [passkeys, follows, mine] = await Promise.all([
+  const [passkeys, follows, mine, digest] = await Promise.all([
     credentialsFor(user.id),
     count("SELECT COUNT(*) n FROM follows WHERE user_id = ?", [user.id]),
     // A missing table must not take the account page down with it.
     profileStore().get(user.id).catch(() => null),
+    isSubscribed(user.id).catch(() => true),
   ]);
   // Only the six fields cross to the client form, as plain strings.
   const profileValues: Record<string, string | null> = Object.fromEntries(
@@ -59,6 +63,16 @@ export default async function Account() {
           required.
         </p>
         <ProfileForm initial={profileValues} />
+      </section>
+
+      <section className="panel">
+        <h2>Weekly digest</h2>
+        <p className="muted">
+          One email a week, {describeSlot(slotFrom(process.env))}: the shows new to the directory,
+          the most followed, and what the big catalogues published.{" "}
+          <Link href="/newsletter">The latest issue</Link>.
+        </p>
+        <NewsletterToggle initial={digest} />
       </section>
 
       <section className="panel">

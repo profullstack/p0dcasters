@@ -141,6 +141,76 @@ export async function GET() {
           responses: { 200: { description: "{ openprofiles: [{ id, name, url, page, show, updatedAt, accounts, web }], next }" } },
         },
       },
+      "/api/v1/newsletter": {
+        get: {
+          summary: "The weekly digest: schedule, next send time, latest issue",
+          operationId: "getNewsletter",
+          responses: {
+            200: {
+              description: "{ schedule, slot: { day, time, timezone }, week, nextSendAt, latest: { week, subject, createdAt, finishedAt, sent, url } | null, page, preview, subscribe }",
+            },
+          },
+        },
+      },
+      "/api/v1/newsletter/preview": {
+        get: {
+          summary: "This week's issue as it would be built now",
+          operationId: "previewNewsletter",
+          description: "Built from the live directory, at most every 15 minutes. No recipients and nothing written; the per-reader unsubscribe link is left as `unsubscribePlaceholder`.",
+          responses: {
+            200: { description: "{ week, subject, html, text, sections, unsubscribePlaceholder, page }" },
+            503: { description: "The preview could not be built" },
+          },
+        },
+      },
+      "/api/v1/newsletter/send": {
+        post: {
+          summary: "Run one pass of the weekly send (admins only)",
+          operationId: "sendNewsletter",
+          description: "Session cookie of an admin (ADMIN_EMAILS). A dry run unless dry_run is false: it returns the recipient count and the issue, and sends and writes nothing. A real pass sends nothing before the week's slot, never twice to one account in a week, and at most `limit` mails.",
+          requestBody: {
+            content: {
+              "application/json": {
+                schema: { type: "object", properties: { dry_run: { type: "boolean", default: true }, limit: { type: "integer", minimum: 1, maximum: 200, default: 50 } } },
+              },
+            },
+          },
+          responses: {
+            200: { description: "{ dry_run, week, slotAt, nextAt, state, recipients, sent, failed, remaining, issue }" },
+            401: { description: "Not signed in" },
+            403: { description: "Not an admin" },
+          },
+        },
+      },
+      "/api/v1/me/newsletter": {
+        get: {
+          summary: "Whether the signed-in account gets the weekly digest",
+          operationId: "getMyNewsletter",
+          description: "Session cookie only.",
+          responses: { 200: { description: "{ subscribed }" }, 401: { description: "Not signed in" } },
+        },
+        put: {
+          summary: "Turn the weekly digest on or off for the signed-in account",
+          operationId: "setMyNewsletter",
+          requestBody: {
+            required: true,
+            content: { "application/json": { schema: { type: "object", required: ["subscribed"], properties: { subscribed: { type: "boolean" } } } } },
+          },
+          responses: { 200: { description: "{ subscribed }" }, 400: { description: "No boolean subscribed" }, 401: { description: "Not signed in" } },
+        },
+      },
+      "/newsletter/unsubscribe": {
+        post: {
+          summary: "RFC 8058 one-click unsubscribe",
+          operationId: "unsubscribeOneClick",
+          description: "The URL in every issue's List-Unsubscribe header. Body `List-Unsubscribe=One-Click`; GET is the same link clicked in a browser, HEAD records nothing.",
+          parameters: [
+            { name: "u", in: "query", required: true, schema: { type: "string" }, description: "User id" },
+            { name: "t", in: "query", required: true, schema: { type: "string" }, description: "HMAC of the user id" },
+          ],
+          responses: { 200: { description: "Unsubscribed" }, 400: { description: "Bad token; nothing changed" } },
+        },
+      },
       "/opml": {
         get: {
           summary: "The whole directory as OPML",

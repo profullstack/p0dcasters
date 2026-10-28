@@ -195,6 +195,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 { label: "Contact", href: "/contact" },
                 { label: "Privacy", href: "/privacy" },
                 { label: "Terms", href: "/terms" },
+                { label: "Newsletter", href: "/newsletter" },
                 { label: "OPML", href: "/opml" },
                 { label: "API", href: "/openapi.json" },
                 { label: "MCP", href: "/mcp" },

@@ -31,8 +31,14 @@ export default function Privacy() {
         <ul>
           <li>
             <strong>Your email address</strong> — the account identity, and where sign-in
-            links are sent. Nothing else is mailed to it: there is no newsletter and no
-            marketing.
+            links are sent. The only other mail is the{" "}
+            <Link href="/newsletter">weekly digest</Link> of what happened in the directory:
+            on by default, off with one click in any issue or on your account page, and
+            no ads or marketing in it.
+          </li>
+          <li>
+            <strong>Whether you get the digest</strong>, and a record of which weekly issues
+            were sent to you, so nobody gets the same week twice.
           </li>
           <li>
             <strong>The shows you follow</strong> — a list of directory slugs, used to
@@ -70,8 +76,8 @@ export default function Privacy() {
         <h2>Who else is involved</h2>
         <ul>
           <li>
-            <strong>Resend</strong> delivers sign-in emails, so it processes your address
-            to send them.
+            <strong>Resend</strong> delivers sign-in emails and the weekly digest, so it
+            processes your address to send them.
           </li>
           <li>
             <strong>Podcast Index</strong> is where the feed metadata comes from. It is a
@@ -102,7 +108,7 @@ export default function Privacy() {
         <h2>Changes</h2>
         <p>
           If this ever describes something different, the page changes with it rather than
-          quietly staying wrong. Last updated 29 August 2026.
+          quietly staying wrong. Last updated 28 October 2026.
         </p>
       </section>
     </div>

@@ -6,12 +6,21 @@ const FROM = "p0dcasters <noreply@p0dcasters.com>";
  * Resend's REST API directly — the SDK adds a dependency for one POST.
  * Sending is verified on the `send.p0dcasters.com` subdomain; the root MX
  * belongs to Forward Email, so the two halves never collide.
+ *
+ * `headers` are extra message headers, passed through as Resend's `headers`
+ * field: the weekly digest's List-Unsubscribe pair is the one user.
  */
-export async function sendMail(to: string, subject: string, html: string, text: string) {
+export async function sendMail(
+  to: string,
+  subject: string,
+  html: string,
+  text: string,
+  headers?: Record<string, string>,
+) {
   const key = env("RESEND_API_KEY");
   if (!key) {
     if (env("NODE_ENV") === "production") throw new Error("RESEND_API_KEY is not set");
-    console.log(`\n--- magic link mail to ${to} ---\n${text}\n---\n`);
+    console.log(`\n--- mail to ${to}: ${subject} ---\n${text}\n---\n`);
     return;
   }
   const res = await fetch("https://api.resend.com/emails", {
@@ -20,7 +29,7 @@ export async function sendMail(to: string, subject: string, html: string, text: 
       authorization: `Bearer ${key}`,
       "content-type": "application/json",
     },
-    body: JSON.stringify({ from: FROM, to, subject, html, text }),
+    body: JSON.stringify({ from: FROM, to, subject, html, text, ...(headers ? { headers } : {}) }),
   });
   if (!res.ok) {
     throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 300)}`);

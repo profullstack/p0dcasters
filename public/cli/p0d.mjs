@@ -17,7 +17,7 @@
 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 const DEFAULT_API = 'https://p0dcasters.com';
 
 /**
@@ -72,6 +72,15 @@ export const COMMANDS = [
       "`profile <slug>` prints the person behind a show as an OpenProfile.md (logicsrc.com/openprofile) with its Broadcast section. `profile claim <slug>` claims it as you; `profile edit <slug>` opens the file in $EDITOR (or takes --file) and saves it; `profile publish <slug> --public|--private` lists or hides it. The writes take an OpenAccess token (openaccess.logicsrc.com, scope openprofile:edit, plus email for a claim) in OPENACCESS_TOKEN or P0D_TOKEN.",
     options: ['--file <openprofile.md>', '--public', '--private', '--json'],
     examples: ['p0d profile steve-farrar', 'p0d profile claim steve-farrar', 'p0d profile edit steve-farrar --file me.md', 'p0d profile publish steve-farrar --private'],
+  },
+  {
+    name: 'newsletter',
+    usage: 'newsletter [preview]',
+    summary: 'The weekly digest: schedule and latest issue, or this week so far',
+    detail:
+      'With no argument: when the weekly email goes out, when the next one is due, and the last issue sent. `newsletter preview` prints this week\'s issue as it would be built now, as plain text (--html for the HTML). Subscribing is a setting on your account at /account; every issue has a one-click unsubscribe link.',
+    options: ['--html', '--json'],
+    examples: ['p0d newsletter', 'p0d newsletter preview', 'p0d newsletter preview --html > issue.html'],
   },
   {
     name: 'opml',
@@ -263,6 +272,21 @@ export async function run(argv, io = {}) {
       }
       case 'profile':
         return profile(rest, flags, base, request, o);
+      case 'newsletter': {
+        if (rest[0] === 'preview') {
+          const issue = await request('/api/v1/newsletter/preview');
+          if (flags.json) return json(o, issue);
+          o.out(flags.html ? issue.html : `Subject: ${issue.subject}\n\n${issue.text.replace(/\n$/, '')}`);
+          return 0;
+        }
+        if (rest[0]) return fail(o, `newsletter: unknown argument ${rest[0]}; try p0d newsletter preview`);
+        const body = await request('/api/v1/newsletter');
+        if (flags.json) return json(o, body);
+        o.out(`Weekly digest, ${body.schedule}\nnext   ${body.nextSendAt}`);
+        o.out(body.latest ? `latest ${body.latest.week}: ${body.latest.subject} (sent to ${body.latest.sent})` : 'latest none sent yet');
+        o.out(`page   ${body.page}`);
+        return 0;
+      }
       case 'opml': {
         const path = rest[0] ? `/opml?category=${encodeURIComponent(rest[0])}` : '/opml';
         const res = await o.fetch(`${base}${path}`, { headers: { 'user-agent': `p0d/${VERSION}` } });

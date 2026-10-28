@@ -6,6 +6,10 @@ import { validateProfile, saveSignupProfile, type ProfileStore } from "@profulls
  * validated fields ride on the link (login_tokens.profile, JSON) and are saved
  * on verify. Plain sign-in never sends them and is never asked for them.
  *
+ * The weekly digest checkbox rides along the same way, as `newsletter` in the
+ * same JSON: an account opts in by default, so only an unticked box changes
+ * anything, and it can only be stored once the account exists.
+ *
  * Kept free of the database so it can be tested on its own.
  */
 
@@ -19,7 +23,15 @@ export function signupProfileFrom(
   if (body.signup !== true) return { ok: true, pending: null };
   const check = validateProfile({ ...body, email });
   if (!check.ok) return { ok: false, errors: check.errors };
-  return { ok: true, pending: JSON.stringify(check.profile) };
+  // Anything but an explicit false is the default, opted in.
+  return { ok: true, pending: JSON.stringify({ ...check.profile, newsletter: body.newsletter !== false }) };
+}
+
+/** The digest choice a signup link carried: false only when the box was unticked. */
+export function newsletterChoice(raw: unknown): boolean | null {
+  const fields = parsePending(raw);
+  if (!fields || typeof fields.newsletter !== "boolean") return null;
+  return fields.newsletter;
 }
 
 /** The fields a link carried, or null for a sign-in link or a mangled value. */
@@ -43,8 +55,10 @@ export async function saveVerifiedProfile(
   user: { id: number | string; email: string },
   raw: unknown,
 ): Promise<void> {
-  const fields = parsePending(raw);
-  if (!fields) return;
+  const parsed = parsePending(raw);
+  if (!parsed) return;
+  // The digest flag is the users row's, not the profile's.
+  const { newsletter: _newsletter, ...fields } = parsed;
   try {
     await saveSignupProfile(store, String(user.id), fields, { email: user.email });
   } catch (err) {

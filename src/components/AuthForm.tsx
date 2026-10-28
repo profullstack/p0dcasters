@@ -57,8 +57,12 @@ export default function AuthForm({
     // /signup also sends the profile fields; /login only ever sends the address.
     const profile: Record<string, unknown> = {};
     if (mode === "signup" && formRef.current) {
-      for (const [k, v] of new FormData(formRef.current)) if (k !== "email") profile[k] = v;
+      for (const [k, v] of new FormData(formRef.current)) if (k !== "email" && k !== "newsletter") profile[k] = v;
       profile.signup = true;
+      // An unticked box is absent from FormData, so the choice is read off the
+      // element and sent as a real boolean either way.
+      const box = formRef.current.elements.namedItem("newsletter");
+      profile.newsletter = box instanceof HTMLInputElement ? box.checked : true;
     }
     try {
       const res = await fetch("/api/auth/magic", {
@@ -200,6 +204,18 @@ export default function AuthForm({
             errors={fieldErrors}
             idPrefix="signup-"
           />
+        )}
+
+        {/* Ticked by default, by the owner's choice; unticking it is stored
+            when the account is made. Also on /account, and in every issue. */}
+        {mode === "signup" && (
+          <label className="auth-check" htmlFor="signup-newsletter">
+            <input id="signup-newsletter" name="newsletter" type="checkbox" defaultChecked />
+            <span>
+              Send me the weekly p0dcasters digest{" "}
+              <a href="/newsletter" className="muted small">(what is in it)</a>
+            </span>
+          </label>
         )}
 
         <button className="btn primary wide" type="submit" disabled={busy || !email}>

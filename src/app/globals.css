@@ -287,6 +287,16 @@ button.btn:disabled { opacity: .55; cursor: default; }
 .pfs-profile input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .pfs-profile input[aria-invalid="true"] { border-color: var(--accent); }
 .pfs-profile__error { color: var(--accent); font-size: 13.5px; margin: -6px 0 12px; }
+/* The digest opt-in on /signup and the toggle on /account. */
+.auth-check {
+  display: flex; gap: 10px; align-items: flex-start; margin: 4px 0 18px;
+  font-size: 14.5px; font-family: ui-sans-serif, system-ui, sans-serif; cursor: pointer;
+}
+.auth-check input { margin-top: 3px; accent-color: var(--accent); }
+.newsletter-issue {
+  width: 100%; height: 1500px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: #fbfaf7;
+}
 .auth-done h2 { font-size: 26px; margin: 0 0 12px; letter-spacing: -0.02em; }
 
 .panel {
