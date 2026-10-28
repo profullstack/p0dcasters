@@ -1,5 +1,6 @@
 import { cachedDb } from "@/lib/cached-db";
 import { NETWORKS } from "@/lib/networks";
+import { channels } from "@/lib/live/tv";
 
 const { all, languageBuckets } = cachedDb(86400);
 
@@ -35,7 +36,7 @@ export async function GET(
     const langs = await languageBuckets();
     // /search is deliberately absent — robots.txt disallows it, and a sitemap
     // that submits a disallowed URL is asking for a coverage error.
-    const statics = ["", "/browse", "/networks", "/self-hosted", "/hosts", "/about", "/submit", "/mcp", "/cli", "/privacy", "/terms", "/contact"];
+    const statics = ["", "/podcasts", "/radio", "/tv", "/browse", "/networks", "/self-hosted", "/hosts", "/about", "/submit", "/mcp", "/cli", "/privacy", "/terms", "/contact"];
     return wrap([
       ...statics.map((p) => `  <url><loc>${SITE}${p}</loc><priority>0.9</priority></url>`),
       // Listed, but low: /crawlstats is a real page and worth being findable,
@@ -49,6 +50,14 @@ export async function GET(
       ...langs.map((l) => `  <url><loc>${SITE}/language/${esc(l.code)}</loc><priority>0.6</priority></url>`),
       ...NETWORKS.map((nw) => `  <url><loc>${SITE}/networks/${esc(nw.slug)}</loc><priority>0.7</priority></url>`),
     ]);
+  }
+
+  // One URL per TV channel with a stream. Radio stations have no page of their
+  // own (they play from the list), so they are not listed.
+  if (name === "tv") {
+    const list = await channels();
+    if (!list.length) return new Response("Not found", { status: 503 });
+    return wrap(list.map((c) => `  <url><loc>${SITE}/tv/${esc(encodeURIComponent(c.id))}</loc><priority>0.5</priority></url>`));
   }
 
   const n = parseInt(name, 10);

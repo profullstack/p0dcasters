@@ -79,5 +79,6 @@ export function listingJsonLd({
 
 /** One <script type="application/ld+json">, stringified. */
 export function jsonLdScript(data: unknown) {
-  return { __html: JSON.stringify(data) };
+  // `<` escaped so a title holding "</script>" cannot close the tag early.
+  return { __html: JSON.stringify(data).replace(/</g, "\\u003c") };
 }

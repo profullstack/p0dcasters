@@ -164,6 +164,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </picture>
                 </Link>
                 <nav>
+                  <Link href="/podcasts">Podcasts</Link>
+                  <Link href="/radio">Radio</Link>
+                  <Link href="/tv">TV</Link>
                   <Link href="/browse">Browse</Link>
                   <Link href="/search">Search</Link>
                   <Link href="/networks">Networks</Link>

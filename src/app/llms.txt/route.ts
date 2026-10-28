@@ -44,6 +44,12 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 - [Home](https://p0dcasters.com/): Deep catalogues still publishing, plus this week's
   episodes.
 - [Browse](https://p0dcasters.com/browse): Every subject and every language, with counts.
+- [Podcasts](https://p0dcasters.com/podcasts): The podcast catalogue's front page: subjects,
+  languages and the deepest shows still publishing.
+- [Radio](https://p0dcasters.com/radio): Internet radio stations streaming now (radio-browser.info
+  via nichedb.dev), most listened first; filter with ?country=<cc>&genre=<genre>&q=<name>.
+- [TV](https://p0dcasters.com/tv): Television channels with an open live stream (iptv-org via
+  nichedb.dev), each watchable at /tv/<channel-id>; filter with ?country=<cc>&category=<c>.
 - [Networks](https://p0dcasters.com/networks): The broadcasters and podcast networks that
   publish their library as RSS, each at /networks/<slug>.
 - [Self-hosted](https://p0dcasters.com/self-hosted): Only the shows that publish from a

@@ -21,6 +21,10 @@ export type Track = {
   showSlug: string;
   showTitle: string;
   image: string | null;
+  /** Where the dock's title links. Defaults to the show page. */
+  href?: string;
+  /** A live stream (a radio station): no length, nothing to seek or speed up. */
+  live?: boolean;
 };
 
 type PlayerState = {
@@ -114,7 +118,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (saved.track) {
       setTrack(saved.track);
       setQueue(saved.queue || []);
-      restored.current = saved.position || 0;
+      // A live stream resumes at now, not where it was left.
+      restored.current = saved.track.live ? null : saved.position || 0;
       setPosition(saved.position || 0);
     }
     if (saved.rate) setRateState(saved.rate);
@@ -174,7 +179,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         if (!cancelled) {
           setLoading(false);
           setPlaying(false);
-          setError("This episode would not play. The show may have moved the file.");
+          setError(unplayable(track));
         }
       });
 
@@ -314,7 +319,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       if (attachedSrc !== track.audio) return;
       el.play().catch(() => {
         setPlaying(false);
-        setError("This episode would not play. The show may have moved the file.");
+        setError(unplayable(track));
       });
     } else {
       el.pause();
@@ -323,7 +328,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const el = audioRef.current;
-    if (el) el.playbackRate = rate;
+    if (el) el.playbackRate = track?.live ? 1 : rate;
   }, [rate, track]);
 
   useEffect(() => {
@@ -408,8 +413,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         preload="metadata"
         onLoadedMetadata={(e) => {
           const el = e.currentTarget;
-          setDuration(el.duration || 0);
-          el.playbackRate = rate;
+          setDuration(Number.isFinite(el.duration) ? el.duration || 0 : 0);
+          el.playbackRate = track?.live ? 1 : rate;
           el.volume = volume;
           if (restored.current != null) {
             el.currentTime = restored.current;
@@ -430,7 +435,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         onError={() => {
           setLoading(false);
           setPlaying(false);
-          setError("This episode would not play. The show may have moved the file.");
+          setError(unplayable(track));
         }}
       />
       <PlayerBar />
@@ -438,13 +443,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+function unplayable(track: Track | null): string {
+  return track?.live
+    ? "This station would not play. It may be off the air, or its stream may have moved."
+    : "This episode would not play. The show may have moved the file.";
+}
+
 function PlayerBar() {
   const p = usePlayer();
   const [openRate, setOpenRate] = useState(false);
   if (!p.track) return null;
 
-  const total = p.duration || p.track.duration || 0;
-  const pct = total > 0 ? Math.min(100, (p.position / total) * 100) : 0;
+  const live = !!p.track.live;
+  // A live stream reports an infinite (or meaningless) duration.
+  const total = live ? 0 : Number.isFinite(p.duration) ? p.duration || p.track.duration || 0 : 0;
+  const pct = live ? 100 : total > 0 ? Math.min(100, (p.position / total) * 100) : 0;
 
   return (
     <div className="player" role="region" aria-label="Audio player">
@@ -471,7 +484,7 @@ function PlayerBar() {
       </div>
 
       <div className="player-inner">
-        <Link className="player-show" href={`/podcast/${p.track.showSlug}`}>
+        <Link className="player-show" href={p.track.href || `/podcast/${p.track.showSlug}`}>
           {safeImage(p.track.image) ? (
             // eslint-disable-next-line @next/next/no-img-element
             // Decorative on purpose here: the show title sits beside it in the
@@ -489,22 +502,26 @@ function PlayerBar() {
         </Link>
 
         <div className="player-controls">
-          <button
-            type="button"
-            className="ghost"
-            onClick={p.previous}
-            aria-label="Previous episode"
-          >
-            ⏮
-          </button>
-          <button
-            type="button"
-            className="ghost"
-            onClick={() => p.nudge(-15)}
-            aria-label="Back 15 seconds"
-          >
-            ↺15
-          </button>
+          {!live && (
+            <>
+              <button
+                type="button"
+                className="ghost"
+                onClick={p.previous}
+                aria-label="Previous episode"
+              >
+                ⏮
+              </button>
+              <button
+                type="button"
+                className="ghost"
+                onClick={() => p.nudge(-15)}
+                aria-label="Back 15 seconds"
+              >
+                ↺15
+              </button>
+            </>
+          )}
           <button
             type="button"
             className="play"
@@ -513,29 +530,37 @@ function PlayerBar() {
           >
             {p.loading && p.playing ? "…" : p.playing ? "❚❚" : "▶"}
           </button>
-          <button
-            type="button"
-            className="ghost"
-            onClick={() => p.nudge(30)}
-            aria-label="Forward 30 seconds"
-          >
-            30↻
-          </button>
-          <button
-            type="button"
-            className="ghost"
-            onClick={p.next}
-            aria-label="Next episode"
-          >
-            ⏭
-          </button>
+          {!live && (
+            <>
+              <button
+                type="button"
+                className="ghost"
+                onClick={() => p.nudge(30)}
+                aria-label="Forward 30 seconds"
+              >
+                30↻
+              </button>
+              <button
+                type="button"
+                className="ghost"
+                onClick={p.next}
+                aria-label="Next episode"
+              >
+                ⏭
+              </button>
+            </>
+          )}
         </div>
 
         <div className="player-right">
-          <span className="player-time">
-            {clock(p.position)} <i>/</i> {clock(total)}
-          </span>
-          <div className="player-rate">
+          {live ? (
+            <span className="player-live">● Live</span>
+          ) : (
+            <span className="player-time">
+              {clock(p.position)} <i>/</i> {clock(total)}
+            </span>
+          )}
+          {!live && <div className="player-rate">
             <button
               type="button"
               className="ghost"
@@ -562,7 +587,7 @@ function PlayerBar() {
                 ))}
               </div>
             )}
-          </div>
+          </div>}
           <input
             className="player-volume"
             type="range"

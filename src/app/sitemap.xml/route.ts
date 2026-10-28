@@ -14,6 +14,7 @@ export async function GET() {
   const now = new Date().toISOString();
   const urls = [
     `${SITE}/sitemaps/pages.xml`,
+    `${SITE}/sitemaps/tv.xml`,
     ...Array.from({ length: chunks }, (_, i) => `${SITE}/sitemaps/${i}.xml`),
   ];
   const xml =
