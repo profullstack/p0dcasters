@@ -13,8 +13,8 @@
         "@profullstack/profile": "0.1.6",
         "@profullstack/scraper-daemon": "0.2.2",
         "@profullstack/submit-feed": "^0.1.3",
-        "@profullstack/throttle": "^0.4.0",
-        "@profullstack/x402-gateway": "^0.15.3",
+        "@profullstack/throttle": "^0.4.1",
+        "@profullstack/x402-gateway": "^0.16.1",
         "@simplewebauthn/browser": "^14.0.0",
         "@simplewebauthn/server": "^14.0.3",
         "bullmq": "6.4.2",
@@ -208,9 +208,9 @@
 
     "@profullstack/submit-feed": ["@profullstack/submit-feed@0.1.3", "", { "dependencies": { "fast-xml-parser": "^5.2.5" } }, "sha512-RMH294Q1qFJ6L01pU5q/yowshx1Xpu4gfGC2OuNaxyZ5jySqM9FvgqvVuWH+G18711SqzNq+DL8dvbAaBgBIvA=="],
 
-    "@profullstack/throttle": ["@profullstack/throttle@0.4.0", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0" } }, "sha512-Lj+XHt51OxyaJ2FqosZDyr9Z5RFB8z+ARixpoUfrDu3YlvFlct5GbbZM/C0qLZkUgzeuFSDvtYt9f0NNfBkFqA=="],
+    "@profullstack/throttle": ["@profullstack/throttle@0.4.1", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0" } }, "sha512-ffY49nQ20/ZXyp/LVh/LxXTKJozqxyggBhjt9rRGz/JCC30IKFaqN2UmNwThm721r0rgQnhikpHNOb5EqzU9kw=="],
 
-    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.15.3", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-YtxaHuiNdnEmwQBkNJXGOEvFUb+5k54GPeZw5RiPKqYcKrA/tRTRVTMbyuX4XSGfmaOEo1BCGpa3w8S46+YQUg=="],
+    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.16.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-4aRbH2t5J7vJo9n6SqODNrxD0NBI7GsCo3WjTYuAfIzuPjElHB9TwtpvdpXwOneEJGpQ0JJpHght4M6F39SJng=="],
 
     "@simplewebauthn/browser": ["@simplewebauthn/browser@14.0.0", "", {}, "sha512-1odWVqeEBTl7lJ9zMKLEsmTlnyrDO5iRcTvfMKKk1WThUnp/i8JJdffdj2icP+tty159s4PgwE3BiMoEW9NFow=="],
 
