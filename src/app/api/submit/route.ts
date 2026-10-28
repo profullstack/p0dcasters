@@ -3,6 +3,8 @@ import { parseSubmission, submitReply, wantsHtml } from "@profullstack/submit-fe
 import type { AcceptedFeed, RejectedFeed } from "@profullstack/submit-feed";
 import { currentUser, origin } from "@/lib/auth/session";
 import { bearerPrincipal, SCOPE_SUBMIT } from "@/lib/openaccess";
+import { CRAWLER_HEADER, crawlerSource } from "@/lib/crawler-submit";
+import { env } from "@/lib/auth/crypto";
 import {
   MAX_URLS,
   RATE_LIMIT,
@@ -34,6 +36,8 @@ export const maxDuration = 60;
  * No account is needed; the budget is twenty requests an hour per address.
  * A signed-in listener, or an OpenAccess principal holding podcasts:submit,
  * is remembered on the row as the submitter, which the reviewer sees.
+ * A request carrying a valid x-crawler-token is one of our own crawlers: its
+ * row's source is `crawler:<name>` and a passing feed is listed at once.
  */
 export async function POST(req: Request) {
   const html = wantsHtml(req.headers.get("accept"));
@@ -61,7 +65,10 @@ export async function POST(req: Request) {
   }
 
   const ipHash = hashIp(clientIp(req));
-  if ((await requestsThisHour(ipHash)) >= RATE_LIMIT) {
+  // One of our own crawlers (src/lib/crawler-submit.ts): its feeds are listed
+  // without review and it is not held to the per-address hourly budget.
+  const crawler = crawlerSource(req.headers.get(CRAWLER_HEADER), env("CRAWLER_TOKENS"));
+  if (!crawler && (await requestsThisHour(ipHash)) >= RATE_LIMIT) {
     return html
       ? back("rate-limited")
       : Response.json(submitReply({ ok: false, error: "rate-limited", retryAfterSeconds: 3600 }), {
@@ -71,7 +78,7 @@ export async function POST(req: Request) {
   }
 
   const [user, principal] = await Promise.all([currentUser(), bearerPrincipal(req)]);
-  const submittedBy = user?.email ?? (principal?.scopes.includes(SCOPE_SUBMIT) ? principal.sub : null);
+  const submittedBy = crawler ?? user?.email ?? (principal?.scopes.includes(SCOPE_SUBMIT) ? principal.sub : null);
   const { batchId, ids } = await createBatch(s.urls, { userId: user?.id ?? null, ipHash, submittedBy });
   const statusUrl = `${site}/submissions/${batchId}`;
   const rejected: RejectedFeed[] = s.invalid.map((url) => ({ url, error: "invalid-url" }));

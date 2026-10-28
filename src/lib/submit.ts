@@ -5,6 +5,7 @@ import type { Podcast } from "@/lib/db";
 import { env, now, secret, sha256, token } from "@/lib/auth/crypto";
 import { normalizeLang } from "@/lib/format";
 import { notifyReviewers } from "@/lib/review";
+import { isCrawlerSource } from "@/lib/crawler-submit";
 
 /**
  * Feed submission, the site-specific half.
@@ -187,6 +188,17 @@ export async function resolveSubmission(id: string, opts: { notify?: boolean } =
   });
 
   if (outcome.status === "listed") void forward(outcome.feedUrl);
+
+  // One of our own crawlers found this feed (src/lib/crawler-submit.ts): it
+  // passed the rules, so list it now instead of queueing it for a person.
+  if (outcome.status === "review" && isCrawlerSource(row.submitted_by)) {
+    const d = await decideSubmission(id, "approve", `auto:${row.submitted_by}`, "auto-approved: crawler submission", { reread: false });
+    if (d.ok && d.status !== "rejected" && d.slug) {
+      return { status: d.status, slug: d.slug, title: d.title ?? outcome.title, feedUrl: outcome.feedUrl };
+    }
+    return outcome;
+  }
+
   if (outcome.status === "review" && opts.notify !== false) {
     void notifyReviewers({
       title: outcome.title,
@@ -236,7 +248,13 @@ export type Decision =
  * Reject: the row records who said no and why, and the same feed can be
  * submitted again once whatever it was is fixed.
  */
-export async function decideSubmission(id: string, decision: "approve" | "reject", by: string, reason: string | null): Promise<Decision> {
+export async function decideSubmission(
+  id: string,
+  decision: "approve" | "reject",
+  by: string,
+  reason: string | null,
+  opts: { reread?: boolean } = {},
+): Promise<Decision> {
   const row = await submissionRow(id);
   if (!row) return { ok: false, error: "no such submission", status: 404 };
   if (row.status !== "review") return { ok: false, error: `submission is ${row.status}, not waiting for review`, status: 409 };
@@ -266,11 +284,14 @@ export async function decideSubmission(id: string, decision: "approve" | "reject
     return { ok: false, error: "the submission carries no show to list; submit the feed again", status: 409 };
   }
   let fresh: Omit<Podcast, "id" | "slug"> | null = null;
-  try {
-    const r = await resolveFeed(feedUrl, { kind: "podcast", timeoutMs: 10_000, userAgent: USER_AGENT, maxCandidates: 0 });
-    if (r.ok && r.feed.title) fresh = rowFromFeed(r.feed, feedUrl, stored.host);
-  } catch {
-    /* the snapshot stands */
+  // reread: false when the snapshot was taken moments ago (auto-approval).
+  if (opts.reread !== false) {
+    try {
+      const r = await resolveFeed(feedUrl, { kind: "podcast", timeoutMs: 10_000, userAgent: USER_AGENT, maxCandidates: 0 });
+      if (r.ok && r.feed.title) fresh = rowFromFeed(r.feed, feedUrl, stored.host);
+    } catch {
+      /* the snapshot stands */
+    }
   }
   const toList = fresh ?? stored;
   const slug = await claimSlug(toList.title, feedUrl);
