@@ -4,9 +4,8 @@ import Ad from "@/components/Ad";
 import Art from "@/components/Art";
 import StationPlay from "@/components/live/StationPlay";
 import { AD_TEXT } from "@/lib/ads";
-import { titleCase } from "@/lib/format";
 import { radio, type Station } from "@/lib/live/radio";
-import { countryName } from "@/lib/live/nichedb";
+import { countryName, label } from "@/lib/live/nichedb";
 import { jsonLdScript } from "@/lib/jsonld";
 
 // The station list lives in memory (lib/live), so this renders per request.
@@ -36,7 +35,7 @@ function href(p: { country?: string; genre?: string; q?: string; page?: number }
 }
 
 function heading(country?: string, genre?: string) {
-  const g = genre ? `${titleCase(genre)} ` : "";
+  const g = genre ? `${label(genre)} ` : "";
   return country ? `${g}radio from ${countryName(country)}` : genre ? `${g}radio` : "Live radio";
 }
 
@@ -61,7 +60,7 @@ function StationCard({ s }: { s: Station }) {
         <h3>{s.name}</h3>
         <div className="host">{where || "Internet radio"}</div>
         <div className="sub">
-          {s.genres.slice(0, 3).map(titleCase).join(" · ") || "Radio"}
+          {s.genres.slice(0, 3).map(label).join(" · ") || "Radio"}
           {s.bitrate ? ` · ${s.bitrate} kbps` : ""}
           {s.home && (
             <>
@@ -162,7 +161,7 @@ export default async function Radio({ searchParams }: { searchParams: Promise<Pa
             <option value="">Any genre</option>
             {res.genres.slice(0, 120).map((g) => (
               <option key={g.key} value={g.key}>
-                {titleCase(g.key)} ({g.n.toLocaleString()})
+                {label(g.key)} ({g.n.toLocaleString()})
               </option>
             ))}
           </select>
@@ -187,7 +186,7 @@ export default async function Radio({ searchParams }: { searchParams: Promise<Pa
             <div className="chips">
               {res.genres.slice(0, 24).map((g) => (
                 <Link className="chip" key={g.key} href={href({ genre: g.key })}>
-                  {titleCase(g.key)} <b>{g.n.toLocaleString()}</b>
+                  {label(g.key)} <b>{g.n.toLocaleString()}</b>
                 </Link>
               ))}
             </div>

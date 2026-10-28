@@ -76,3 +76,10 @@ test("httpsOnly", () => {
   expect(httpsOnly("not a url")).toBeNull();
   expect(httpsOnly(" https://x.example/a ")).toBe("https://x.example/a");
 });
+
+test("label capitalises words with accented letters intact", async () => {
+  const { label } = await import("../src/lib/live/nichedb.ts");
+  expect(label("américa")).toBe("América");
+  expect(label("estación latina")).toBe("Estación Latina");
+  expect(label("80s rock")).toBe("80s Rock");
+});

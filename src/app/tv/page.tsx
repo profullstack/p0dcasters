@@ -3,9 +3,8 @@ import Link from "next/link";
 import Ad from "@/components/Ad";
 import Art from "@/components/Art";
 import { AD_TEXT } from "@/lib/ads";
-import { titleCase } from "@/lib/format";
 import { tv, type Channel } from "@/lib/live/tv";
-import { countryName } from "@/lib/live/nichedb";
+import { countryName, label } from "@/lib/live/nichedb";
 import { jsonLdScript } from "@/lib/jsonld";
 
 // The channel list lives in memory (lib/live), so this renders per request.
@@ -35,7 +34,7 @@ function href(p: { country?: string; category?: string; q?: string; page?: numbe
 }
 
 function heading(country?: string, category?: string) {
-  const c = category ? `${titleCase(category)} ` : "";
+  const c = category ? `${label(category)} ` : "";
   return country ? `${c}TV from ${countryName(country)}` : category ? `${c}TV channels` : "Live TV";
 }
 
@@ -58,7 +57,7 @@ function ChannelCard({ c }: { c: Channel }) {
         <h3>{c.name}</h3>
         <div className="host">{c.cc ? countryName(c.cc) : "International"}</div>
         <div className="sub">
-          {c.categories.slice(0, 3).map(titleCase).join(" · ") || "General"}
+          {c.categories.slice(0, 3).map(label).join(" · ") || "General"}
           {c.quality ? ` · ${c.quality}` : ""}
         </div>
       </div>
@@ -140,7 +139,7 @@ export default async function Tv({ searchParams }: { searchParams: Promise<Param
             <option value="">Any category</option>
             {res.categories.map((c) => (
               <option key={c.key} value={c.key}>
-                {titleCase(c.key)} ({c.n.toLocaleString()})
+                {label(c.key)} ({c.n.toLocaleString()})
               </option>
             ))}
           </select>
@@ -155,7 +154,7 @@ export default async function Tv({ searchParams }: { searchParams: Promise<Param
             <div className="chips">
               {res.categories.slice(0, 24).map((c) => (
                 <Link className="chip" key={c.key} href={href({ category: c.key })}>
-                  {titleCase(c.key)} <b>{c.n.toLocaleString()}</b>
+                  {label(c.key)} <b>{c.n.toLocaleString()}</b>
                 </Link>
               ))}
             </div>

@@ -208,3 +208,8 @@ export function countryName(cc: string): string {
     return cc.toUpperCase();
   }
 }
+
+/** "américa" -> "América". format.titleCase's \b splits words at accented letters. */
+export function label(s: string): string {
+  return s.replace(/(^|[^\p{L}\p{N}'])(\p{L})/gu, (_, pre: string, c: string) => pre + c.toUpperCase());
+}

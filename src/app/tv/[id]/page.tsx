@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import Ad from "@/components/Ad";
 import TvPlayer from "@/components/live/TvPlayer";
 import { AD_TEXT } from "@/lib/ads";
-import { safeDecode, titleCase } from "@/lib/format";
+import { safeDecode } from "@/lib/format";
 import { channel } from "@/lib/live/tv";
-import { countryName } from "@/lib/live/nichedb";
+import { countryName, label } from "@/lib/live/nichedb";
 import { jsonLdScript } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title: `${c.name} live`,
     description: `Watch ${c.name}${where} live in the browser: ${
-      c.categories.map(titleCase).join(", ") || "television"
+      c.categories.map(label).join(", ") || "television"
     }, from the channel's own public stream.`,
     alternates: { canonical: `/tv/${encodeURIComponent(c.id)}` },
     openGraph: c.logo ? { images: [c.logo] } : undefined,
@@ -44,7 +44,7 @@ export default async function TvChannel({ params }: { params: Promise<{ id: stri
         url,
         broadcastChannelId: c.id,
         broadcastServiceTier: "Free",
-        ...(c.categories.length ? { genre: c.categories.map(titleCase) } : {}),
+        ...(c.categories.length ? { genre: c.categories.map(label) } : {}),
         providesBroadcastService: {
           "@type": "BroadcastService",
           name: c.name,
@@ -89,7 +89,7 @@ export default async function TvChannel({ params }: { params: Promise<{ id: stri
           )}
           {c.categories.length > 0 && (
             <div>
-              <b>{c.categories.map(titleCase).join(", ")}</b>Category
+              <b>{c.categories.map(label).join(", ")}</b>Category
             </div>
           )}
           {c.quality && (
@@ -121,7 +121,7 @@ export default async function TvChannel({ params }: { params: Promise<{ id: stri
         <Ad format={AD_TEXT} />
         {c.categories[0] && (
           <p style={{ marginTop: 18 }}>
-            More <Link href={`/tv?category=${encodeURIComponent(c.categories[0])}`}>{titleCase(c.categories[0])} channels</Link>
+            More <Link href={`/tv?category=${encodeURIComponent(c.categories[0])}`}>{label(c.categories[0])} channels</Link>
             {c.cc && (
               <>
                 {" "}
