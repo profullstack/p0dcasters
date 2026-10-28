@@ -6,6 +6,7 @@ import { env, now, secret, sha256, token } from "@/lib/auth/crypto";
 import { normalizeLang } from "@/lib/format";
 import { notifyReviewers } from "@/lib/review";
 import { isCrawlerSource } from "@/lib/crawler-submit";
+import { registrableDomain } from "@/lib/domain";
 
 /**
  * Feed submission, the site-specific half.
@@ -410,14 +411,21 @@ async function existing(url: string): Promise<{ slug: string; title: string; fee
   return row ? { slug: row.slug, title: row.title, feedUrl: row.feed_url } : null;
 }
 
-/** A listed show with this title on one of these hosts. */
+/**
+ * A listed show with this title on the same registrable domain as one of these
+ * hosts. The dump's `host` is the registrable domain (libsyn.com) while a
+ * submitted feed keeps its full host (rss.libsyn.com), and a publisher's feed
+ * moves between a platform's subdomains, so comparing exact hosts listed the
+ * same show twice as title and title-2.
+ */
 async function sameShow(title: string, hosts: string[]): Promise<{ slug: string; title: string; feedUrl: string } | null> {
-  const hs = hosts.filter(Boolean);
-  if (!title || !hs.length) return null;
+  const ds = [...new Set(hosts.map(registrableDomain).filter(Boolean))];
+  if (!title || !ds.length) return null;
+  const where = ds.map(() => "(host = ? OR host LIKE ?)").join(" OR ");
   const row = await one<{ slug: string; title: string; feed_url: string }>(
     `SELECT slug, title, feed_url FROM podcasts
-     WHERE lower(title) = lower(?) AND host IN (${hs.map(() => "?").join(",")}) LIMIT 1`,
-    [title.trim(), ...hs],
+     WHERE lower(title) = lower(?) AND (${where}) ORDER BY id LIMIT 1`,
+    [title.trim(), ...ds.flatMap((d) => [d, `%.${d}`])],
   );
   return row ? { slug: row.slug, title: row.title, feedUrl: row.feed_url } : null;
 }
