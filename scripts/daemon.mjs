@@ -148,11 +148,20 @@ async function probe(url) {
   }
 }
 
+/** NAME's value in the web app's env file (../app.env), or null. */
+function appEnv(name) {
+  const line = (files.read(join(REPO, "..", "app.env")) ?? "").split("\n").find((l) => l.startsWith(`${name}=`));
+  return line ? line.slice(name.length + 1).replace(/^["']|["'\s\r]+$/g, "") || null : null;
+}
+
 let cred = null;
 async function credential() {
   if (cred) return cred;
   const tries = [
     ["env", async () => process.env.DATABASE_URL],
+    // The web app's own env file holds the credential it serves with right now, so a
+    // rotated password reaches the daemon without touching the cache or the vault.
+    ["app.env", async () => appEnv("DATABASE_URL")],
     ["cache", async () => files.read(`${P.data}/.database-url`)?.trim()],
     ["vault", () => vaultEnv("DATABASE_URL")],
   ];
@@ -160,14 +169,14 @@ async function credential() {
     const url = await get().catch(() => null);
     if (!url || !/^postgres(ql)?:\/\//.test(url)) continue;
     if (!(await probe(url))) continue;
-    if (source === "vault") {
+    if (source === "vault" || source === "app.env") {
       writeFileSync(`${P.data}/.database-url`, url, { mode: 0o600 });
-      log("database credential refreshed from vault");
+      log(`database credential refreshed from ${source}`);
     }
     cred = { url, source };
     return cred;
   }
-  log("no working database credential: environment, cache and vault all failed");
+  log("no working database credential: environment, app.env, cache and vault all failed");
   return null;
 }
 
@@ -248,10 +257,7 @@ const secrets = {};
 async function secretEnv(name) {
   if (secrets[name]) return secrets[name];
   let v = process.env[name];
-  if (!v) {
-    const line = (files.read(join(REPO, "..", "app.env")) ?? "").split("\n").find((l) => l.startsWith(`${name}=`));
-    v = line ? line.slice(name.length + 1).replace(/^["']|["'\s\r]+$/g, "") : null;
-  }
+  if (!v) v = appEnv(name);
   if (!v && name === "RESEND_API_KEY") v = files.read(`${P.data}/.resend-key`)?.trim() || null;
   if (!v) v = await vaultEnv(name);
   if (v) secrets[name] = v;
