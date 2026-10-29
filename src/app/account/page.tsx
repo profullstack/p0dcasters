@@ -13,6 +13,8 @@ import { COLUMNS } from "@profullstack/profile";
 import { profileStore } from "@/lib/profile";
 import Ad from "@/components/Ad";
 import { AD_TEXT } from "@/lib/ads";
+import { canDisconnect, coinpayConfig, coinpayMessage, isPlaceholderEmail } from "@/lib/auth/coinpay";
+import { dbCoinpayStore } from "@/lib/auth/coinpay-store";
 
 export const dynamic = "force-dynamic";
 
@@ -21,28 +23,38 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function Account() {
+export default async function Account({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
   const user = await currentUser();
   if (!user) redirect("/login?next=/account");
 
-  const [passkeys, follows, mine, digest] = await Promise.all([
+  const [passkeys, follows, mine, digest, coinpay] = await Promise.all([
     credentialsFor(user.id),
     count("SELECT COUNT(*) n FROM follows WHERE user_id = ?", [user.id]),
     // A missing table must not take the account page down with it.
     profileStore().get(user.id).catch(() => null),
     isSubscribed(user.id).catch(() => true),
+    dbCoinpayStore().identityByUser(user.id).catch(() => null),
   ]);
+  const placeholder = isPlaceholderEmail(user.email);
+  const coinpayNote = coinpayMessage(params.coinpay);
   // Only the six fields cross to the client form, as plain strings.
   const profileValues: Record<string, string | null> = Object.fromEntries(
     COLUMNS.map((c) => [c, mine?.[c] == null ? null : String(mine[c])]),
   );
-  if (!profileValues.email) profileValues.email = user.email;
+  // A CoinPay-made account has an undeliverable placeholder address; never
+  // prefill it (nor the unverified CoinPay email) as the reader's.
+  if (!profileValues.email && !placeholder) profileValues.email = user.email;
 
   return (
     <div className="wrap narrow">
       <h1>Your account</h1>
       <p className="muted">
-        Signed in as <b>{user.email}</b>. Joined{" "}
+        Signed in {placeholder ? <>with <b>CoinPay</b></> : <>as <b>{user.email}</b></>}. Joined{" "}
         {new Date(user.created_at * 1000).toLocaleDateString(undefined, {
           year: "numeric",
           month: "long",
@@ -90,6 +102,45 @@ export default async function Account() {
             </>
           )}
         </p>
+      </section>
+
+      <section className="panel" id="coinpay">
+        <h2>CoinPay</h2>
+        {params.coinpay === "connected" && <p className="auth-note">CoinPay is connected.</p>}
+        {params.coinpay === "disconnected" && <p className="auth-note">CoinPay is disconnected.</p>}
+        {coinpayNote && <p className="auth-error">{coinpayNote}</p>}
+        {coinpay ? (
+          <>
+            <p className="muted">
+              Connected: you can sign in here with your CoinPay account
+              {coinpay.coinpay_email ? <> ({coinpay.coinpay_email})</> : null}.
+            </p>
+            {canDisconnect(user, passkeys.length) ? (
+              <form action="/api/v1/coinpay/disconnect" method="post">
+                <button className="btn" type="submit">
+                  Disconnect CoinPay
+                </button>
+              </form>
+            ) : (
+              <p className="muted small">
+                CoinPay is the only way into this account. Add a passkey below before
+                disconnecting it.
+              </p>
+            )}
+          </>
+        ) : coinpayConfig() ? (
+          <>
+            <p className="muted">
+              Connect your CoinPay account to sign in here with it, the same account you
+              use across the Profullstack sites.
+            </p>
+            <a className="btn" href="/api/v1/coinpay/oauth/start?mode=connect">
+              Connect CoinPay
+            </a>
+          </>
+        ) : (
+          <p className="muted">Connecting CoinPay is not available right now.</p>
+        )}
       </section>
 
       <section className="panel">
