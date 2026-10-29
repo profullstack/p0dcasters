@@ -53,6 +53,11 @@ export default async function Submissions() {
           const show = parse(s.podcast);
           return (
             <article className="review-item" key={s.id} id={`s-${s.id}`}>
+              {waiting.length > 1 && (
+                <label className="small muted review-pick">
+                  <input type="checkbox" data-accept-pick value={s.id} /> select
+                </label>
+              )}
               {show ? (
                 <>
                   <div className="card submit-preview">

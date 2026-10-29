@@ -8,6 +8,11 @@ import { findOrCreateUser } from "@/lib/auth/session";
 import { claimProfile, editorOf, rememberPrincipal, renderShowProfile, saveOverrides } from "@/lib/openprofile/store";
 import { profilePage, profileUrl } from "@/lib/openprofile/generate";
 import { newsletterInfo, previewIssue } from "@/lib/newsletter-store";
+import { reviewerOf } from "@/lib/review";
+import { acceptSubmissions } from "@/lib/accept-all";
+import { SCOPE_REVIEW } from "@/lib/openaccess";
+import { submissionsByStatus } from "@/lib/submit";
+import { publicRow } from "@/lib/review-row";
 
 /**
  * What an agent can do with the directory.
@@ -364,6 +369,42 @@ TOOLS.push(
         text: issue.text,
         ...(args?.html === true ? { html: issue.html } : {}),
       };
+    },
+  },
+);
+
+TOOLS.push(
+  {
+    name: "list_submissions",
+    title: "The review queue",
+    description: `The submitted feeds waiting for a person to list or reject them. For reviewers: needs an OpenAccess bearer with scope ${SCOPE_REVIEW} in the Authorization header.`,
+    inputSchema: { type: "object", properties: {} },
+    annotations: { readOnlyHint: true, openWorldHint: false },
+    async run(_args, ctx) {
+      const by = reviewerOf(null, await principalOf(ctx as ToolContext));
+      if (!by) throw toolError(`Present an OpenAccess token with scope ${SCOPE_REVIEW}.`);
+      const rows = await submissionsByStatus("review");
+      return { count: rows.length, submissions: rows.map(publicRow) };
+    },
+  },
+  {
+    name: "accept_submissions",
+    title: "Accept all waiting submissions",
+    description: `List every submission waiting for review at once, or only the given ids (from list_submissions). A feed already in the directory comes back as existing; one failure does not stop the rest. Returns counts listed / existing / failed and a result per id. Needs an OpenAccess bearer with scope ${SCOPE_REVIEW}.`,
+    inputSchema: {
+      type: "object",
+      properties: {
+        ids: { type: "array", items: { type: "string" }, description: "Only these submissions. Omit for all waiting." },
+        reason: { type: "string", description: "A note for the review log." },
+      },
+    },
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
+    async run(args, ctx) {
+      const by = reviewerOf(null, await principalOf(ctx as ToolContext));
+      if (!by) throw toolError(`Present an OpenAccess token with scope ${SCOPE_REVIEW}.`);
+      const ids = Array.isArray(args?.ids) ? args.ids.filter((x: unknown): x is string => typeof x === "string") : undefined;
+      const reason = typeof args?.reason === "string" ? args.reason.trim().slice(0, 500) || null : null;
+      return acceptSubmissions(by, { ids, reason });
     },
   },
 );
