@@ -78,6 +78,7 @@ export async function headStamp(fetchImpl, url = DUMP_URL, { signal, timeoutMs =
  * @param {{acquire(): Promise<boolean>, release(): void}} deps.lock   the shell's flock
  * @param {(s: {job: string, lastOk: number|null, lastError: string|null}) => Promise<void>} [deps.alert]
  * @param {() => Promise<object>} [deps.newsletter]  one pass of the weekly digest (src/lib/newsletter.ts)
+ * @param {object} [deps.crawl]  the show crawler (src/lib/feed-crawl.ts): { lib, q, concurrency }
  * @param {object} [deps.bin]   { node, bun, python }
  * @param {string} [deps.repo]  the checkout the scripts live in
  */
@@ -94,6 +95,7 @@ export function buildDaemon(deps) {
     lock,
     alert,
     newsletter,
+    crawl = null,
     console: out = console,
     now = Date.now,
     minRows = 10_000,
@@ -352,8 +354,9 @@ export function buildDaemon(deps) {
     redis,
     store,
     // Two: the directory pipeline runs for hours and must not hold the weekly
-    // digest back. Each task still runs one at a time on its own.
-    concurrency: 2,
+    // digest back. Each task still runs one at a time on its own. The show
+    // crawler's reads come on top, so it never waits behind either.
+    concurrency: 2 + (crawl ? crawl.concurrency + 1 : 0),
     onRun,
     onStall: async (s) => {
       out.error(`[directory] stalled: no success since ${s.lastOk ? new Date(s.lastOk).toISOString() : "start"}${s.lastError ? `: ${s.lastError}` : ""}`);
@@ -380,5 +383,52 @@ export function buildDaemon(deps) {
       },
     });
   }
+  if (crawl) addShowCrawler(daemon, crawl, out);
   return daemon;
+}
+
+/** Feeds read per tier at once from one host: anchor.fm alone is 116k shows. */
+export const SHOWS_PER_HOST = 4;
+export const SHOWS_JOB = "shows";
+
+/**
+ * The show crawler: every listed show's feed on its own rhythm (see
+ * src/lib/feed-crawl.ts), plus a job that keeps feed_state in step with the
+ * podcasts table the dump reload swaps in.
+ *
+ * @param {ReturnType<import('@profullstack/scraper-daemon').createDaemon>} daemon
+ * @param {{ lib: typeof import('../src/lib/feed-crawl.ts'), q: Function, concurrency: number, tiers?: string[] }} crawl
+ */
+export function addShowCrawler(daemon, { lib, q, concurrency, tiers }, out = console) {
+  const TIERS = tiers ?? ["hot", "active", "slow", "dormant", "archived"];
+  daemon.job({
+    name: "shows-seed",
+    every: "30m",
+    timeout: "20m",
+    async run() {
+      const seeded = await lib.seedFeedState(q);
+      // After a reload the fresh rows carry the dump's dates; put back anything newer we read.
+      const reapplied = await lib.applyToPodcasts(q);
+      return { ...seeded, reapplied };
+    },
+  });
+  daemon.feeds({
+    name: SHOWS_JOB,
+    concurrency,
+    perHost: SHOWS_PER_HOST,
+    timeout: "1m",
+    staleAfter: "2h",
+    due: (tier, limit) => lib.dueFeeds(q, TIERS.indexOf(tier), limit),
+    run: async (feed, ctx) => {
+      const r = await lib.readFeed(feed, ctx.signal);
+      return { dates: r.dates, changed: !r.notModified, crawl: r };
+    },
+    save: (feed, plan, result) => lib.saveCrawl(q, feed, plan, result.crawl),
+    fail: (feed, f) => lib.saveFailure(q, feed, f),
+    previous: (feed) => feed.minutes,
+    fails: (feed) => feed.fails,
+    // Ten failures in a row and a show is read once a quarter, like an archived one.
+    retireAfter: 10,
+  });
+  out.log?.(`[p0dcasters.com] show crawler on: ${concurrency} at once, ${SHOWS_PER_HOST} per host`);
 }

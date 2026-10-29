@@ -29,6 +29,7 @@ import { buildDaemon, pathsFor } from "./daemon-lib.mjs";
 // Bun runs the TypeScript directly: the same sender the web app's admin route uses.
 import { runWeeklyNewsletter, slotFor, slotFrom, sqlStore } from "../src/lib/newsletter.ts";
 import { sendMail } from "../src/lib/auth/mail.ts";
+import * as feedCrawl from "../src/lib/feed-crawl.ts";
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..");
 const P = pathsFor();
@@ -234,7 +235,9 @@ if (!c) {
   console.error("p0dcasters daemon: no working DATABASE_URL; exiting (systemd retries)");
   process.exit(1);
 }
-const sql = new SQL(c.url, { max: 2 });
+// Two for the directory and the digest, plus room for the show crawler's writes.
+const CRAWL_CONCURRENCY = Number(process.env.CRAWL_CONCURRENCY ?? 24);
+const sql = new SQL(c.url, { max: CRAWL_CONCURRENCY > 0 ? 8 : 2 });
 // scraper-daemon 0.1.1+ passes state as text both ways, so Bun's SQL needs no help here.
 const store = pgStore((text, params) => sql.unsafe(text, params));
 
@@ -298,6 +301,11 @@ if (process.argv.includes("--status")) {
   process.exit(0);
 }
 
+/* ---------- the show crawler (src/lib/feed-crawl.ts) ---------- */
+
+const crawlQuery = (text, params = []) => sql.unsafe(text, params);
+if (CRAWL_CONCURRENCY > 0) await feedCrawl.ensureFeedState(crawlQuery);
+
 const daemon = buildDaemon({
   createDaemon,
   store,
@@ -310,6 +318,7 @@ const daemon = buildDaemon({
   lock,
   alert,
   newsletter: () => newsletterPass(),
+  crawl: CRAWL_CONCURRENCY > 0 ? { lib: feedCrawl, q: crawlQuery, concurrency: CRAWL_CONCURRENCY } : null,
   repo: REPO,
 });
 
