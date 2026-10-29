@@ -2,7 +2,8 @@ import { currentUser } from "@/lib/auth/session";
 import { bearerPrincipal, SCOPE_REVIEW } from "@/lib/openaccess";
 import { reviewerOf } from "@/lib/review";
 import { revalidatePath } from "next/cache";
-import { decideSubmission, submissionsByStatus, type SubmissionRow } from "@/lib/submit";
+import { submissionsByStatus, type SubmissionRow } from "@/lib/submit";
+import { acceptSubmissions } from "@/lib/accept-all";
 import { publicRow } from "@/lib/review-row";
 
 export const dynamic = "force-dynamic";
@@ -54,22 +55,9 @@ export async function POST(req: Request) {
     return Response.json({ ok: false, error: 'decision must be "approve" (reject one at a time)' }, { status: 400, headers });
   }
   const reason = typeof body.reason === "string" ? body.reason.trim().slice(0, 500) || null : null;
-  const ids = Array.isArray(body.ids)
-    ? body.ids.filter((x): x is string => typeof x === "string")
-    : (await submissionsByStatus("review")).map((r) => r.id);
-
-  const results: { id: string; ok: boolean; status?: string; slug?: string | null; title?: string | null; error?: string }[] = [];
-  for (const id of ids) {
-    try {
-      const out = await decideSubmission(id, "approve", by, reason);
-      results.push(out.ok ? { id, ok: true, status: out.status, slug: out.slug, title: out.title } : { id, ok: false, error: out.error });
-    } catch (e) {
-      results.push({ id, ok: false, error: e instanceof Error ? e.message : String(e) });
-    }
-  }
-  const listed = results.filter((r) => r.ok && r.status === "listed").length;
-  const existing = results.filter((r) => r.ok && r.status === "existing").length;
-  const failed = results.filter((r) => !r.ok).length;
+  const ids = Array.isArray(body.ids) ? body.ids.filter((x): x is string => typeof x === "string") : undefined;
+  const out = await acceptSubmissions(by, { ids, reason });
+  const { listed, results } = out;
   if (listed) {
     try {
       for (const r of results) if (r.slug) revalidatePath(`/podcast/${r.slug}`);
@@ -78,5 +66,5 @@ export async function POST(req: Request) {
       /* nothing to revalidate outside a request scope */
     }
   }
-  return Response.json({ ok: failed === 0, listed, existing, failed, results }, { headers });
+  return Response.json(out, { headers });
 }
