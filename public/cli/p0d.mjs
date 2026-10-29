@@ -17,7 +17,7 @@
 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 const DEFAULT_API = 'https://p0dcasters.com';
 
 /**
@@ -81,6 +81,15 @@ export const COMMANDS = [
       'With no argument: when the weekly email goes out, when the next one is due, and the last issue sent. `newsletter preview` prints this week\'s issue as it would be built now, as plain text (--html for the HTML). Subscribing is a setting on your account at /account; every issue has a one-click unsubscribe link.',
     options: ['--html', '--json'],
     examples: ['p0d newsletter', 'p0d newsletter preview', 'p0d newsletter preview --html > issue.html'],
+  },
+  {
+    name: 'review',
+    usage: 'review [accept-all]',
+    summary: 'The submission queue, for reviewers; accept all of it',
+    detail:
+      'Lists the submissions waiting for a person. `review accept-all` lists every one of them at once (asks first unless --yes); a feed already listed comes back as already listed. Needs an OpenAccess token with scope submissions:review in OPENACCESS_TOKEN or P0D_TOKEN.',
+    options: ['--yes', '--json'],
+    examples: ['p0d review', 'p0d review accept-all --yes'],
   },
   {
     name: 'opml',
@@ -286,6 +295,35 @@ export async function run(argv, io = {}) {
         o.out(body.latest ? `latest ${body.latest.week}: ${body.latest.subject} (sent to ${body.latest.sent})` : 'latest none sent yet');
         o.out(`page   ${body.page}`);
         return 0;
+      }
+      case 'review': {
+        const token = o.env.OPENACCESS_TOKEN || o.env.P0D_TOKEN;
+        if (!token) return fail(o, 'review: set OPENACCESS_TOKEN or P0D_TOKEN (scope submissions:review)');
+        const auth = { authorization: `Bearer ${token}` };
+        if (rest[0] && rest[0] !== 'accept-all') return fail(o, `review: unknown argument ${rest[0]}; try p0d review accept-all`);
+        const queue = await request('/api/review?status=review', { headers: auth });
+        const waiting = queue.submissions ?? [];
+        if (!rest[0]) {
+          if (flags.json) return json(o, queue);
+          if (!waiting.length) o.out('Nothing waiting.');
+          for (const s of waiting) o.out(`${s.id}  ${s.title ?? s.input ?? ''}  ${s.feedUrl ?? s.feed_url ?? ''}`);
+          return 0;
+        }
+        if (!waiting.length) {
+          if (flags.json) return json(o, { ok: true, listed: 0, existing: 0, failed: 0, results: [] });
+          o.out('Nothing waiting.');
+          return 0;
+        }
+        if (!flags.yes) return fail(o, `review accept-all: ${waiting.length} waiting; run again with --yes to list them all`);
+        const body = await request('/api/review', {
+          method: 'POST',
+          headers: { ...auth, 'content-type': 'application/json' },
+          body: JSON.stringify({ decision: 'approve', ids: waiting.map((s) => s.id) }),
+        });
+        if (flags.json) return json(o, body);
+        o.out(`listed ${body.listed}, already listed ${body.existing}${body.failed ? `, failed ${body.failed}` : ''}`);
+        for (const r of body.results ?? []) if (!r.ok) o.out(`failed  ${r.id} — ${r.error}`);
+        return body.failed ? 1 : 0;
       }
       case 'opml': {
         const path = rest[0] ? `/opml?category=${encodeURIComponent(rest[0])}` : '/opml';

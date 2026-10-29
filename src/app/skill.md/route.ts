@@ -57,7 +57,7 @@ plain HTTP below, described in \`/openapi.json\`.
   existing}], rejected: [{url, error, message}], queued, total, submissionId, statusUrl,
   review?}\`. An OpenAccess bearer token (hub https://openaccess.logicsrc.com, scope
   \`podcasts:submit\`) records its principal as the submitter; \`submissions:review\`
-  opens \`GET /api/review\` and \`POST /api/review/{id} {decision: approve|reject}\`.
+  opens \`GET /api/review\`, \`POST /api/review/{id} {decision: approve|reject}\` and \`POST /api/review {decision: approve}\` (accept every waiting submission, or only \`ids\`).
 
 ## Limits worth knowing
 
