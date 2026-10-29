@@ -8,6 +8,7 @@ import { recentDecisions, submissionsByStatus } from "@/lib/submit";
 import Art from "@/components/Art";
 import TimeAgo from "@/components/TimeAgo";
 import ReviewButtons from "@/components/ReviewButtons";
+import AcceptAllButton from "@/components/AcceptAllButton";
 import { safeImage } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +47,7 @@ export default async function Submissions() {
             ? "Nothing waiting."
             : `${waiting.length} waiting. Approving lists the show at once; rejecting keeps the feed out until someone submits it again.`}
         </p>
+        {waiting.length > 1 && <AcceptAllButton ids={waiting.map((s) => s.id)} />}
 
         {waiting.map((s) => {
           const show = parse(s.podcast);

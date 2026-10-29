@@ -96,3 +96,28 @@ test('update and remove refuse outside an installed copy', async () => {
   const r = io();
   assert.equal(await run(['remove', '--yes'], { ...r, argv1: '/nowhere/p0d' }), 1);
 });
+
+test('review accept-all lists every waiting submission, only with --yes', async () => {
+  const o = io();
+  o.env.P0D_TOKEN = 'tok';
+  o.fetch = async (url, init = {}) => {
+    o.calls.push({ url, init });
+    if ((init.method ?? 'GET') === 'GET') {
+      return new Response(JSON.stringify({ ok: true, submissions: [{ id: 'a', title: 'A' }, { id: 'b', title: 'B' }] }), { status: 200 });
+    }
+    return new Response(JSON.stringify({ ok: true, listed: 1, existing: 1, failed: 0, results: [] }), { status: 200 });
+  };
+  assert.equal(await run(['review', 'accept-all'], o), 1);
+  assert.equal(o.calls.length, 1);
+  assert.equal(await run(['review', 'accept-all', '--yes'], o), 0);
+  const post = o.calls.at(-1);
+  assert.equal(post.init.method, 'POST');
+  assert.equal(post.init.headers.authorization, 'Bearer tok');
+  assert.deepEqual(JSON.parse(post.init.body), { decision: 'approve', ids: ['a', 'b'] });
+  assert.match(o.out_.at(-1), /listed 1, already listed 1/);
+});
+
+test('review needs a token', async () => {
+  const o = io();
+  assert.equal(await run(['review'], o), 1);
+});

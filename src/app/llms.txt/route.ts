@@ -81,7 +81,7 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
   review (and counted in queued), not accepted, until a person lists it. Twenty requests
   an hour per address. An OpenAccess bearer token (hub https://openaccess.logicsrc.com,
   scope podcasts:submit) records its principal as the submitter; scope
-  submissions:review opens GET /api/review and POST /api/review/{id}.
+  submissions:review opens GET /api/review, POST /api/review/{id} and POST /api/review {decision: approve} (accept all waiting, or only ids).
 - [MCP](https://p0dcasters.com/mcp): search, get_podcast, list_episodes, list_shows,
   browse, directory_stats, submit_feed, get_openprofile, update_openprofile,
   claim_openprofile, get_newsletter and newsletter_preview at
