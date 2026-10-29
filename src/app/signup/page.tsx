@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import AuthForm from "@/components/AuthForm";
 import { currentUser } from "@/lib/auth/session";
 import { safeNext } from "@/lib/auth/next";
+import { coinpayMessage } from "@/lib/auth/coinpay";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ export default async function Signup({
   if (await currentUser()) redirect(next || "/following");
   return (
     <div className="wrap narrow">
-      <AuthForm mode="signup" next={next} expired={false} />
+      <AuthForm mode="signup" next={next} expired={false} coinpayError={coinpayMessage(params.coinpay)} />
     </div>
   );
 }

@@ -239,3 +239,16 @@ create index if not exists i_host on podcasts(host);
 create index if not exists i_score on podcasts(score desc);
 create index if not exists i_new on podcasts(newest_pubdate desc);
 create index if not exists i_search on podcasts using gin (p0d_search_vector(title, host, author, description));
+
+-- Sign in with CoinPay (src/lib/auth/coinpay.ts). Bound by the CoinPay `sub`
+-- only, never by email; coinpay_email is unverified contact info. Also created
+-- lazily by src/lib/auth/coinpay-store.ts.
+create table if not exists coinpay_identities (
+  coinpay_sub text primary key,
+  user_id bigint not null unique references users(id) on delete cascade,
+  coinpay_email text,
+  coinpay_name text,
+  created_via text not null,
+  created_at bigint not null,
+  last_login_at bigint
+);

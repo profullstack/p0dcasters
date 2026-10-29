@@ -15,10 +15,13 @@ export default function AuthForm({
   mode,
   next,
   expired,
+  coinpayError = null,
 }: {
   mode: "login" | "signup";
   next: string;
   expired: boolean;
+  /** Why a CoinPay sign-in came back refused, already worded for a reader. */
+  coinpayError?: string | null;
 }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -27,7 +30,7 @@ export default function AuthForm({
   const [note, setNote] = useState<string | null>(
     expired ? "That link had already been used, or it expired. Here is another." : null,
   );
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(coinpayError);
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -161,6 +164,19 @@ export default function AuthForm({
 
       {note && !sent && <p className="auth-note">{note}</p>}
 
+      {/* CoinPay is the house master account: first, and a full navigation
+          (the start route sets the PKCE/state cookie and 302s to CoinPay). */}
+      <a
+        className="btn primary wide"
+        href={`/api/v1/coinpay/oauth/start?mode=login${next ? `&next=${encodeURIComponent(next)}` : ""}`}
+      >
+        {mode === "signup" ? "Sign up with CoinPay" : "Sign in with CoinPay"}
+      </a>
+
+      <div className="auth-or">
+        <span>or use your email</span>
+      </div>
+
       <form ref={formRef} onSubmit={submit}>
         <label htmlFor="email">Email address</label>
         <input
@@ -218,7 +234,7 @@ export default function AuthForm({
           </label>
         )}
 
-        <button className="btn primary wide" type="submit" disabled={busy || !email}>
+        <button className="btn wide" type="submit" disabled={busy || !email}>
           {busy ? "Sending…" : "Email me a link"}
         </button>
       </form>

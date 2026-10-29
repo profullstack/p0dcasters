@@ -1,6 +1,6 @@
 {
   "name": "p0dcasters",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@logicsrc/openaccess": "0.3.1",
+    "@profullstack/coinpay-onboard": "0.3.1",
     "@profullstack/footer": "0.3.0",
     "@profullstack/libsql-pg": "^0.1.4",
     "@profullstack/openprofile": "^0.2.0",
