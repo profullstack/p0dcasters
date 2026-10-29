@@ -12,6 +12,7 @@ import FollowButton from "@/components/FollowButton";
 import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
 import PlaylistButtons from "@/components/PlaylistButtons";
 import ShareButton from "@/components/ShareButton";
+import RefreshButton from "@/components/RefreshButton";
 import { nixampUrl, playlistUrl } from "@/lib/playlist";
 import { profileUrl } from "@/lib/openprofile/generate";
 import { cadence, languageName, titleCase, clamp, safeImage, normalizeLang } from "@/lib/format";
@@ -192,6 +193,7 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
               <LatestButton feedUrl={p.feed_url} show={show} />
             </Suspense>
             <FollowButton slug={p.slug} />
+            <RefreshButton slug={p.slug} />
             <a className="btn" href={p.feed_url} rel="noopener nofollow">
               RSS feed
             </a>
