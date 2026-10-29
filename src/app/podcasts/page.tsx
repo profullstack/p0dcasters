@@ -7,6 +7,7 @@ import Card from "@/components/Card";
 import Ad from "@/components/Ad";
 import { AD_TEXT } from "@/lib/ads";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
+import { recentCeiling } from "@/lib/sort";
 
 const { all, count, languageBuckets } = cachedDb(300);
 
@@ -26,10 +27,14 @@ export const metadata: Metadata = {
  * page only points into the catalogue.
  */
 export default async function Podcasts() {
-  const [total, hosts, featured, cats, langs] = await Promise.all([
+  const [total, hosts, featured, fresh, cats, langs] = await Promise.all([
     count("SELECT COUNT(*) AS n FROM podcasts"),
     count("SELECT COUNT(DISTINCT host) AS n FROM podcasts"),
     all<Podcast>("SELECT * FROM podcasts ORDER BY score DESC LIMIT 24"),
+    all<Podcast>(
+      "SELECT * FROM podcasts WHERE episode_count >= 8 AND newest_pubdate <= ? ORDER BY newest_pubdate DESC LIMIT 12",
+      [recentCeiling()],
+    ),
     all<{ category: string; n: number }>(
       "SELECT category, COUNT(*) AS n FROM podcasts WHERE category IS NOT NULL GROUP BY category ORDER BY n DESC LIMIT 24",
     ),
@@ -93,6 +98,18 @@ export default async function Podcasts() {
       </section>
 
       <Ad format={AD_TEXT} />
+
+      <section>
+        <h2 className="sec">Just published</h2>
+        <div className="grid">
+          {fresh.map((p) => (
+            <Card key={p.id} p={p} />
+          ))}
+        </div>
+        <p style={{ color: "var(--muted)", margin: "10px 0 0" }}>
+          Every subject, language and network has its own: pick one above and choose <b>Recent</b>.
+        </p>
+      </section>
 
       <section>
         <h2 className="sec">Deep catalogues, still publishing</h2>

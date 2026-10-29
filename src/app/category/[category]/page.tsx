@@ -9,6 +9,8 @@ import { safeDecode, titleCase } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 import Link from "next/link";
 import TimeAgo from "@/components/TimeAgo";
+import SortTabs from "@/components/SortTabs";
+import { listHref, listSort, sortSql } from "@/lib/sort";
 
 export const revalidate = 3600;
 const PER = 60;
@@ -32,12 +34,15 @@ export default async function Category({
   searchParams,
 }: {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }) {
   const { category } = await params;
-  const { page } = await searchParams;
+  const { page, sort: sortParam } = await searchParams;
   const cat = safeDecode(category);
   const pg = Math.max(1, parseInt(page || "1", 10) || 1);
+  const sort = listSort(sortParam);
+  const by = sortSql(sort);
+  const path = `/category/${category}`;
 
   const total = await count("SELECT COUNT(*) AS n FROM podcasts WHERE category = ?", [cat]);
   if (!total) notFound();
@@ -54,8 +59,8 @@ export default async function Category({
   );
 
   const rows = await all<Podcast>(
-    "SELECT * FROM podcasts WHERE category = ? ORDER BY score DESC LIMIT ? OFFSET ?",
-    [cat, PER, (pg - 1) * PER],
+    `SELECT * FROM podcasts WHERE category = ?${by.where} ORDER BY ${by.order} LIMIT ? OFFSET ?`,
+    [cat, ...by.params, PER, (pg - 1) * PER],
   );
   const pages = Math.ceil(total / PER);
 
@@ -105,8 +110,9 @@ export default async function Category({
               {facts?.newest ? <TimeAgo unix={facts.newest} /> : <>unknown</>}.
             </li>
             <li>
-              Ordered by catalogue depth and longevity weighted by recency — not by raw
-              recency, and not by popularity. <Link href="/about">Why, and what gets in</Link>.
+              Popular orders by catalogue depth and longevity weighted by recency;{" "}
+              <Link href={listHref(path, "recent")}>Recent</Link> puts the newest episode first.{" "}
+              <Link href="/about">Why, and what gets in</Link>.
             </li>
             <li>
               Nothing is hosted here: each card links to the show, and the show links to its
@@ -116,6 +122,7 @@ export default async function Category({
         </div>
         )}
         <Ad format={AD_TEXT} />
+        <SortTabs path={path} sort={sort} />
         <div className="grid">
           {(split ? rows.slice(0, split) : rows).map((p) => (
             <Card key={p.id} p={p} />
@@ -133,7 +140,7 @@ export default async function Category({
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
-              <Link className="btn" href={`/category/${category}?page=${pg - 1}`}>
+              <Link className="btn" href={listHref(path, sort, pg - 1)}>
                 ← Previous
               </Link>
             )}
@@ -141,7 +148,7 @@ export default async function Category({
               {pg} of {pages}
             </span>
             {pg < pages && (
-              <Link className="btn" href={`/category/${category}?page=${pg + 1}`}>
+              <Link className="btn" href={listHref(path, sort, pg + 1)}>
                 Next →
               </Link>
             )}

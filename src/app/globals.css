@@ -154,6 +154,7 @@ h2.sec {
 .row .n { margin-left: auto; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
 
 .pager { display: flex; gap: 10px; justify-content: center; padding: 30px 0; }
+.sorttabs { display: flex; gap: 8px; margin: 0 0 14px; }
 .empty { padding: 46px 0; color: var(--muted); text-align: center; }
 .prose { max-width: 68ch; font-size: 16.5px; line-height: 1.72; }
 .prose h2 { font-size: 21px; margin: 32px 0 10px; letter-spacing: -0.01em; }
