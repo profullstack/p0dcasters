@@ -9,6 +9,8 @@ import { languageName, normalizeLang, safeDecode } from "@/lib/format";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
 import Link from "next/link";
 import TimeAgo from "@/components/TimeAgo";
+import SortTabs from "@/components/SortTabs";
+import { listHref, listSort, sortSql } from "@/lib/sort";
 
 export const revalidate = 3600;
 const PER = 60;
@@ -35,11 +37,13 @@ export default async function Language({
   searchParams,
 }: {
   params: Promise<{ lang: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }) {
   const { lang } = await params;
-  const { page } = await searchParams;
+  const { page, sort: sortParam } = await searchParams;
   const pg = Math.max(1, parseInt(page || "1", 10) || 1);
+  const sort = listSort(sortParam);
+  const by = sortSql(sort);
 
   // One language, one URL. Anything that resolves to a code but isn't spelled
   // like it — /language/eng, /language/en_US, an old link to /language/franç —
@@ -71,8 +75,8 @@ export default async function Language({
   );
 
   const rows = await all<Podcast>(
-    `SELECT * FROM podcasts WHERE lang_base IN (${holes}) ORDER BY score DESC LIMIT ? OFFSET ?`,
-    [...variants, PER, (pg - 1) * PER],
+    `SELECT * FROM podcasts WHERE lang_base IN (${holes})${by.where} ORDER BY ${by.order} LIMIT ? OFFSET ?`,
+    [...variants, ...by.params, PER, (pg - 1) * PER],
   );
   const pages = Math.ceil(total / PER);
 
@@ -133,6 +137,7 @@ export default async function Language({
         </div>
         )}
         <Ad format={AD_TEXT} />
+        <SortTabs path={`/language/${code}`} sort={sort} />
         <div className="grid">
           {(split ? rows.slice(0, split) : rows).map((p) => (
             <Card key={p.id} p={p} />
@@ -150,7 +155,7 @@ export default async function Language({
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
-              <Link className="btn" href={`/language/${code}?page=${pg - 1}`}>
+              <Link className="btn" href={listHref(`/language/${code}`, sort, pg - 1)}>
                 ← Previous
               </Link>
             )}
@@ -158,7 +163,7 @@ export default async function Language({
               {pg} of {pages}
             </span>
             {pg < pages && (
-              <Link className="btn" href={`/language/${code}?page=${pg + 1}`}>
+              <Link className="btn" href={listHref(`/language/${code}`, sort, pg + 1)}>
                 Next →
               </Link>
             )}

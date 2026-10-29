@@ -6,6 +6,7 @@ import type { Podcast } from "@/lib/db";
 import Card from "@/components/Card";
 import Art from "@/components/Art";
 import Link from "next/link";
+import { recentCeiling } from "@/lib/sort";
 
 const { all, count, languageBuckets } = cachedDb(300);
 
@@ -27,7 +28,8 @@ export default async function Home() {
     count("SELECT COUNT(DISTINCT host) AS n FROM podcasts"),
     all<Podcast>("SELECT * FROM podcasts ORDER BY score DESC LIMIT 12"),
     all<Podcast>(
-      "SELECT * FROM podcasts WHERE episode_count >= 8 ORDER BY newest_pubdate DESC LIMIT 10",
+      "SELECT * FROM podcasts WHERE episode_count >= 8 AND newest_pubdate <= ? ORDER BY newest_pubdate DESC LIMIT 10",
+      [recentCeiling()],
     ),
     all<CatRow>(
       "SELECT category, COUNT(*) AS n FROM podcasts WHERE category IS NOT NULL GROUP BY category ORDER BY n DESC LIMIT 18",

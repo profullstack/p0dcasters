@@ -8,6 +8,8 @@ import Card from "@/components/Card";
 import Ad from "@/components/Ad";
 import { AD_TEXT } from "@/lib/ads";
 import { listingJsonLd, jsonLdScript } from "@/lib/jsonld";
+import SortTabs from "@/components/SortTabs";
+import { listHref, listSort, sortSql } from "@/lib/sort";
 
 const { all, count } = cachedDb(3600);
 
@@ -31,10 +33,12 @@ export default async function NetworkPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }) {
   const { slug } = await params;
-  const { page } = await searchParams;
+  const { page, sort: sortParam } = await searchParams;
+  const sort = listSort(sortParam);
+  const by = sortSql(sort, "score DESC, newest_pubdate DESC");
   const n = networkBySlug(slug);
   if (!n) notFound();
   const pg = Math.max(1, parseInt(page || "1", 10) || 1);
@@ -42,8 +46,9 @@ export default async function NetworkPage({
 
   const total = await count(`SELECT COUNT(*) AS n FROM podcasts WHERE ${w.sql}`, w.params);
   const rows = total
-    ? await all<Podcast>(`SELECT * FROM podcasts WHERE ${w.sql} ORDER BY score DESC, newest_pubdate DESC LIMIT ? OFFSET ?`, [
+    ? await all<Podcast>(`SELECT * FROM podcasts WHERE (${w.sql})${by.where} ORDER BY ${by.order} LIMIT ? OFFSET ?`, [
         ...w.params,
+        ...by.params,
         PER,
         (pg - 1) * PER,
       ])
@@ -82,6 +87,7 @@ export default async function NetworkPage({
           </p>
         )}
         <Ad format={AD_TEXT} />
+        <SortTabs path={`/networks/${n.slug}`} sort={sort} />
         <div className="grid">
           {rows.map((p) => (
             <Card key={p.id} p={p} />
@@ -90,7 +96,7 @@ export default async function NetworkPage({
         {pages > 1 && (
           <div className="pager">
             {pg > 1 && (
-              <Link className="btn" href={`/networks/${n.slug}?page=${pg - 1}`}>
+              <Link className="btn" href={listHref(`/networks/${n.slug}`, sort, pg - 1)}>
                 ← Previous
               </Link>
             )}
@@ -98,7 +104,7 @@ export default async function NetworkPage({
               {pg} of {pages}
             </span>
             {pg < pages && (
-              <Link className="btn" href={`/networks/${n.slug}?page=${pg + 1}`}>
+              <Link className="btn" href={listHref(`/networks/${n.slug}`, sort, pg + 1)}>
                 Next →
               </Link>
             )}
