@@ -179,18 +179,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </header>
             <main id="main">{children}</main>
-            <footer className="site">
-              <div className="wrap">
-                <p className="small">
-                  Feed metadata from the <a href="https://podcastindex.org">Podcast Index</a>, the
-                  networks&rsquo; own feed lists, and publishers who add their own show.
-                </p>
-              </div>
-            </footer>
-            {/* The links, copyright and webring row; the pit.world footer is last in <body>. */}
+            {/* One shared footer includes site navigation and keeps the feed credit visible. */}
             <Footer
               site="https://p0dcasters.com/"
+              owner={{ name: "p0dcasters", url: "https://p0dcasters.com/" }}
+              tagline="Feed metadata from the Podcast Index, network feed lists, and publishers."
               links={[
+                { label: "Podcast Index", href: "https://podcastindex.org" },
                 { label: "About", href: "/about" },
                 { label: "Contact", href: "/contact" },
                 { label: "Privacy", href: "/privacy" },
