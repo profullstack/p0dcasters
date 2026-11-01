@@ -45,7 +45,7 @@ export default function ProfileForm({ initial }: { initial: Values }) {
 
   return (
     <form onSubmit={save}>
-      <ProfileFields key={JSON.stringify(values)} defaultValues={values} errors={errors} idPrefix="account-" />
+      <ProfileFields key={JSON.stringify(values)} defaultValues={values} errors={errors} idPrefix="account-"  importOpenProfile/>
       <button className="btn" type="submit" disabled={busy}>
         {busy ? "Saving…" : "Save details"}
       </button>
