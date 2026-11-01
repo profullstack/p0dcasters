@@ -1,4 +1,6 @@
 import { cookies } from "next/headers";
+import { saveOpenProfileContact } from "@profullstack/profile";
+import { profileStore } from "@/lib/profile";
 import { finishSignIn, sameState } from "@profullstack/coinpay-onboard/oauth";
 import { currentUser, startSession } from "@/lib/auth/session";
 import {
@@ -59,6 +61,10 @@ export async function GET(req: Request) {
     dbCoinpayStore(),
   );
   if (!result.ok) return fail(result.code);
+  if (pending.mode === "connect" && claims.openprofile_url) {
+    try { await saveOpenProfileContact(profileStore(), String(result.userId), claims.openprofile_url); }
+    catch { console.warn("[coinpay] OpenProfile import skipped"); }
+  }
 
   if (pending.mode === "connect") return back("/account?coinpay=connected");
   await startSession(result.userId);

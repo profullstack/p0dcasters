@@ -89,7 +89,7 @@ export function decodePending(raw: string | undefined): PendingAuth | null {
   }
 }
 
-export type CoinpayClaims = { sub: string; email: string | null; name: string | null };
+export type CoinpayClaims = { sub: string; email: string | null; name: string | null; openprofile_url?: string };
 
 export type IdentityRow = {
   user_id: number;
@@ -190,10 +190,10 @@ export function canDisconnect(user: { email: string }, passkeyCount: number): bo
 }
 
 /** Trims what userinfo returned to what is stored; the email is contact info only. */
-export function claimsFrom(r: { sub: string; email: string | null; name: string | null }): CoinpayClaims {
+export function claimsFrom(r: { sub: string; email: string | null; name: string | null; userinfo?: { openprofile_url?: unknown } }): CoinpayClaims {
   const email = typeof r.email === "string" && r.email.includes("@") ? r.email.slice(0, 320) : null;
   const name = typeof r.name === "string" && r.name.trim() ? r.name.trim().slice(0, 200) : null;
-  return { sub: r.sub, email, name };
+  return { sub: r.sub, email, name, ...(typeof r.userinfo?.openprofile_url === "string" ? { openprofile_url: r.userinfo.openprofile_url } : {}) };
 }
 
 const MESSAGES: Record<string, string> = {
