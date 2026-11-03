@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <clipPath id="tile"><rect x="100" y="200" width="320" height="320" rx="64"/></clipPath>
+  </defs>
+  <rect width="1280" height="720" fill="#14140f"/>
+  <rect x="100" y="200" width="320" height="320" rx="64" fill="#ffffff"/>
+  <image x="100" y="200" width="320" height="320" clip-path="url(#tile)" xlink:href="logo-512.png"/>
+  <text x="470" y="385" font-family="DejaVu Sans" font-weight="bold" font-size="104" fill="#f4f1ea">podcasters</text>
+  <text x="474" y="460" font-family="DejaVu Sans" font-size="44" fill="#e27a55">podcasts · radio · TV</text>
+</svg>

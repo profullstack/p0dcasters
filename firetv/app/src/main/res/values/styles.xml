@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pod_bg">#14140f</color>
+    <color name="pod_fg">#f4f1ea</color>
+    <color name="pod_accent">#e27a55</color>
+
+    <style name="PitTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/pod_bg</item>
+        <item name="android:colorAccent">@color/pod_accent</item>
+        <item name="android:colorPrimary">@color/pod_bg</item>
+        <item name="android:colorPrimaryDark">@color/pod_bg</item>
+        <item name="android:textColor">@color/pod_fg</item>
+    </style>
+
+    <style name="PitDialog" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/pod_accent</item>
+        <item name="android:background">@color/pod_bg</item>
+        <item name="android:textColor">@color/pod_fg</item>
+    </style>
+</resources>
