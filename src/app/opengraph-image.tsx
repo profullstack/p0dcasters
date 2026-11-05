@@ -101,7 +101,7 @@ export default async function Image() {
               marginTop: 22,
             }}
           >
-            Self-hosted shows, every hosting platform, and networks like TWiT, NPR and the BBC.
+            Self-hosted shows, every hosting platform, and the big network libraries.
             Listen in the browser and follow your favourites.
           </div>
         </div>

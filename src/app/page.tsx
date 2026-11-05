@@ -45,10 +45,9 @@ export default async function Home() {
           <h1>Every podcast with a feed — on any host.</h1>
           <p className="lede">
             <span className="count">{total.toLocaleString()}</span> live shows, read from
-            their RSS feeds: shows on their own domain, shows on Anchor, Buzzsprout, Libsyn
-            and every other host, and the big libraries — TWiT, NPR, the BBC and the rest of
-            the <Link href="/networks">networks</Link>. Free, no account, listen in the
-            browser. Only the shows on their own domain?{" "}
+            their RSS feeds: shows on their own domain, shows on every hosting platform,
+            and the big library <Link href="/networks">networks</Link>. Free, no account,
+            listen in the browser. Only the shows on their own domain?{" "}
             <Link href="/self-hosted">Self-hosted</Link>. Missing one?{" "}
             <Link href="/submit">Add it</Link>.
           </p>

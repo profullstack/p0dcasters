@@ -1,6 +1,12 @@
 #!/bin/bash
 # Boots an Android TV emulator (API 30, the base of Fire OS 8), installs the APK,
 # drives it with remote-control keys and saves 1920x1080 screenshots to store/shots.
+#
+# THIS IS A FUNCTIONAL TEST, NOT THE SOURCE OF STORE ART. It searches the live
+# directory, so 04-results, 05-results-nav, 05b-results-right and 08-menu-search
+# are full of other people's cover art and show names. Uploading those is what
+# got 1.0.0 rejected on 2026-11-04 under Amazon's IP and Copyright policy.
+# Store screenshots come from store/capture.sh (/tv-preview), never from here.
 # Runs inside gradle:8.7-jdk17 with --device /dev/kvm and the SDK cache at /sdk:
 #   docker run --rm --device /dev/kvm -v ~/scratch/android-sdk:/sdk -v "$PWD/firetv:/w" -w /w \
 #     gradle:8.7-jdk17 bash emulator-test.sh

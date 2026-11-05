@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   // 146 characters. Kept short: a wording of 176 once lost its last clause to
   // truncation in exactly the snippet it was written for.
   description:
-    "A free directory of every live podcast with an RSS feed — on any host, plus networks like TWiT, NPR and the BBC. Listen in the browser.",
+    "A free directory of every live podcast with an RSS feed — on any host, plus the big network libraries. Listen in the browser.",
   openGraph: {
     type: "website",
     siteName: "p0dcasters",
