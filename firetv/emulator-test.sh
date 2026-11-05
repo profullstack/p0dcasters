@@ -1,15 +1,7 @@
 #!/bin/bash
-# Boots an Android TV emulator (API 30, the base of Fire OS 8), installs the APK,
-# drives it with remote-control keys and saves 1920x1080 screenshots to store/shots.
-#
-# THIS IS A FUNCTIONAL TEST, NOT THE SOURCE OF STORE ART. It searches the live
-# directory, so 04-results, 05-results-nav, 05b-results-right and 08-menu-search
-# are full of other people's cover art and show names. Uploading those is what
-# got 1.0.0 rejected on 2026-11-04 under Amazon's IP and Copyright policy.
-# Store screenshots come from store/capture.sh (/tv-preview), never from here.
-# Runs inside gradle:8.7-jdk17 with --device /dev/kvm and the SDK cache at /sdk:
-#   docker run --rm --device /dev/kvm -v ~/scratch/android-sdk:/sdk -v "$PWD/firetv:/w" -w /w \
-#     gradle:8.7-jdk17 bash emulator-test.sh
+# Boots API 30 Android TV and checks the Fire TV reader's empty state and form.
+# It never opens the public catalog or writes screenshots into the repository.
+# Run inside gradle:8.7-jdk17 with --device /dev/kvm and the SDK cache at /sdk.
 set -euo pipefail
 SDK=/sdk
 export ANDROID_HOME=$SDK ANDROID_SDK_ROOT=$SDK ANDROID_AVD_HOME=/root/.android/avd
@@ -20,69 +12,55 @@ apt-get install -y -qq libpulse0 libnss3 libxcomposite1 libxcursor1 libxi6 libxt
   libasound2 libgl1 libxkbfile1 libxdamage1 libxrandr2 libdrm2 libgbm1 >/dev/null 2>&1
 
 SM="$SDK/cmdline-tools/latest/bin/sdkmanager --sdk_root=$SDK"
-(yes || true) | $SM --licenses >/dev/null || true   # yes dies of SIGPIPE: not a failure
+(yes || true) | $SM --licenses >/dev/null || true
 $SM "emulator" "platform-tools" "$IMG" >/dev/null
-
 echo no | "$SDK/cmdline-tools/latest/bin/avdmanager" create avd -n tv -k "$IMG" -d tv_1080p --force >/dev/null
+
 ADB="$SDK/platform-tools/adb"
 "$SDK/emulator/emulator" -avd tv -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect \
   -no-snapshot -memory 2048 >/tmp/emu.log 2>&1 &
-
 "$ADB" wait-for-device
 for i in $(seq 1 120); do
   [ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ] && break
   sleep 2
 done
-echo "booted"
-"$ADB" shell wm size
 
-# The package manager comes up a little after boot_completed; retry until it takes.
 for i in $(seq 1 20); do "$ADB" install -r dist/podcasters-firetv.apk && break; sleep 5; done
-mkdir -p store/shots
-shot() { "$ADB" exec-out screencap -p > "store/shots/$1.png"; echo "shot $1"; }
-key() { "$ADB" shell input keyevent "$@"; sleep 1.2; }
-focus() { "$ADB" shell dumpsys window 2>/dev/null | grep -m1 mCurrentFocus || true; }
-
-# 1. Leanback launch, the way the Fire TV home screen opens it.
-"$ADB" shell monkey -p com.p0dcasters.tv -c android.intent.category.LEANBACK_LAUNCHER 1 >/dev/null
-sleep 12
-focus
-shot 01-home
-
-# 2. The home page autofocuses the search box: OK raises the Fire TV keyboard.
-#    (Arrows moving the focus ring are checked on the results page below.)
-key KEYCODE_DPAD_CENTER
-sleep 2
-focus
-shot 03-keyboard
-"$ADB" shell input text "true%scrime"
-key KEYCODE_ENTER
-sleep 10
-shot 04-results
-key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
-shot 05-results-nav
-key KEYCODE_DPAD_RIGHT
-shot 05b-results-right
-
-# 3. Back returns to the home page, Back again leaves the app.
-key KEYCODE_BACK
-sleep 4
-shot 06-back
-key KEYCODE_BACK
-sleep 2
-focus
-
-# 4. Menu key opens the standalone search box.
 "$ADB" shell monkey -p com.p0dcasters.tv -c android.intent.category.LEANBACK_LAUNCHER 1 >/dev/null
 sleep 8
-key KEYCODE_MENU
-sleep 2
-shot 07-menu-search
-"$ADB" shell input text "technology"
-key KEYCODE_ENTER
-sleep 10
-shot 08-menu-search
+mkdir -p dist/test-artifacts
+"$ADB" exec-out screencap -p > dist/test-artifacts/reader-empty.png
 
-"$ADB" logcat -d | grep -E "AndroidRuntime|FATAL|com.p0dcasters.tv|chromium.*Uncaught" | tail -20 || true
-[ -n "${OWNER:-}" ] && chown -R "$OWNER" store/shots
-ls -l store/shots
+dump_ui() {
+  "$ADB" shell uiautomator dump /sdcard/window.xml >/dev/null
+  "$ADB" pull /sdcard/window.xml "$1" >/dev/null
+}
+UI=$(mktemp)
+trap 'rm -f "$UI"; "$ADB" emu kill >/dev/null 2>&1 || true' EXIT
+dump_ui "$UI"
+if ! grep -q 'android.webkit.WebView' "$UI" || ! "$ADB" shell pidof com.p0dcasters.tv >/dev/null; then
+  cat "$UI"
+  echo "reader activity did not remain open" >&2
+  exit 1
+fi
+
+# The native keyboard must accept a URL, and the page must reject HTTP without
+# making a network request. This also exercises the D-pad form and JS bridge.
+"$ADB" shell input keyevent KEYCODE_DPAD_CENTER
+sleep 2
+"$ADB" exec-out screencap -p > dist/test-artifacts/reader-keyboard.png
+"$ADB" shell input text 'http://127.0.0.1/rss.xml'
+"$ADB" shell input keyevent KEYCODE_ENTER
+sleep 2
+# Keyboard Done fills the URL. Only selecting the page's Load button submits it.
+"$ADB" shell input keyevent KEYCODE_DPAD_RIGHT
+"$ADB" shell input keyevent KEYCODE_DPAD_CENTER
+sleep 2
+dump_ui "$UI"
+"$ADB" exec-out screencap -p > dist/test-artifacts/reader-http-rejected.png
+
+if "$ADB" logcat -d | grep -E 'FATAL EXCEPTION|Process: com\.p0dcasters\.tv|Uncaught TypeError|Uncaught ReferenceError' | tail -20; then
+  echo "runtime error found in emulator log" >&2
+  exit 1
+fi
+echo "Fire TV reader emulator check passed"

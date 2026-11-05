@@ -4,43 +4,41 @@
 - **Package:** com.p0dcasters.tv
 - **Category:** Music & Audio > Podcasts (fallback: Entertainment)
 - **Price:** Free. No in-app purchases.
-- **Devices:** Fire TV only. Audience: 13+ (open podcast directory, unfiltered content).
-- **Collects data:** no. No account needed to listen.
+- **Devices:** Fire TV only. Audience: 13+ (user-supplied feeds may contain unfiltered content).
+- **Account:** none. The app does not store feed URLs or collect account information. When you
+  load a feed, your device requests it from the HTTPS host you entered; that host receives the
+  request and normal network metadata.
 - **Privacy policy URL:** https://p0dcasters.com/privacy
 
 ## Short description
 
-Every podcast with a feed, plus live radio and TV. Free, no account.
+Play episodes from a podcast RSS feed you provide. Free, no account.
 
 ## Long description
 
-podcasters puts p0dcasters.com on your TV: every podcast with a public feed, on any host, plus live radio and TV channels.
+podcasters is a podcast RSS reader for Fire TV. Enter an HTTPS RSS feed URL that you choose and load it to see its available episodes. The app starts with no catalog, show artwork or episodes, and does not browse or index podcasts. Audio plays directly from the HTTPS address published in the feed.
 
-Over 390,000 live shows read straight from their RSS feeds: shows on their own domain, shows on every hosting platform, and the big network libraries. Free, no account, nothing to sign up for.
-
-podcasters is a podcast reader. It lists publicly published RSS feeds and plays them from the publisher's own server. It does not host, rehost or alter anyone's audio, and every show remains the property of whoever publishes it. Publishers can have a feed removed at any time from the contact page.
+No account is required. The app does not store feed URLs or collect account information. When you load a feed, your device requests it from the HTTPS host you entered; that host receives the request and normal network metadata.
 
 Made for the remote:
-- Press Menu to search, and type with the Fire TV keyboard or your voice.
-- Arrow keys move between shows and episodes with a big, easy-to-see highlight.
+- Enter a feed address with the Fire TV keyboard or your voice.
+- Arrow keys move between the address field, button and episode controls.
 - Play/pause, fast-forward 30 s and rewind 15 s from the remote.
-- Back steps back through your pages, and leaves the app from the home page.
-
-Browse by category, language and network, find self-hosted shows, or tune in to radio and TV streams.
+- Back leaves the app.
 
 ## Feature bullets
 
-Every podcast with a public feed, on any host
-Over 390,000 live shows, updated from their RSS feeds
-Live radio stations and TV channels
-Free, no account needed
-Search with the Fire TV keyboard or by voice
+Load a podcast RSS feed URL you choose
+Up to 100 playable episodes from the feed
+HTTPS feed and audio URLs
+No preloaded catalog or show artwork
+No account or saved feed history
+Use the Fire TV keyboard or voice input
 Remote play/pause, fast-forward and rewind
-Browse by category, language and network
 
 ## Keywords
 
-podcasts, podcast player, radio, live tv, p0dcasters, podcasters, rss, free podcasts
+podcasts, podcast player, podcasters, rss, podcast feed, free podcasts
 
 ## Art (store/out and store/shots)
 
@@ -49,18 +47,8 @@ podcasts, podcast player, radio, live tv, p0dcasters, podcasters, rss, free podc
 | Icon 512x512 / 114x114 | out/icon-512.png, out/icon-114.png |
 | Fire TV icon 1280x720 | out/firetv-icon-1280x720.png |
 | Fire TV background 1920x1080 | out/firetv-background-1920x1080.png |
-| Screenshots 1920x1080 | shots/01-hero.png, shots/02-grid.png |
+| Screenshots 1920x1080 | shots/01-empty.png, shots/02-url-entry.png |
 
-### Screenshots must not carry anyone else's artwork
-
-Amazon rejected version 1.0.0 on 2026-11-04 under the Intellectual Property
-and Copyright policy. The screenshots were live captures of `/search`, so real
-cover art and real show names — Mighty Oaks Daily Devotional, The Harry Sisson
-Show and others — were sitting in the store listing. We have no licence to
-anyone's cover art; a feed being public does not grant one.
-
-Capture the grid from **`/tv-preview`**, never from `/search`, `/podcasts` or
-the home page's "deep catalogues" row. That page renders the real card grid
-with invented shows and no image URLs, so `<Art>` draws its own typographic
-tile for every square. The search screenshot must be taken with the keyboard
-open and **no results behind it**.
+All screenshots must show only the bundled blank reader or user-entered example feed content
+whose names and artwork are original or licensed for this use. Never capture the live directory
+or any third-party catalog results.
