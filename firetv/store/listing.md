@@ -49,7 +49,7 @@ podcasts, podcast player, radio, live tv, p0dcasters, podcasters, rss, free podc
 | Icon 512x512 / 114x114 | out/icon-512.png, out/icon-114.png |
 | Fire TV icon 1280x720 | out/firetv-icon-1280x720.png |
 | Fire TV background 1920x1080 | out/firetv-background-1920x1080.png |
-| Screenshots 1920x1080 | shots/01-home.png, 02-grid.png, 03-keyboard.png |
+| Screenshots 1920x1080 | shots/01-hero.png, shots/02-grid.png |
 
 ### Screenshots must not carry anyone else's artwork
 
