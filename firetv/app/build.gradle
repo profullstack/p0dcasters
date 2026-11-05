@@ -10,8 +10,8 @@ android {
         applicationId 'com.p0dcasters.tv'
         minSdk 22          // Fire OS 5: every Fire TV still in service
         targetSdk 34
-        versionCode 1
-        versionName '1.0.0'
+        versionCode 2
+        versionName '1.1.0'
     }
 
     // The release key lives in the vault, never in the repo. scripts/build.sh

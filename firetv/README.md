@@ -1,18 +1,23 @@
-# podcasters (p0dcasters.com) for Fire TV
+# podcasters RSS reader for Fire TV
 
-A small native Android app (`com.p0dcasters.tv`) that puts https://p0dcasters.com on a Fire TV
-and makes it work with a remote. No dependencies beyond the Android SDK.
+A small native Android app (`com.p0dcasters.tv`) for playing podcast episodes from HTTPS RSS
+feeds that the viewer enters. It includes no podcast directory, show artwork or preloaded feeds.
+The feed is fetched only after the viewer chooses Load; audio is played from the publisher's
+HTTPS URL. No dependencies beyond the Android SDK.
 
-- **WebView** on p0dcasters.com. Remote play/pause, fast-forward 30 s and rewind 15 s drive the page's player (`pitMedia`). Results open in the app; `mailto:`/`intent:` links go to the system.
+- **Bundled reader UI** (`app/src/main/assets/reader.html`): a local page with no external scripts,
+  images or catalog requests. Native code downloads the user-selected RSS document and accepts
+  HTTPS audio enclosures only.
 - **Remote navigation** (`app/src/main/assets/tv.js`): Chromium's WebView scrolls on arrow
-  keys instead of moving between links, so every D-pad press runs `pitNav(dir)` in the page:
+  keys instead of moving between controls, so every D-pad press runs `pitNav(dir)` in the page:
   spatial focus to the nearest link/button, scrolling across long gaps, and a large focus
-  ring. The ring is set through `element.style` because strict CSPs (`style-src 'self'`)
-  blocks an injected `<style>`.
+  ring.
 - **Typing**: OK on a text field (or Menu/Search anywhere) opens a native text box, the one
-  thing that reliably raises the Fire TV keyboard and its microphone. The text goes back into
-  the page and a search box submits.
-- **Back** walks WebView history, then exits. Full-screen video and an offline screen are native.
+  thing that reliably raises the Fire TV keyboard and its microphone. Text fills the feed URL;
+  the viewer still presses Load before the app makes a request.
+- **Playback**: remote play/pause, fast-forward 30 s and rewind 15 s control the selected episode.
+- **Back** exits the app. Feed titles are rendered as text, and remote feed links cannot navigate
+  the WebView away from the bundled page.
 - Leanback launcher + banner, touchscreen not required, so the Appstore lists it for Fire TV.
 
 ## Build
@@ -41,11 +46,10 @@ docker run --rm --device /dev/kvm -e OWNER=$(id -u):$(id -g) -v ~/scratch/androi
   -v "$PWD/firetv:/w" -w /w gradle:8.7-jdk17 bash emulator-test.sh
 ```
 
-Boots API 30 Android TV (the base of Fire OS 8), installs the APK, drives it with key
-events (OK -> keyboard -> search, arrows through results, Back, Menu search
-) and writes 1920x1080 screenshots to `store/shots/`.
+Boots API 30 Android TV (the base of Fire OS 8), installs the APK and checks the blank reader,
+native keyboard and HTTP URL rejection. Screenshots go under the ignored `dist/test-artifacts/`.
 
 ## Appstore
 
-Listing copy and the art map are in `store/listing.md`; `store/render.sh` regenerates the
-icons/banner from `store/src/*.svg`.
+Listing copy is in `store/listing.md`; `store/render.sh` regenerates the icons/banner from
+`store/src/*.svg`.

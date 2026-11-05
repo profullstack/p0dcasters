@@ -1,4 +1,4 @@
-/* Podcasters (p0dcasters.com) for Fire TV: remote-control navigation for any page in the WebView.
+/* Podcasters RSS reader for Fire TV: remote-control navigation for the bundled reader UI.
  *
  * Chromium's WebView scrolls on arrow keys instead of moving between links, so
  * the activity hands every D-pad press to pitNav() and OK to pitEnter(). Both
@@ -14,9 +14,7 @@
   var TEXT = /^(search|text|email|url|tel|number|password|)$/;
   var field = null; // the text field OK was pressed on, while the keyboard is up
 
-  // The focus ring is set through CSSOM on the element itself: p0dcasters.com (and
-  // many sites) ship style-src 'self', which blocks an injected <style> but not
-  // element.style. A TV needs a ring you can see from the couch.
+  // A TV needs a focus ring that can be seen from the couch.
   var RING = [['outline', '4px solid #e27a55'], ['outline-offset', '3px'],
     ['box-shadow', '0 0 0 8px rgba(5,5,5,.85)']];
   function ring(el, on) {
@@ -148,7 +146,7 @@
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     var type = (el.getAttribute('type') || '').toLowerCase();
-    if (el.form && (type === 'search' || el.name === 'q')) {
+    if (el.form && type === 'search') {
       if (el.form.requestSubmit) el.form.requestSubmit(); else el.form.submit();
       return 'submitted';
     }

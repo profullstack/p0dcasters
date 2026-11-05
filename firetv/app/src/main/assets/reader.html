@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src https: blob:; connect-src 'none'; img-src 'none'">
+<title>Podcast RSS Reader</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #14140f; color: #f4f1ea;
+    font: 25px/1.45 system-ui, sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 52px 68px 80px; }
+  h1 { margin: 0 0 14px; color: #e27a55; font-size: 42px; }
+  p { max-width: 1000px; margin: 0 0 28px; color: #d0cdc5; }
+  form { display: flex; gap: 16px; align-items: stretch; margin: 0 0 26px; }
+  input, button { min-height: 68px; border: 2px solid #807b70; border-radius: 10px;
+    background: #24231e; color: #fff; font: inherit; padding: 12px 18px; }
+  input { flex: 1; min-width: 0; }
+  button { background: #e27a55; border-color: #e27a55; color: #14140f; font-weight: 700; }
+  :focus { outline: 4px solid #e27a55; outline-offset: 4px; }
+  #status { min-height: 1.5em; color: #d0cdc5; }
+  #feed-title { margin: 34px 0 12px; font-size: 30px; }
+  #episodes { display: grid; gap: 12px; }
+  .episode { display: flex; align-items: center; gap: 20px; padding: 16px;
+    border: 1px solid #4a4840; border-radius: 10px; }
+  .episode-title { flex: 1; overflow-wrap: anywhere; }
+  audio { width: 100%; margin-top: 24px; }
+  .empty { color: #9e9b92; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Podcast RSS Reader</h1>
+  <p>Enter an HTTPS podcast RSS feed URL you choose. This app has no podcast catalog, show artwork, or preloaded episodes.</p>
+  <form id="feed-form">
+    <input id="feed-url" name="q" type="url" inputmode="url" autocomplete="url"
+      placeholder="https://example.com/podcast.rss" aria-label="Podcast RSS feed URL" autofocus>
+    <button type="submit">Load feed</button>
+  </form>
+  <p id="status" role="status" aria-live="polite">No feed loaded. Add a feed URL to begin.</p>
+  <h2 id="feed-title"></h2>
+  <section id="episodes" aria-label="Episodes"></section>
+  <audio id="player" controls hidden></audio>
+</main>
+<script>
+  (function () {
+    var form = document.getElementById('feed-form');
+    var input = document.getElementById('feed-url');
+    var status = document.getElementById('status');
+    var title = document.getElementById('feed-title');
+    var episodes = document.getElementById('episodes');
+    var player = document.getElementById('player');
+
+    window.setFeedUrl = function (value) {
+      input.value = value || '';
+      input.focus();
+    };
+
+    window.feedLoaded = function (result) {
+      episodes.textContent = '';
+      title.textContent = '';
+      player.pause();
+      player.removeAttribute('src');
+      player.hidden = true;
+      if (result.error) {
+        status.textContent = result.error;
+        return;
+      }
+      title.textContent = result.title;
+      status.textContent = 'Choose an episode to play.';
+      result.episodes.forEach(function (episode) {
+        var row = document.createElement('div');
+        row.className = 'episode';
+        var name = document.createElement('span');
+        name.className = 'episode-title';
+        name.textContent = episode.title;
+        var play = document.createElement('button');
+        play.type = 'button';
+        play.textContent = 'Play';
+        play.addEventListener('click', function () {
+          player.src = episode.audio;
+          player.hidden = false;
+          player.play();
+          status.textContent = 'Playing: ' + episode.title;
+        });
+        row.appendChild(name);
+        row.appendChild(play);
+        episodes.appendChild(row);
+      });
+    };
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var address = input.value.trim();
+      if (!/^https:\/\//i.test(address)) {
+        status.textContent = 'Enter an HTTPS feed URL.';
+        return;
+      }
+      episodes.textContent = '';
+      title.textContent = '';
+      status.textContent = 'Loading the feed you selected…';
+      window.Podcasters.loadFeed(address);
+    });
+  })();
+</script>
+</body>
+</html>
