@@ -38,7 +38,16 @@ const SAMPLE: Array<Pick<Podcast, "title" | "host" | "episode_count"> & { days: 
 
 const DAY = 86_400;
 
-export default function TvPreviewPage() {
+export default async function TvPreviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ hero?: string }>;
+}) {
+  // ?hero=1 adds the real hero above the grid, for the first store screenshot.
+  // The home page cannot be used for one: below its hero it shows the "deep
+  // catalogues" row, which is real cover art, and two of those shows are the
+  // ones Amazon named in the rejection.
+  const hero = (await searchParams).hero === "1";
   const now = Math.floor(Date.now() / 1000);
   const shows = SAMPLE.map((s, i) => ({
     id: i + 1,
@@ -65,7 +74,24 @@ export default function TvPreviewPage() {
   })) as unknown as Podcast[];
 
   return (
-    <main className="wrap">
+    <>
+      {hero && (
+        <div className="hero">
+          <div className="wrap">
+            <h1>Every podcast with a feed — on any host.</h1>
+            <p className="lede">
+              390,000 live shows, read from their RSS feeds: shows on their own domain,
+              shows on every hosting platform, and the big library networks. Free, no
+              account, listen on your TV.
+            </p>
+            <form className="searchbar" action="/search">
+              <input name="q" placeholder="Search podcasts…" aria-label="Search podcasts" />
+              <button type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      )}
+      <main className="wrap">
       <section>
         <h2 className="sec">Browse every show</h2>
         <div className="grid">
@@ -74,6 +100,7 @@ export default function TvPreviewPage() {
           ))}
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
