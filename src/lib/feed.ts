@@ -243,6 +243,17 @@ async function loadEpisodes(feedUrl: string): Promise<Episode[]> {
   }
 }
 
+/**
+ * The newest episode date (unix seconds) a feed states, 0 if none. A date more than
+ * a day ahead is a feed's scheduling mistake, not a release, so it does not count.
+ */
+export function publishedNewest(episodes: Episode[], nowMs = Date.now()): number {
+  const latest = Math.floor(nowMs / 1000) + 86_400;
+  let best = 0;
+  for (const e of episodes) if (e.pubdate > best && e.pubdate <= latest) best = e.pubdate;
+  return best;
+}
+
 export async function fetchEpisodes(feedUrl: string): Promise<Episode[]> {
   const hit = episodeCache.get(feedUrl);
   if (hit) return hit;

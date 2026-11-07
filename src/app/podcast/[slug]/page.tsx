@@ -9,7 +9,7 @@ import Art from "@/components/Art";
 import Ad from "@/components/Ad";
 import { AD_TEXT } from "@/lib/ads";
 import FollowButton from "@/components/FollowButton";
-import { LatestButton, ShowEpisodes } from "@/components/ShowEpisodes";
+import { EpisodeTotal, LatestButton, LatestDate, ShowEpisodes } from "@/components/ShowEpisodes";
 import PlaylistButtons from "@/components/PlaylistButtons";
 import ShareButton from "@/components/ShareButton";
 import RefreshButton from "@/components/RefreshButton";
@@ -165,11 +165,18 @@ export default async function Show({ params }: { params: Promise<{ slug: string 
 
           <div className="facts">
             <div>
-              <b>{Number(p.episode_count).toLocaleString()}</b> episodes
+              <b>
+                <Suspense fallback={Number(p.episode_count).toLocaleString()}>
+                  <EpisodeTotal feedUrl={p.feed_url} stored={Number(p.episode_count)} />
+                </Suspense>
+              </b>{" "}
+              episodes
             </div>
             <div>
               <b>
-                <TimeAgo unix={p.newest_pubdate} />
+                <Suspense fallback={<TimeAgo unix={p.newest_pubdate} />}>
+                  <LatestDate feedUrl={p.feed_url} stored={p.newest_pubdate} />
+                </Suspense>
               </b>{" "}
               latest
             </div>

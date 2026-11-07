@@ -357,6 +357,10 @@ export function buildDaemon(deps) {
     // digest back. Each task still runs one at a time on its own. The show
     // crawler's reads come on top, so it never waits behind either.
     concurrency: 2 + (crawl ? crawl.concurrency + 1 : 0),
+    // A tick starts at most `concurrency` reads, so this is the crawler's ceiling:
+    // 24 slots every 2 s is 43k reads an hour. The default 5 s (17k) only just
+    // covers the 15k an hour the catalogue needs, and can never clear a backlog.
+    ...(crawl ? { tickMs: SHOWS_TICK_MS } : {}),
     onRun,
     onStall: async (s) => {
       out.error(`[directory] stalled: no success since ${s.lastOk ? new Date(s.lastOk).toISOString() : "start"}${s.lastError ? `: ${s.lastError}` : ""}`);
@@ -387,8 +391,9 @@ export function buildDaemon(deps) {
   return daemon;
 }
 
-/** Feeds read per tier at once from one host: anchor.fm alone is 116k shows. */
+/** Feeds read at once from one host, across all tiers: anchor.fm alone is 116k shows. */
 export const SHOWS_PER_HOST = 4;
+export const SHOWS_TICK_MS = 2_000;
 export const SHOWS_JOB = "shows";
 
 /**
