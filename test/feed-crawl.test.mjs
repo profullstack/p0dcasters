@@ -2,6 +2,7 @@ import { describe, expect, test, afterAll, beforeAll } from "bun:test";
 import { SQL } from "bun";
 import { createDaemon } from "@profullstack/scraper-daemon";
 import * as lib from "../src/lib/feed-crawl.ts";
+import { publishedNewest } from "../src/lib/feed.ts";
 import { addShowCrawler } from "../scripts/daemon-lib.mjs";
 
 const url = process.env.TEST_DATABASE_URL;
@@ -40,6 +41,19 @@ describe.skipIf(!url)("feed_state against Postgres", () => {
     expect(rows["https://feeds.example/daily.xml"]).toBe(360);
     expect(rows["https://feeds.example/gone.xml"]).toBe(129600);
     expect(await lib.seedFeedState(q)).toEqual({ added: 0, dropped: 0 });
+  });
+
+  test("one host's backlog at the head of a tier does not hide every other host", async () => {
+    await q(`DELETE FROM feed_state`);
+    // Sixty overdue shows from one platform, then the show that used to starve behind them.
+    const rows = Array.from({ length: 60 }, (_, i) => `('https://feeds.busy.example/${i}.xml', 1679, now() - interval '9 days' + ${i} * interval '1 second')`);
+    rows.push(`('https://feed.other.example/show.xml', 1679, now() - interval '8 days')`);
+    await q(`INSERT INTO feed_state(feed_url, minutes, next_at) VALUES ${rows.join(",")}`);
+    const due = await lib.dueFeeds(q, 2, 30);
+    expect(due).toHaveLength(30);
+    expect(due.map((f) => f.url).slice(0, 2)).toEqual(["https://feeds.busy.example/0.xml", "https://feed.other.example/show.xml"]);
+    await q(`DELETE FROM feed_state`);
+    await lib.seedFeedState(q);
   });
 
   test("due shows come back per tier, and a crawl moves the directory row forward", async () => {
@@ -106,4 +120,13 @@ describe("addShowCrawler", () => {
     expect(saved[0].plan.minutes).toBe(15);
     expect(saved[0].plan.tier).toBe("hot");
   });
+});
+
+test("the show header's date is the newest real release, not a scheduling mistake", () => {
+  const at = (pubdate) => ({ pubdate });
+  const now = NOW * 1000;
+  expect(publishedNewest([], now)).toBe(0);
+  expect(publishedNewest([at(0)], now)).toBe(0);
+  expect(publishedNewest([at(NOW - DAY), at(NOW - 3 * DAY)], now)).toBe(NOW - DAY);
+  expect(publishedNewest([at(NOW + 30 * DAY), at(NOW - DAY)], now)).toBe(NOW - DAY);
 });

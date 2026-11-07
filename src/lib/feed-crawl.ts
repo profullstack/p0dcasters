@@ -34,6 +34,8 @@ const UA = "p0dcasters/1.0 (+https://p0dcasters.com)";
 const TIER = tierSql("minutes");
 /** The last this-many publish dates are kept, so a 304 can still be scheduled on rhythm. */
 const KEEP_DATES = 30;
+/** How many of a tier's oldest due rows dueFeeds shares out between their hosts. */
+const DUE_WINDOW = 1000;
 
 export const FEED_STATE_DDL = [
   `CREATE TABLE IF NOT EXISTS feed_state(
@@ -88,13 +90,29 @@ export async function seedFeedState(q: Query): Promise<{ added: number; dropped:
   return { added: added.length, dropped: dropped.length };
 }
 
-/** Due shows of one tier (0 hot .. 4 archived), oldest due first. */
+/**
+ * Due shows of one tier (0 hot .. 4 archived): the oldest due of each host, then
+ * each host's second oldest, and so on.
+ *
+ * Not plain oldest-first. The daemon over-reads a few dozen rows and skips any on a
+ * host already at its cap or on hold, so a head of the queue that is all one host
+ * yields nothing: in November 2026 58 of the first 60 rows of a tier were one
+ * platform, that tier read no feed at all for days, and 320k shows went overdue.
+ * Taking turns inside a window of the oldest rows keeps one host from blocking the
+ * others, and stays one short index scan.
+ */
 export async function dueFeeds(q: Query, tierIndex: number, limit: number): Promise<FeedRow[]> {
   const rows = await q(
-    `SELECT feed_url, minutes, fails, etag, last_modified, dates
-     FROM feed_state WHERE ${TIER} = $1 AND next_at <= now()
-     ORDER BY next_at LIMIT $2`,
-    [tierIndex, limit],
+    `SELECT feed_url, minutes, fails, etag, last_modified, dates FROM (
+       SELECT *, row_number() OVER (PARTITION BY lower(substring(feed_url from '^[a-z]+://([^/:?#]+)')) ORDER BY next_at) AS turn
+       FROM (
+         SELECT feed_url, minutes, fails, etag, last_modified, dates, next_at
+         FROM feed_state WHERE ${TIER} = $1 AND next_at <= now()
+         ORDER BY next_at LIMIT $3
+       ) oldest
+     ) ranked
+     ORDER BY turn, next_at LIMIT $2`,
+    [tierIndex, limit, Math.max(DUE_WINDOW, limit)],
   );
   return rows.map((r) => ({
     key: String(r.feed_url),
