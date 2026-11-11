@@ -27,6 +27,8 @@ type Reply = {
 export default function SubmitForm({ initial, error, errorUrl }: { initial: string; error: string; errorUrl: string }) {
   const [input, setInput] = useState(initial || errorUrl);
   const [busy, setBusy] = useState(false);
+  /** An OPML file stands in for the URL box, so the box is only required without one. */
+  const [hasFile, setHasFile] = useState(false);
   const [reply, setReply] = useState<Reply | null>(null);
   const [failure, setFailure] = useState<string | null>(error ? describe(error) : null);
 
@@ -77,7 +79,7 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
           id="input"
           name="input"
           rows={3}
-          required={!reply}
+          required={!reply && !hasFile}
           placeholder={"https://example.com\nhttps://example.org/podcast.rss"}
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -88,9 +90,15 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
         <label htmlFor="opml" className="small">
           Or upload an OPML file (up to 50 feeds)
         </label>
-        <input id="opml" name="opml" type="file" accept=".opml,.xml,.txt,text/xml,text/plain" />
+        <input
+          id="opml"
+          name="opml"
+          type="file"
+          accept=".opml,.xml,.txt,text/xml,text/x-opml,text/plain"
+          onChange={(e) => setHasFile(Boolean(e.target.files?.length))}
+        />
         <button className="btn primary wide" type="submit" disabled={busy}>
-          {busy ? "Reading the feed…" : "Add it"}
+          {busy ? (hasFile ? "Reading the file…" : "Reading the feed…") : "Add it"}
         </button>
       </form>
 
