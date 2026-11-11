@@ -413,5 +413,13 @@ export const TOOLS_BY_NAME = new Map(TOOLS.map((t) => [t.name, t]));
 
 /** A tool as tools/list describes it: everything but run. */
 export function describe(tool: Tool) {
-  return { name: tool.name, title: tool.title, description: tool.description, inputSchema: tool.inputSchema, annotations: tool.annotations };
+  // annotations.title too: the claude.ai directory reads the listing name from
+  // the annotations and flags every tool that lacks one (2026-11-11).
+  return {
+    name: tool.name,
+    title: tool.title,
+    description: tool.description,
+    inputSchema: tool.inputSchema,
+    annotations: { title: tool.title, ...tool.annotations },
+  };
 }
