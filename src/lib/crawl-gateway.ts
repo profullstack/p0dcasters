@@ -73,7 +73,14 @@ export const gateway = createGateway({
   contact: "mailto:hello@p0dcasters.com",
   // A refused crawler may still read the map of the site, so the refusal is
   // legible to it rather than a wall. robots.txt and /crawl are always open.
-  openPaths: ["/llms.txt", "/skill.md"],
+  //
+  // /api/mcp is how an agent uses the directory, not how it copies it, so no
+  // user-agent list or spoofed-browser check ever answers it 402. Connector
+  // clients (claude.ai's custom-connector verifier among them) read any non-2xx
+  // without WWW-Authenticate as "needs sign-in", find no OAuth metadata and
+  // fail with "couldn't register with the sign-in service" (2026-11-11). The
+  // endpoint keeps its own per-caller budget in lib/throttle.ts.
+  openPaths: ["/llms.txt", "/skill.md", "/api/mcp"],
   training: TRAINING,
   retrieval: RETRIEVAL,
   denyCidrs: OVH_VPS_RANGES,
