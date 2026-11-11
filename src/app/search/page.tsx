@@ -45,7 +45,7 @@ export default async function Search({
         <h1 style={{ fontSize: 30, margin: "0 0 18px", letterSpacing: "-0.02em" }}>
           Search
         </h1>
-        <form className="searchbar" action="/search" style={{ maxWidth: 560 }}>
+        <form className="searchbar" action="/search" style={{ maxWidth: 560 }} {...{ toolname: "search_podcasts", tooldescription: "Search the podcast directory and show the results page", toolautosubmit: "" }}>
           <input
             name="q"
             defaultValue={query}

@@ -147,7 +147,7 @@ export default async function Radio({ searchParams }: { searchParams: Promise<Pa
           that plays on this page are shown.
         </p>
 
-        <form className="live-filter" action="/radio">
+        <form className="live-filter" action="/radio" {...{ toolname: "filter_radio", tooldescription: "Filter live radio stations by name and country", toolautosubmit: "" }}>
           <input name="q" defaultValue={q} placeholder="Search stations…" aria-label="Search stations" />
           <select name="country" defaultValue={country?.toLowerCase() || ""} aria-label="Country">
             <option value="">Any country</option>
