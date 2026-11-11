@@ -129,6 +129,18 @@ const siteJsonLd = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* WebMCP: site tools + the /api/mcp server for the AI agent in the visitor's browser (@profullstack/webmcp). */}
+        <script
+          type="module"
+          data-webmcp=""
+          src="https://cdn.jsdelivr.net/npm/@profullstack/webmcp@0/src/embed.js"
+          data-mcp="/api/mcp"
+          data-search-api="/api/search?q={query}&limit={limit}"
+          data-search="/search?q={query}"
+          data-pages={JSON.stringify({ podcasts: "/podcasts", radio: "/radio", tv: "/tv", browse: "/browse", networks: "/networks", add_a_show: "/submit", about: "/about" })}
+        />
+      </head>
       {/*
         Every internal link is a next/link on purpose. The player lives in the
         layout and keeps playing across route changes — but only while the

@@ -125,7 +125,7 @@ export default async function Tv({ searchParams }: { searchParams: Promise<Param
           play it on a secure page.
         </p>
 
-        <form className="live-filter" action="/tv">
+        <form className="live-filter" action="/tv" {...{ toolname: "filter_tv", tooldescription: "Filter live TV channels by name and country", toolautosubmit: "" }}>
           <input name="q" defaultValue={q} placeholder="Search channels…" aria-label="Search channels" />
           <select name="country" defaultValue={country?.toLowerCase() || ""} aria-label="Country">
             <option value="">Any country</option>

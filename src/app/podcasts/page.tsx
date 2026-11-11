@@ -67,7 +67,7 @@ export default async function Podcasts() {
           themselves. Prefer something live? <Link href="/radio">Radio</Link> and{" "}
           <Link href="/tv">TV</Link> play here too.
         </p>
-        <form className="searchbar" action="/search">
+        <form className="searchbar" action="/search" {...{ toolname: "search_podcasts", tooldescription: "Search the podcast directory and show the results page", toolautosubmit: "" }}>
           <input name="q" placeholder="Search podcasts…" aria-label="Search podcasts" />
           <button type="submit">Search</button>
         </form>

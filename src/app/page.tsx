@@ -51,7 +51,7 @@ export default async function Home() {
             <Link href="/self-hosted">Self-hosted</Link>. Missing one?{" "}
             <Link href="/submit">Add it</Link>.
           </p>
-          <form className="searchbar" action="/search">
+          <form className="searchbar" action="/search" {...{ toolname: "search_podcasts", tooldescription: "Search the podcast directory and show the results page", toolautosubmit: "" }}>
             <input
               name="q"
               placeholder="Search podcasts…"

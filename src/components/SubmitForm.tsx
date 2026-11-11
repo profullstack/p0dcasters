@@ -73,7 +73,7 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
         account needed.
       </p>
 
-      <form onSubmit={submit} method="post" action="/api/submit" encType="multipart/form-data">
+      <form onSubmit={submit} method="post" action="/api/submit" encType="multipart/form-data" {...{ toolname: "submit_show_form", tooldescription: "Fill in the add-a-show form with site or feed URLs (one per line); the person reviews and submits" }}>
         <label htmlFor="input">Site or feed URL, one per line</label>
         <textarea
           id="input"
