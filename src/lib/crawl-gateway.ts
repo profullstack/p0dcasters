@@ -80,7 +80,9 @@ export const gateway = createGateway({
   // without WWW-Authenticate as "needs sign-in", find no OAuth metadata and
   // fail with "couldn't register with the sign-in service" (2026-11-11). The
   // endpoint keeps its own per-caller budget in lib/throttle.ts.
-  openPaths: ["/llms.txt", "/skill.md", "/api/mcp"],
+  // /api/v1/mcp/oauth/ is the open sign-in those same clients insist on
+  // (lib/mcp/open-oauth.ts); /.well-known/ is open by default.
+  openPaths: ["/llms.txt", "/skill.md", "/api/mcp", "/api/v1/mcp/oauth/"],
   training: TRAINING,
   retrieval: RETRIEVAL,
   denyCidrs: OVH_VPS_RANGES,
