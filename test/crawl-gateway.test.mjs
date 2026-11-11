@@ -33,3 +33,21 @@ test('Lightpanda may still read robots.txt', async () => {
   const res = await gate(req('/robots.txt', { 'user-agent': 'Lightpanda/1.0' }));
   assert.notEqual(res?.status, 402);
 });
+
+test('the MCP endpoint is never sold, whatever the client calls itself', async () => {
+  for (const ua of ['anthropic-ai/1.0', 'ClaudeBot/1.0', CHROME, 'Lightpanda/1.0']) {
+    const res = await gate(
+      new Request('https://p0dcasters.com/api/mcp', {
+        method: 'POST',
+        headers: { 'x-forwarded-for': '37.231.157.22', 'user-agent': ua, 'content-type': 'application/json' },
+        body: '{}',
+      }),
+    );
+    assert.equal(res ?? undefined, undefined, ua);
+  }
+});
+
+test('OAuth discovery under /.well-known is never sold', async () => {
+  const res = await gate(req('/.well-known/oauth-protected-resource', { 'user-agent': 'anthropic-ai/1.0' }));
+  assert.notEqual(res?.status, 402);
+});
