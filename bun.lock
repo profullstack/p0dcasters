@@ -14,7 +14,7 @@
         "@profullstack/profile": "0.1.8",
         "@profullstack/scraper-daemon": "0.4.0",
         "@profullstack/submit-feed": "^0.1.3",
-        "@profullstack/throttle": "^0.4.1",
+        "@profullstack/throttle": "^0.5.0",
         "@profullstack/x402-gateway": "^0.18.1",
         "@simplewebauthn/browser": "^14.0.0",
         "@simplewebauthn/server": "^14.0.3",
@@ -213,7 +213,7 @@
 
     "@profullstack/submit-feed": ["@profullstack/submit-feed@0.1.3", "", { "dependencies": { "fast-xml-parser": "^5.2.5" } }, "sha512-RMH294Q1qFJ6L01pU5q/yowshx1Xpu4gfGC2OuNaxyZ5jySqM9FvgqvVuWH+G18711SqzNq+DL8dvbAaBgBIvA=="],
 
-    "@profullstack/throttle": ["@profullstack/throttle@0.4.1", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0" } }, "sha512-ffY49nQ20/ZXyp/LVh/LxXTKJozqxyggBhjt9rRGz/JCC30IKFaqN2UmNwThm721r0rgQnhikpHNOb5EqzU9kw=="],
+    "@profullstack/throttle": ["@profullstack/throttle@0.5.0", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0" } }, "sha512-WrPWHCJPRMy480ypsIN0KSzPcgkCtjdqS1ERTNOFv/WnSCE1Gvn1PrYLIbMh5cnfA2rNUvfWNLFXlFV4M00Rrw=="],
 
     "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.18.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-zc2JGLXMX8eCk7Mp4X91E175enOTNcWPZncKf3LXzoGE+XEhHDJHM1LRZkkY3x2pjLYX3AB11Vx/TP3cobSQ/g=="],
 
@@ -597,7 +597,6 @@
 
     "@logicsrc/openaccess/@profullstack/footer": ["@profullstack/footer@0.2.6", "", { "peerDependencies": { "react": ">=18" }, "optionalPeers": ["react"], "bin": { "profullstack-footer": "bin/profullstack-footer.js" } }, "sha512-BKwbDszAc7e0mYIBiPjgr/5WS8WyDt8IW718s/zW/8pCWOIB1BGwSNs6fmImRSo5kqIjQKUVbXp22jZQ5GEipA=="],
 
-    "@profullstack/throttle/@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.16.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-4aRbH2t5J7vJo9n6SqODNrxD0NBI7GsCo3WjTYuAfIzuPjElHB9TwtpvdpXwOneEJGpQ0JJpHght4M6F39SJng=="],
 
     "body-parser/content-type": ["content-type@2.1.0", "", {}, "sha512-mj7UPXE0jaqaOsukNZRUEfEi2AcL7C/vwmwcHV0O97eO1E1pxBZuyjlZrx5seTaNBg1U6+o35wpa35Qfcc+7ag=="],
 
