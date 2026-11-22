@@ -51,3 +51,16 @@ test('OAuth discovery under /.well-known is never sold', async () => {
   const res = await gate(req('/.well-known/oauth-protected-resource', { 'user-agent': 'anthropic-ai/1.0' }));
   assert.notEqual(res?.status, 402);
 });
+
+const GPTBOT = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.2; +https://openai.com/gptbot)';
+
+test('a forged session cookie does not exempt GPTBot (x402-gateway 0.18.3 sessionCookie)', async () => {
+  const res = await gate(req('/podcast/broken-heart', { 'user-agent': GPTBOT, cookie: 'p0d_session=forged' }));
+  assert.equal(res?.status, 402);
+});
+
+test('a signed-in reader is not judged by a stale browser string', async () => {
+  const stale = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  const res = await gate(req('/podcast/broken-heart', { 'user-agent': stale, cookie: 'p0d_session=abc' }));
+  assert.equal(res?.status ?? 200, 200);
+});
