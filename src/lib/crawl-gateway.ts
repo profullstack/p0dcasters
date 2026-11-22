@@ -52,7 +52,7 @@ const OVH_VPS_RANGES = [
   "213.32.0.0/16",
 ];
 
-// A signed-in reader is never charged, whatever their client looks like. Only
+// A signed-in reader is not judged by their client string (a hint only). Only
 // the cookie's presence is checked here: verifying it needs the database, which
 // the edge runtime cannot reach, and a made-up cookie buys nothing but a page
 // render the session check then refuses.
@@ -92,5 +92,9 @@ export const gateway = createGateway({
   // that declares itself (Googlebot's evergreen string claims Chrome too) is
   // judged by the lists above, never by this.
   chargeSpoofedBrowsers: true,
-  exempt: signedIn,
+  // These are SHAPES (the session cookie's name), which any client can
+  // send, so they are a hint, never a pass (x402-gateway 0.18.3 `sessionCookie`):
+  // they spare an odd browser string, but GPTBot wearing one is still charged.
+  // They used to be `exempt`, which let a forged one read free.
+  sessionCookie: signedIn,
 });
