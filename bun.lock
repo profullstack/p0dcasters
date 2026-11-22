@@ -15,7 +15,7 @@
         "@profullstack/scraper-daemon": "0.4.0",
         "@profullstack/submit-feed": "^0.1.3",
         "@profullstack/throttle": "^0.5.1",
-        "@profullstack/x402-gateway": "^0.18.3",
+        "@profullstack/x402-gateway": "^0.18.4",
         "@simplewebauthn/browser": "^14.0.0",
         "@simplewebauthn/server": "^14.0.3",
         "bullmq": "6.4.2",
@@ -215,7 +215,7 @@
 
     "@profullstack/throttle": ["@profullstack/throttle@0.5.1", "", { "dependencies": { "@profullstack/x402-gateway": "^0.6.0 || ^0.7.0 || ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^0.14.0 || ^0.15.0 || ^0.16.0 || ^0.17.0 || ^0.18.0" } }, "sha512-/NNyN+ISI+7WeCD5nZbQL4bd/+TegUOOmDtkxljaiMsBKKIIXVofRX8O49dYm/YXpHBc/BYfr5R6jAS6zynqXQ=="],
 
-    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.18.3", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-p0bU1TyKX76IlwRqgLGMlCOGNktVVXAZpXPi2L02lIXm0Lj8IzJmuDe0ddtfXQzPZpKiTIJVvcfUmHqD8fmCMA=="],
+    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.18.4", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-Glff1R6FvaYbiZK+zJv+vB11DOxUU7zQt9yIw/aLrVnta9OTqkULnGzqLy62egL6BZbxtVfW3kx/yHXiZOKVAw=="],
 
     "@simplewebauthn/browser": ["@simplewebauthn/browser@14.0.0", "", {}, "sha512-1odWVqeEBTl7lJ9zMKLEsmTlnyrDO5iRcTvfMKKk1WThUnp/i8JJdffdj2icP+tty159s4PgwE3BiMoEW9NFow=="],
 
