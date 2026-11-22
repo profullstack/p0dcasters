@@ -20,8 +20,21 @@ import { randomBytes } from "node:crypto";
 import { authorizeUrl as cpAuthorizeUrl, pkce, randomToken, SIGN_IN_SCOPES } from "@profullstack/coinpay-onboard/oauth";
 import { env, now, seal, unseal } from "./crypto";
 import { safeNext } from "./next";
+import pkg from "../../../package.json";
 
 export const COINPAY_BASE = "https://coinpayportal.com";
+
+/**
+ * Names p0dcasters.com in CoinPay's logs and throttle: every Profullstack app
+ * shares one host, so the runtime default UA made them one caller. Passed as
+ * `fetch` to coinpay-onboard 0.3 (token + userinfo), which has no UA option.
+ */
+export const COINPAY_UA = `p0dcasters.com/${pkg.version} (+https://p0dcasters.com)`;
+export const coinpayFetch = ((input: RequestInfo | URL, init: RequestInit = {}) => {
+  const headers = new Headers(init.headers);
+  headers.set("user-agent", COINPAY_UA);
+  return fetch(input, { ...init, headers });
+}) as typeof fetch;
 export const CALLBACK_PATH = "/api/v1/coinpay/oauth/callback";
 export const PENDING_COOKIE = "p0d_cp_oauth";
 export const PENDING_COOKIE_PATH = "/api/v1/coinpay/oauth";

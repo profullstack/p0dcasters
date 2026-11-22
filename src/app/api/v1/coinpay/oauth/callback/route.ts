@@ -8,6 +8,7 @@ import {
   PENDING_COOKIE_PATH,
   claimsFrom,
   coinpayConfig,
+  coinpayFetch,
   decodePending,
   redirectUri,
   resolveCoinpayUser,
@@ -48,6 +49,7 @@ export async function GET(req: Request) {
       clientSecret: cfg.clientSecret,
       redirectUri: redirectUri(cfg),
       base: cfg.base,
+      fetch: coinpayFetch,
     });
     claims = claimsFrom(r);
   } catch (err) {
