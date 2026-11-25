@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import Link from "next/link";
 
 type Me = { signedIn: boolean; email?: string };
 
@@ -41,24 +40,4 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   return <Ctx.Provider value={{ ...me, known, refresh }}>{children}</Ctx.Provider>;
-}
-
-export function AccountNav() {
-  const { signedIn, known } = useSession();
-  // Nothing is rendered until the answer is in: flashing "Sign in" at somebody
-  // who is signed in reads as having been logged out.
-  if (!known) return <span className="nav-placeholder" aria-hidden="true" />;
-  if (!signedIn) {
-    return (
-      <Link className="nav-cta" href="/login">
-        Sign in
-      </Link>
-    );
-  }
-  return (
-    <>
-      <Link href="/following">Following</Link>
-      <Link href="/account">Account</Link>
-    </>
-  );
 }

@@ -4,7 +4,8 @@ import Script from "next/script";
 import { Footer } from "@profullstack/footer/react";
 import "./globals.css";
 import { PlayerProvider } from "@/components/Player";
-import { AccountNav, SessionProvider } from "@/components/Session";
+import { SessionProvider } from "@/components/Session";
+import { SiteNav } from "@/components/SiteNav";
 import AdRescan from "@/components/AdRescan";
 import ServiceWorker from "@/components/ServiceWorker";
 import PitFooter from "@/components/PitFooter";
@@ -175,19 +176,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <img src="/logo.png" alt="p0dcasters" width={600} height={100} />
                   </picture>
                 </Link>
-                <nav>
-                  <Link href="/podcasts">Podcasts</Link>
-                  <Link href="/radio">Radio</Link>
-                  <Link href="/tv">TV</Link>
-                  <Link href="/browse">Browse</Link>
-                  <Link href="/search">Search</Link>
-                  <Link href="/networks">Networks</Link>
-                  <Link href="/self-hosted">Self-hosted</Link>
-                  <Link href="/hosts">Hosts</Link>
-                  <Link href="/submit">Add a show</Link>
-                  <Link href="/about">About</Link>
-                  <AccountNav />
-                </nav>
+                <SiteNav />
               </div>
             </header>
             <main id="main">{children}</main>
