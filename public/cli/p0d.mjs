@@ -17,7 +17,7 @@
 
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-export const VERSION = '0.3.0';
+export const VERSION = '0.3.1';
 const DEFAULT_API = 'https://p0dcasters.com';
 
 /**
@@ -61,8 +61,8 @@ export const COMMANDS = [
     summary: 'Add a show to the directory',
     detail:
       'Give it the show\'s site or its feed, several of either, or an OPML file. The feed is found from a site URL, checked against the rules (audio episodes, an episode inside 90 days; any host) and queued for a person to list; a refusal names the rule. No account needed; twenty requests an hour per address.',
-    options: ['--json'],
-    examples: ['p0d submit example.org', 'p0d submit https://example.org/podcast.rss https://other.org', 'p0d submit subscriptions.opml'],
+    options: ['--email <address>  where the decision is sent (required; or P0D_EMAIL)', '--json'],
+    examples: ['p0d submit example.org --email you@example.com', 'p0d submit https://example.org/podcast.rss https://other.org', 'p0d submit subscriptions.opml'],
   },
   {
     name: 'profile',
@@ -267,7 +267,9 @@ export async function run(argv, io = {}) {
       case 'submit': {
         if (!rest.length) return fail(o, 'submit: give at least one URL or an .opml file');
         const opml = rest.find((a) => /\.opml$/i.test(a));
-        const payload = opml ? { opml: await o.readFile(opml) } : { urls: rest };
+        const email = (flags.email && flags.email !== true ? String(flags.email) : '') || o.env.P0D_EMAIL || '';
+        if (!email) return fail(o, 'submit: give --email <address> (or set P0D_EMAIL); we email it when the show is listed');
+        const payload = { ...(opml ? { opml: await o.readFile(opml) } : { urls: rest }), email };
         const body = await request('/api/submit', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },

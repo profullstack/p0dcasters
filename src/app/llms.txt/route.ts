@@ -74,9 +74,10 @@ p0dcasters is operated by Profullstack. Contact: hello@p0dcasters.com
 
 - [Submit](https://p0dcasters.com/submit): Paste a podcast's site or feed URL; the feed is
   found and checked against the inclusion rules at once, and a person lists it after a
-  look, usually the same day. No account.
+  look, usually the same day. No account; an email is required and gets the decision.
 - [POST /api/submit](https://p0dcasters.com/api/submit): The same as JSON —
-  {"url": "..."} or {"urls": [...]} or {"opml": "..."} — answering
+  {"url": "...", "email": "..."} or {"urls": [...], "email": "..."} or {"opml": "...", "email": "..."}
+  (email required unless signed in or an OpenAccess agent; 400 email-required) — answering
   {ok, accepted, rejected, queued, statusUrl, review}. A feed that passes comes back in
   review (and counted in queued), not accepted, until a person lists it. Twenty requests
   an hour per address. An OpenAccess bearer token (hub https://openaccess.logicsrc.com,

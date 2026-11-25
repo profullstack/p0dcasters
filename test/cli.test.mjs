@@ -74,19 +74,24 @@ test('search prints slugs and --json prints the body', async () => {
 
 test('submit posts urls, or an OPML file, and exits 1 when nothing was added', async () => {
   const o = io({ '/api/submit': { ok: true, accepted: [{ page: 'https://p0dcasters.com/podcast/x', existing: false }], rejected: [], queued: 0, total: 1 } });
-  assert.equal(await run(['submit', 'example.org'], o), 0);
-  assert.deepEqual(JSON.parse(o.calls[0].init.body), { urls: ['example.org'] });
+  assert.equal(await run(['submit', 'example.org', '--email', 'me@example.org'], o), 0);
+  assert.deepEqual(JSON.parse(o.calls[0].init.body), { urls: ['example.org'], email: 'me@example.org' });
   assert.match(o.out_[0], /^added/);
 
   const f = io({ '/api/submit': { ok: true, accepted: [], rejected: [], queued: 1, total: 1, statusUrl: 'https://p0dcasters.com/submissions/abc' } });
+  f.env.P0D_EMAIL = 'env@example.org';
   assert.equal(await run(['submit', 'subs.opml'], f), 0);
+  assert.equal(JSON.parse(f.calls[0].init.body).email, 'env@example.org');
   assert.ok(JSON.parse(f.calls[0].init.body).opml.includes('<opml'));
   assert.match(f.out_[0], /queued/);
 
   const r = io({ '/api/submit': { ok: false, accepted: [], rejected: [{ url: 'x', error: 'no-feed-found', message: 'No feed.' }], queued: 0, total: 1 } });
-  assert.equal(await run(['submit', 'x'], r), 1);
+  assert.equal(await run(['submit', 'x', '--email=me@example.org'], r), 1);
   assert.match(r.out_[0], /not listed/);
   assert.equal(await run(['submit'], io()), 1);
+  const n = io();
+  assert.equal(await run(['submit', 'example.org'], n), 1);
+  assert.equal(n.calls.length, 0);
 });
 
 test('update and remove refuse outside an installed copy', async () => {

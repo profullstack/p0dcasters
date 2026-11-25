@@ -7,6 +7,7 @@
       "dependencies": {
         "@logicsrc/openaccess": "0.3.1",
         "@profullstack/coinpay-onboard": "0.3.1",
+        "@profullstack/cross-promo": "^0.2.1",
         "@profullstack/footer": "0.3.0",
         "@profullstack/libsql-pg": "^0.1.4",
         "@profullstack/openprofile": "^0.2.0",
@@ -196,6 +197,8 @@
     "@peculiar/x509": ["@peculiar/x509@2.2.0", "", { "dependencies": { "@peculiar/asn1-cms": "^2.11.0", "@peculiar/asn1-csr": "^2.11.0", "@peculiar/asn1-ecc": "^2.11.0", "@peculiar/asn1-pkcs9": "^2.11.0", "@peculiar/asn1-rsa": "^2.11.0", "@peculiar/asn1-schema": "^2.11.0", "@peculiar/asn1-x509": "^2.11.0", "@peculiar/asn1-x509-post-quantum": "^2.11.0", "pvtsutils": "^1.3.6", "tslib": "^2.8.1", "tsyringe": "^4.10.0" } }, "sha512-adpW58ySPQMOUPv8pTKT3RIyCFqfUFt8X05ukPdtkQToXDVr8dMtxuenik1yx8tNFTbpApWsM/Hi5SzlIx48+Q=="],
 
     "@profullstack/coinpay-onboard": ["@profullstack/coinpay-onboard@0.3.1", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.32.2", "zod": "^4.6.7" }, "bin": { "coinpay-onboard": "bin/coinpay-onboard" } }, "sha512-+K7D6uaX10y+0V5sg7To1jKwNG8iCNbN9SSW6q5ACzoiDNswMox3G7gzY/Swxd128klq7ecN2Ni4JVNr50nRIQ=="],
+
+    "@profullstack/cross-promo": ["@profullstack/cross-promo@0.2.1", "", { "bin": { "cross-promo": "bin/cross-promo.js" } }, "sha512-gFjNB/Qp3ErFqGmddo53wnbSy4A0oB5TCREZQjFonAuC+TPMIMlesXsdvIm5L0Y63ZhvkhBKiUtK6BgxAp69ag=="],
 
     "@profullstack/footer": ["@profullstack/footer@0.3.0", "", { "peerDependencies": { "react": ">=18" }, "optionalPeers": ["react"], "bin": { "profullstack-footer": "bin/profullstack-footer.js" } }, "sha512-T95BxnTLRWj0OdEZQwGQkHJCPSBs8VpDATyAIPUqomnC9IRMMvgLEFeION1HSqIvwgHgiC0vbs15ydZyFq99ew=="],
 

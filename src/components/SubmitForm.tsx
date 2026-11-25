@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { explainError } from "@profullstack/submit-feed/core";
 
@@ -31,6 +31,16 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
   const [hasFile, setHasFile] = useState(false);
   const [reply, setReply] = useState<Reply | null>(null);
   const [failure, setFailure] = useState<string | null>(error ? describe(error) : null);
+  const [email, setEmail] = useState("");
+  // A signed-in listener's address fills the box; they can still change it.
+  useEffect(() => {
+    fetch("/api/me", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((me: { email?: string }) => {
+        if (me.email) setEmail((cur) => cur || (me.email as string));
+      })
+      .catch(() => {});
+  }, []);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +53,7 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
       const body = new FormData();
       if (file) body.set("opml", file);
       body.set("input", input);
+      body.set("email", email);
       const res = await fetch("/api/submit", { method: "POST", body, headers: { accept: "application/json" } });
       const json = (await res.json()) as Reply;
       if (!res.ok) {
@@ -69,8 +80,8 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
       <p className="muted">
         Paste the podcast&rsquo;s site or its feed. The feed is found from the page and checked
         against the <Link href="/about">rules</Link> right now, so you see at once whether it can
-        be listed; a person then looks at it before it goes live, usually the same day. No
-        account needed.
+        be listed; a person then looks at it before it goes live, usually the same day, and
+        we email you the moment it is. No account needed.
       </p>
 
       <form onSubmit={submit} method="post" action="/api/submit" encType="multipart/form-data" {...{ toolname: "submit_show_form", tooldescription: "Fill in the add-a-show form with site or feed URLs (one per line); the person reviews and submits" }}>
@@ -96,6 +107,17 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
           type="file"
           accept=".opml,.xml,.txt,text/xml,text/x-opml,text/plain"
           onChange={(e) => setHasFile(Boolean(e.target.files?.length))}
+        />
+        <label htmlFor="email">Your email, so we can tell you when it is listed</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <button className="btn primary wide" type="submit" disabled={busy}>
           {busy ? (hasFile ? "Reading the file…" : "Reading the feed…") : "Add it"}
@@ -147,5 +169,7 @@ export default function SubmitForm({ initial, error, errorUrl }: { initial: stri
 }
 
 function describe(code: string): string {
+  if (code === "email-required") return "Give an email address so we can tell you when the show is listed.";
+  if (code === "invalid-email") return "That email address does not look right. Check it and try again.";
   return explainError(code);
 }

@@ -13,6 +13,7 @@ import { acceptSubmissions } from "@/lib/accept-all";
 import { SCOPE_REVIEW } from "@/lib/openaccess";
 import { submissionsByStatus } from "@/lib/submit";
 import { publicRow } from "@/lib/review-row";
+import { cleanEmail } from "@/lib/submitter-mail";
 
 /**
  * What an agent can do with the directory.
@@ -47,6 +48,23 @@ function bounded(v: unknown, fallback: number, min: number, max: number): number
   const n = Number(v);
   if (!Number.isFinite(n)) return fallback;
   return Math.min(max, Math.max(min, Math.floor(n)));
+}
+
+/** submit_feed as the package defines it, plus the contact address this site requires. */
+function withEmail<T extends { inputSchema: object; description: string }>(tool: T): T {
+  const schema = tool.inputSchema as { properties?: Record<string, object>; required?: string[] };
+  return {
+    ...tool,
+    description: `${tool.description} Requires email: where the reviewer's decision is sent, once per submission.`,
+    inputSchema: {
+      ...schema,
+      properties: {
+        ...schema.properties,
+        email: { type: "string", format: "email", description: "Contact address; we email it when a person lists (or declines) the show." },
+      },
+      required: [...(schema.required ?? []), "email"],
+    },
+  };
 }
 
 export const TOOLS: Tool[] = [
@@ -175,7 +193,7 @@ export const TOOLS: Tool[] = [
       return directoryStats();
     },
   },
-  submitFeedTool({
+  withEmail(submitFeedTool({
     directory: "p0dcasters",
     kind: "podcast",
     maxUrls: MAX_URLS,
@@ -187,10 +205,12 @@ export const TOOLS: Tool[] = [
 
       // The same per-address ledger the form writes to, so an agent and a
       // browser share one budget rather than the agent having a private one.
+      const contactEmail = cleanEmail((args as { email?: unknown })?.email);
+      if (!contactEmail) throw invalid("email is required: the address the reviewer's decision is sent to (the podcaster's, or yours)");
       const ipHash = hashIp(clientIpFromHeader(c.header));
       if ((await requestsThisHour(ipHash)) >= RATE_LIMIT) throw toolError("rate limited: twenty submissions an hour per address. Try again later.");
 
-      const { batchId, ids } = await createBatch(urls, { userId: null, ipHash });
+      const { batchId, ids } = await createBatch(urls, { userId: null, ipHash, contactEmail });
       const statusUrl = `${SITE}/submissions/${batchId}`;
       if (urls.length === 1) {
         const outcome = await resolveSubmission(ids[0]);
@@ -225,7 +245,7 @@ export const TOOLS: Tool[] = [
       else void work();
       return { ok: true, accepted: [], rejected: [], queued: urls.length, total: urls.length, submissionId: batchId, statusUrl };
     },
-  }) as Tool,
+  })) as Tool,
 ];
 
 /** The OpenAccess principal behind an MCP call, from its Authorization header. */

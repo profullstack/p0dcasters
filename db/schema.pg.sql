@@ -151,6 +151,10 @@ create table if not exists submissions (
   reviewed_by text,
   reason text
 );
+-- Who to tell when a person decides (src/lib/submitter-mail.ts): the form's
+-- required address, or the signed-in account's. notified_at claims the batch.
+alter table submissions add column if not exists contact_email text;
+alter table submissions add column if not exists notified_at bigint;
 create index if not exists i_sub_batch on submissions(batch_id, created_at);
 create index if not exists i_sub_feed on submissions(feed_url);
 create index if not exists i_sub_status on submissions(status, created_at);

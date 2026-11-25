@@ -5,6 +5,7 @@ import { currentUser, origin } from "@/lib/auth/session";
 import { bearerPrincipal, SCOPE_SUBMIT } from "@/lib/openaccess";
 import { CRAWLER_HEADER, crawlerSource } from "@/lib/crawler-submit";
 import { env } from "@/lib/auth/crypto";
+import { cleanEmail, emailField } from "@/lib/submitter-mail";
 import {
   MAX_URLS,
   RATE_LIMIT,
@@ -36,6 +37,8 @@ export const maxDuration = 60;
  * No account is needed; the budget is twenty requests an hour per address.
  * A signed-in listener, or an OpenAccess principal holding podcasts:submit,
  * is remembered on the row as the submitter, which the reviewer sees.
+ * A person gives a contact address (`email`), required unless signed in:
+ * it is where the reviewer's decision is sent, once per batch.
  * A request carrying a valid x-crawler-token is one of our own crawlers: its
  * row's source is `crawler:<name>` and a passing feed is listed at once.
  */
@@ -78,8 +81,22 @@ export async function POST(req: Request) {
   }
 
   const [user, principal] = await Promise.all([currentUser(), bearerPrincipal(req)]);
-  const submittedBy = crawler ?? user?.email ?? (principal?.scopes.includes(SCOPE_SUBMIT) ? principal.sub : null);
-  const { batchId, ids } = await createBatch(s.urls, { userId: user?.id ?? null, ipHash, submittedBy });
+  const agent = principal?.scopes.includes(SCOPE_SUBMIT) ? principal.sub : null;
+  const submittedBy = crawler ?? user?.email ?? agent;
+  // Where the decision goes. Required from a person; a signed-in account's
+  // own address stands in, and crawlers and OpenAccess agents are exempt.
+  const given = emailField(body);
+  const contactEmail = cleanEmail(given) ?? (crawler ? null : user?.email ?? null);
+  if (!contactEmail && !crawler && !agent) {
+    const code = given ? "invalid-email" : "email-required";
+    return html
+      ? back(code, s.urls[0])
+      : Response.json(
+          { ...submitReply({ ok: false, error: code }), message: "Give an email address so we can tell you when the show is listed." },
+          { status: 400 },
+        );
+  }
+  const { batchId, ids } = await createBatch(s.urls, { userId: user?.id ?? null, ipHash, submittedBy, contactEmail });
   const statusUrl = `${site}/submissions/${batchId}`;
   const rejected: RejectedFeed[] = s.invalid.map((url) => ({ url, error: "invalid-url" }));
   const accepted: AcceptedFeed[] = [];
