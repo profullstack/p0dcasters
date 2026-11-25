@@ -539,7 +539,7 @@ async function insertPodcast(row: Omit<Podcast, "id">): Promise<void> {
  * slow a submission here. SUBMIT_FORWARD_TO="" turns it off.
  */
 async function forward(feedUrl: string): Promise<void> {
-  const to = env("SUBMIT_FORWARD_TO") ?? (env("NODE_ENV") === "production" ? "https://rssamplifier.com" : "");
+  const to = env("SUBMIT_FORWARD_TO") ?? (env("NODE_ENV") === "production" ? "https://rssamp.com" : "");
   if (!to) return;
   try {
     await submitFeed(to, { url: feedUrl }, { signal: AbortSignal.timeout(15_000), headers: { "user-agent": USER_AGENT } });
