@@ -7,6 +7,7 @@ import { normalizeLang } from "@/lib/format";
 import { notifyReviewers } from "@/lib/review";
 import { isCrawlerSource } from "@/lib/crawler-submit";
 import { registrableDomain } from "@/lib/domain";
+import { notifyBatchIfSettled } from "@/lib/submitter-mail";
 
 /**
  * Feed submission, the site-specific half.
@@ -55,6 +56,8 @@ export type SubmissionRow = {
   reviewed_at?: number | null;
   reviewed_by?: string | null;
   reason?: string | null;
+  contact_email?: string | null;
+  notified_at?: number | null;
 };
 
 export type Outcome =
@@ -69,7 +72,7 @@ let columnsReady: Promise<void> | null = null;
 export function ensureReviewColumns(): Promise<void> {
   if (!columnsReady) {
     columnsReady = (async () => {
-      for (const col of ["submitted_by TEXT", "reviewed_at INTEGER", "reviewed_by TEXT", "reason TEXT"]) {
+      for (const col of ["submitted_by TEXT", "reviewed_at INTEGER", "reviewed_by TEXT", "reason TEXT", "contact_email TEXT", "notified_at BIGINT"]) {
         try {
           await db().execute(`ALTER TABLE submissions ADD COLUMN ${col}`);
         } catch {
@@ -110,7 +113,7 @@ export async function requestsThisHour(ipHash: string | null): Promise<number> {
 /** Record a batch of inputs as pending rows. */
 export async function createBatch(
   inputs: string[],
-  ctx: { userId: number | null; ipHash: string | null; submittedBy?: string | null },
+  ctx: { userId: number | null; ipHash: string | null; submittedBy?: string | null; contactEmail?: string | null },
 ): Promise<{ batchId: string; ids: string[] }> {
   await ensureReviewColumns();
   const batchId = token(9);
@@ -118,9 +121,9 @@ export async function createBatch(
   const t = now();
   await db().batch(
     inputs.map((input, i) => ({
-      sql: `INSERT INTO submissions(id, batch_id, input, status, user_id, ip_hash, created_at, submitted_by)
-            VALUES(?,?,?,'pending',?,?,?,?)`,
-      args: args([ids[i], batchId, input, ctx.userId, ctx.ipHash, t, ctx.submittedBy ?? null]),
+      sql: `INSERT INTO submissions(id, batch_id, input, status, user_id, ip_hash, created_at, submitted_by, contact_email)
+            VALUES(?,?,?,'pending',?,?,?,?,?)`,
+      args: args([ids[i], batchId, input, ctx.userId, ctx.ipHash, t, ctx.submittedBy ?? null, ctx.contactEmail ?? null]),
     })),
     "write",
   );
@@ -265,6 +268,7 @@ export async function decideSubmission(
       sql: `UPDATE submissions SET status = 'rejected', error = 'declined', message = ?, reviewed_at = ?, reviewed_by = ?, reason = ? WHERE id = ?`,
       args: args([reason ?? "Declined by the reviewer.", now(), by, reason, id]),
     });
+    void notifyBatchIfSettled(row.batch_id);
     return { ok: true, status: "rejected", slug: null, title: row.title };
   }
 
@@ -275,6 +279,7 @@ export async function decideSubmission(
       sql: `UPDATE submissions SET status = 'existing', slug = ?, reviewed_at = ?, reviewed_by = ?, reason = ? WHERE id = ?`,
       args: args([known.slug, now(), by, reason, id]),
     });
+    void notifyBatchIfSettled(row.batch_id);
     return { ok: true, status: "existing", slug: known.slug, title: known.title };
   }
 
@@ -303,6 +308,7 @@ export async function decideSubmission(
     args: args([slug, toList.title, listed ? JSON.stringify(listed) : JSON.stringify(toList), now(), by, reason, id]),
   });
   void forward(feedUrl);
+  void notifyBatchIfSettled(row.batch_id);
   return { ok: true, status: "listed", slug, title: toList.title };
 }
 
@@ -312,6 +318,9 @@ export async function drainBatch(batchId: string): Promise<void> {
   for (const r of rows) {
     if (r.status === "pending") await resolveSubmission(r.id);
   }
+  // A reviewer may have decided early rows while later ones were still being
+  // read; if those ended refused on the spot, this is when the batch settles.
+  await notifyBatchIfSettled(batchId);
 }
 
 /**

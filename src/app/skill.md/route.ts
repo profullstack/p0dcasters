@@ -46,7 +46,9 @@ plain HTTP below, described in \`/openapi.json\`.
   Every show in one OPML file, with feed URLs. One request rather than hundreds of thousands.
 
 - **Add a show** — \`POST /api/submit\`
-  JSON \`{"url": "<site or feed>"}\`, \`{"urls": [...]}\` (up to 50) or \`{"opml": "<opml>"}\`.
+  JSON \`{"url": "<site or feed>", "email": "<you>"}\`, \`{"urls": [...]}\` (up to 50) or \`{"opml": "<opml>"}\`.
+  \`email\` is required (400 \`email-required\` / \`invalid-email\`) unless signed in or using an
+  OpenAccess token: the reviewer's decision is emailed there, once per submission.
   A site URL works: the feed is found from the page. One URL is resolved in the call; a
   list is queued and \`statusUrl\` shows each land. A feed can be listed when its items
   carry audio and it published inside the last 90 days, on any host; a refusal names the rule (\`rejected[].error\` and
