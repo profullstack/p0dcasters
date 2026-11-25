@@ -49,9 +49,75 @@ header.site .inner {
 /* The wordmark is a raster at 6:1. Height drives it and width follows, and the
    intrinsic 600x100 on the tag still reserves the box, so nothing jumps. */
 .brand img { display: block; height: 27px; width: auto; }
-header.site nav { display: flex; gap: 18px; margin-left: auto; font-size: 14px; }
-header.site nav a { color: var(--muted); }
-header.site nav a:hover { color: var(--text); }
+/* The nav is two tiers (see SiteNav.tsx): five links in the bar, the rest in a
+   panel behind "More". Under 860px the bar links move into the panel too and
+   the button reads "Menu". The header is one row at every width. */
+header.site nav { display: flex; align-items: center; gap: 18px; margin-left: auto; font-size: 14px; position: relative; }
+header.site nav a { color: var(--muted); white-space: nowrap; }
+header.site nav a:hover, header.site nav a[aria-current="page"] { color: var(--text); }
+.sitenav-panel, .sitenav-primary { display: contents; }
+.sitenav-more {
+  display: none; flex-direction: column;
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 30;
+  min-width: 190px; max-height: calc(100vh - 90px); max-height: calc(100dvh - 90px); overflow-y: auto;
+  padding: 6px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+}
+.sitenav[data-open] .sitenav-more { display: flex; }
+.sitenav-more a, .sitenav-panel .sitenav-primary a { border-radius: 6px; }
+.sitenav-more a { padding: 8px 12px; }
+.sitenav-more a:hover { background: var(--accent-soft); text-decoration: none; }
+.sitenav-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; color: var(--muted); background: none; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 7px; padding: 4px 10px;
+}
+.sitenav-toggle:hover, .sitenav-toggle[aria-expanded="true"] { color: var(--text); }
+.sitenav-toggle svg { transition: transform .15s; }
+.sitenav-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.sitenav-narrow { display: none; }
+/* The "More" button sits between the bar links and the account links. */
+header.site nav > .sitenav-toggle { order: 1; }
+header.site nav > a, header.site nav > .nav-placeholder { order: 2; }
+@media (max-width: 860px) {
+  /* The 44px button sets the height of the bar here, so the padding steps down. */
+  header.site .inner { gap: 12px; padding: 8px 20px; }
+  /* At 320px the wordmark, "Sign in" and the button are 6px wider than the
+     screen. The wordmark is the one that can give. */
+  .brand { min-width: 0; flex: 0 1 auto; }
+  .brand img { max-width: 100%; height: auto; max-height: 27px; }
+  header.site nav { flex: none; }
+  header.site nav { gap: 14px; }
+  .sitenav-wide { display: none !important; }
+  .sitenav-narrow { display: revert; }
+  /* Here the button is last, after "Sign in", at the edge of the screen. */
+  header.site nav > .sitenav-toggle { order: 3; min-height: 44px; padding: 0 13px; }
+  .sitenav-panel {
+    display: none; flex-direction: column;
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 30;
+    width: min(280px, calc(100vw - 40px));
+    max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); overflow-y: auto;
+    padding: 6px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+  }
+  .sitenav[data-open] .sitenav-panel { display: flex; }
+  .sitenav-primary { display: flex; flex-direction: column; }
+  .sitenav-more, .sitenav[data-open] .sitenav-more {
+    display: flex; position: static; min-width: 0; max-height: none; overflow: visible;
+    padding: 6px 0 0; margin-top: 6px; border: 0; border-top: 1px solid var(--border);
+    border-radius: 0; box-shadow: none; background: none;
+  }
+  /* 44px rows: these are touch targets. */
+  .sitenav-panel a { padding: 11px 12px; font-size: 15px; }
+  .sitenav-panel a:hover { background: var(--accent-soft); text-decoration: none; }
+  header.site nav > a.nav-cta { padding: 12px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .sitenav-toggle svg { transition: none; } }
+/* The shared footer sets its tagline nowrap. Ours is 421px of text, so every
+   page scrolled sideways on any screen narrower than that. */
+footer.pfs-footer .pfs-footer__tagline { white-space: normal; }
 
 .searchbar { display: flex; gap: 8px; width: 100%; }
 .searchbar input {
@@ -168,26 +234,12 @@ footer.site a { color: var(--muted); text-decoration: underline; }
 @media (max-width: 640px) {
   .show { grid-template-columns: 1fr; gap: 20px; }
   .show img.art { width: 150px; height: 150px; }
-  /* At 390px the brand plus five links do not fit on one line. The nav used to
-     shrink until "Sign in" broke across two lines and hung under the edge; give
-     it its own row instead. */
-  header.site .inner { flex-wrap: wrap; gap: 6px 13px; padding: 11px 20px; }
-  header.site nav {
-    gap: 13px; font-size: 13px;
-    width: 100%; margin-left: 0; justify-content: space-between;
-  }
-  header.site nav a { white-space: nowrap; }
-
-  /* Touch targets. Measured at 390px: the nav links were 21px tall (bare text),
-     chips 36, the episode play buttons 40, search 41 — all under the 44px floor.
-     Padding rather than min-height, so the box grows around the text instead of
-     leaving it stranded at the top. Confined to this breakpoint: the desktop
-     layout is fine as it is and these paddings would coarsen it.
-     The brand link is deliberately left at 34px — it is 150px wide, so it is not
-     actually hard to hit, and stretching it vertically would either overlap the
-     nav row's hit area or push a sticky header past 100px. */
-  header.site .inner { gap: 0 13px; padding: 8px 20px 4px; }
-  header.site nav a { padding: 12px 0; }
+  /* Touch targets. Measured at 390px: chips were 36px tall, the episode play
+     buttons 40, search 41, all under the 44px floor. Padding rather than
+     min-height, so the box grows around the text instead of leaving it stranded
+     at the top. Confined to this breakpoint: the desktop layout is fine as it
+     is and these paddings would coarsen it. (The header has its own rules, with
+     the nav, at 860px.) */
   .searchbar input, .searchbar button { padding-top: 13px; padding-bottom: 13px; }
   .chip { padding: 11px 15px; }
   .btn { padding: 13px 17px; }
@@ -801,7 +853,3 @@ table.tools pre { margin: 8px 0 0; }
 }
 .tv-stage { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: var(--radius); overflow: hidden; }
 .tv-streams { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; font-size: 13.5px; color: var(--muted); }
-@media (max-width: 640px) {
-  /* Three more links than the row was sized for: let the nav wrap. */
-  header.site nav { flex-wrap: wrap; justify-content: flex-start; gap: 0 14px; }
-}
